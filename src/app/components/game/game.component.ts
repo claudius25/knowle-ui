@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,27 +7,52 @@ import { ClassifyComponent } from '../classify/classify.component';
 import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 import { MultipleChoiceComponent } from '../multiple-choice/multiple-choice.component';
 import { TrueFalseComponent } from '../true-false/true-false.component';
+import { TortiComponent } from '../../characters/torti/torti.component';
+import { TortiAnimation, TortiReaction } from '../../characters/torti/torti.types';
 import { GameService } from '../../shared/services/game.service';
 import { LanguageService } from '../../shared/services/language.service';
 import { UiTextService } from '../../shared/services/ui-text.service';
 import { TtsService } from '../../shared/tts/tts.service';
-import { Activity, AnswerResponse, ClassifyActivityData, MultipleChoiceActivityData, NextActivity, TrueFalseActivityData } from '../../shared/models/game.types';
+import {
+  Activity,
+  AnswerResponse,
+  ClassifyActivityData,
+  MultipleChoiceActivityData,
+  NextActivity,
+  TrueFalseActivityData,
+} from '../../shared/models/game.types';
 
 type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'incorrect';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [AsyncPipe, MultipleChoiceComponent, TrueFalseComponent, ClassifyComponent, LanguageSelectorComponent, MatButtonModule, MatCardModule],
+  imports: [
+    AsyncPipe,
+    TortiComponent,
+    MultipleChoiceComponent,
+    TrueFalseComponent,
+    ClassifyComponent,
+    LanguageSelectorComponent,
+    MatButtonModule,
+    MatCardModule,
+  ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',
 })
 export class GameComponent implements OnInit, OnDestroy {
+  @ViewChild('torti') torti?: TortiComponent;
+
   private readonly gameService = inject(GameService);
   private readonly languageService = inject(LanguageService);
   protected readonly uiText = inject(UiTextService);
   protected readonly tts = inject(TtsService);
   private languageSubscription?: Subscription;
+  private ttsSpeakingSubscription?: Subscription;
+
+  protected showTortiDevPanel = true;
+  protected tortiSpeech = 'Salut! Sunt Torti, ghidul tău explorator.';
+  protected showTortiBubble = false;
 
   protected state: GameState = 'loading';
   protected activity: Activity | null = null;
@@ -42,10 +67,16 @@ export class GameComponent implements OnInit, OnDestroy {
         this.loadActivity(this.activity.activityId, true);
       }
     });
+
+    this.ttsSpeakingSubscription = this.tts.isSpeaking$.subscribe((speaking) => {
+      this.torti?.setTalking(speaking);
+      this.showTortiBubble = speaking;
+    });
   }
 
   ngOnDestroy(): void {
     this.languageSubscription?.unsubscribe();
+    this.ttsSpeakingSubscription?.unsubscribe();
   }
 
   protected chooseAnswer(answer: unknown): void {
@@ -55,13 +86,15 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.selectedAnswer = answer;
     this.state = 'answering';
-    this.gameService.submitAnswer(this.activity.activityId, answer, this.activity.difficulty).subscribe({
-      next: (response) => this.handleAnswer(response),
-      error: () => {
-        this.state = 'error';
-        this.errorMessage = this.text('activityError');
-      },
-    });
+    this.gameService
+      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
+      .subscribe({
+        next: (response) => this.handleAnswer(response),
+        error: () => {
+          this.state = 'error';
+          this.errorMessage = this.text('activityError');
+        },
+      });
   }
 
   protected get multipleChoiceData(): MultipleChoiceActivityData | null {
@@ -104,9 +137,76 @@ export class GameComponent implements OnInit, OnDestroy {
 
   protected speakHelloWorld(): void {
     const currentLang = this.languageService.getCurrentLanguage();
-    const textToSpeak = currentLang === 'ro' ? 'Salut, Lume! Bine ați venit la Knowledge Adventure.' : 'Hello World! Welcome to Knowledge Adventure.';
+    const textToSpeak =
+      currentLang === 'ro'
+        ? 'Salut, Lume! Bine ați venit la Knowledge Adventure.'
+        : 'Hello World! Welcome to Knowledge Adventure.';
+    this.tortiSpeech = textToSpeak;
+    this.showTortiBubble = true;
     this.tts.speak(textToSpeak, {
       lang: currentLang,
+      speed: 1.05,
+      steps: 4,
+    });
+  }
+
+  // Torti Interactive Demo controls
+  protected playTortiAnim(anim: TortiAnimation): void {
+    this.torti?.playAnimation(anim);
+  }
+
+  protected reactTorti(reaction: TortiReaction): void {
+    this.torti?.react(reaction);
+  }
+
+  protected walkTortiLeft(): void {
+    if (!this.torti) return;
+    const currentX = this.torti.character.position.x;
+    const targetX = Math.max(40, currentX - 120);
+    this.torti.walkTo(targetX, this.torti.character.position.y);
+  }
+
+  protected walkTortiRight(): void {
+    if (!this.torti) return;
+    const currentX = this.torti.character.position.x;
+    const targetX = Math.min(680, currentX + 120);
+    this.torti.walkTo(targetX, this.torti.character.position.y);
+  }
+
+  protected toggleTortiTalk(): void {
+    if (!this.torti) return;
+    if (this.torti.character.isTalking) {
+      this.torti.stopTalking();
+      this.showTortiBubble = false;
+    } else {
+      this.tortiSpeech =
+        this.languageService.getCurrentLanguage() === 'ro'
+          ? 'Explorăm împreună lumea cunoașterii!'
+          : 'Exploring the world of knowledge together!';
+      this.showTortiBubble = true;
+      this.torti.startTalking();
+    }
+  }
+
+  protected toggleTortiSleep(): void {
+    if (!this.torti) return;
+    if (this.torti.character.currentState === 'sleeping') {
+      this.torti.wakeUp();
+    } else {
+      this.showTortiBubble = false;
+      this.torti.sleep();
+    }
+  }
+
+  protected onTortiClick(): void {
+    const phrases = ['Nu sunteti sanatoshi la cap?', 'Hai marsh in cotetz'];
+    const randomIndex = Math.floor(Math.random() * phrases.length);
+    const chosenPhrase = phrases[randomIndex];
+
+    this.tortiSpeech = chosenPhrase;
+    this.showTortiBubble = true;
+    this.tts.speak(chosenPhrase, {
+      lang: 'ro',
       speed: 1.05,
       steps: 4,
     });
@@ -153,9 +253,11 @@ export class GameComponent implements OnInit, OnDestroy {
     if (response.correct) {
       this.nextActivity = response.nextActivity;
       this.state = 'correct';
+      this.torti?.react('happy');
       return;
     }
 
     this.state = 'incorrect';
+    this.torti?.react('sad');
   }
 }

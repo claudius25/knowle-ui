@@ -1,0 +1,73 @@
+:host {
+  display: block;
+  pointer-events: none;
+}
+
+.torti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  z-index: 50;
+  transition: opacity 0.2s ease;
+}
+
+.torti-sprite {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  will-change: background-position, transform;
+}
+
+.torti-speech-bubble {
+  position: absolute;
+  min-width: 140px;
+  max-width: 240px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: #19324a;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(25, 50, 74, 0.15);
+  border: 2px solid #278579;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  pointer-events: none;
+  animation: bubblePop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 60;
+
+  p {
+    margin: 0;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #278579;
+  }
+}
+
+@keyframes bubblePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

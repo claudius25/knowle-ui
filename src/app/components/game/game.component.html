@@ -91,5 +91,38 @@
         <button mat-stroked-button color="accent" class="secondary-button" type="button" (click)="retry()">{{ text('retry') }}</button>
       }
     }
+
+    <!-- Torti Character Stage & Interactive Demo Panel -->
+    <section class="torti-stage-section">
+      <div class="torti-stage">
+        <app-torti
+          #torti
+          [x]="140"
+          [y]="155"
+          [scale]="1.0"
+          [speechText]="tortiSpeech"
+          [showBubble]="showTortiBubble"
+          (characterClick)="onTortiClick()"
+        />
+      </div>
+
+      <div class="torti-dev-panel">
+        <div class="torti-panel-header">
+          <span>🐢 <strong>Torti Controls</strong> (Animation & Movement Demo)</span>
+        </div>
+        <div class="torti-panel-actions">
+          <button mat-stroked-button type="button" (click)="playTortiAnim('idle')">Idle</button>
+          <button mat-stroked-button type="button" (click)="walkTortiLeft()">Walk ⬅️</button>
+          <button mat-stroked-button type="button" (click)="walkTortiRight()">Walk ➡️</button>
+          <button mat-stroked-button type="button" (click)="toggleTortiTalk()">Talk 💬</button>
+          <button mat-stroked-button type="button" (click)="reactTorti('happy')">Happy ✨</button>
+          <button mat-stroked-button type="button" (click)="reactTorti('surprised')">Surprised 😲</button>
+          <button mat-stroked-button type="button" (click)="reactTorti('thinking')">Think 🧐</button>
+          <button mat-stroked-button type="button" (click)="playTortiAnim('point')">Point 👉</button>
+          <button mat-stroked-button type="button" (click)="reactTorti('sad')">Sad 🥺</button>
+          <button mat-stroked-button type="button" (click)="toggleTortiSleep()">Sleep 💤</button>
+        </div>
+      </div>
+    </section>
   </mat-card>
 </main>
