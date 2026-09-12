@@ -57,7 +57,7 @@ addEventListener('message', async ({ data }: MessageEvent<WorkerRequest>) => {
               progress,
             };
             postMessage(resp);
-          }
+          },
         );
 
         const resp: WorkerResponse = {

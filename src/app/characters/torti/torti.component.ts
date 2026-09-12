@@ -60,13 +60,13 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
         if (state === 'idle') {
           this.movementFinished.emit();
         }
-      })
+      }),
     );
 
     this.subs.add(
       this.character.currentAnimation$.subscribe((anim) => {
         this.animationFinished.emit(anim);
-      })
+      }),
     );
   }
 
@@ -134,7 +134,11 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   // Computed style for the inner sprite slice
-  getSpriteStyle(frame: SpriteFrame, facing: FacingDirection, anim: TortiAnimation): Record<string, string> {
+  getSpriteStyle(
+    frame: SpriteFrame,
+    facing: FacingDirection,
+    anim: TortiAnimation,
+  ): Record<string, string> {
     const scaleX = facing === 'left' ? -1 : 1;
     const anchorX = frame.anchorX ?? frame.width / 2;
     const anchorY = frame.anchorY ?? frame.height;
@@ -156,10 +160,11 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   getBubbleStyle(facing: FacingDirection): Record<string, string> {
+    const headTopPx = 542 * this.scale;
     return {
-      bottom: `${200 * this.scale + 80}px`,
-      left: facing === 'left' ? 'auto' : `${40 * this.scale}px`,
-      right: facing === 'left' ? `${40 * this.scale}px` : 'auto',
+      bottom: `${headTopPx + 16}px`,
+      left: facing === 'left' ? 'auto' : `${20 * this.scale}px`,
+      right: facing === 'left' ? `${20 * this.scale}px` : 'auto',
     };
   }
 

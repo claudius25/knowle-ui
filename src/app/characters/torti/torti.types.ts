@@ -10,13 +10,7 @@ export type TortiAnimation =
   | 'sad'
   | 'sleep';
 
-export type TortiState =
-  | 'idle'
-  | 'waving'
-  | 'walking'
-  | 'talking'
-  | 'reacting'
-  | 'sleeping';
+export type TortiState = 'idle' | 'waving' | 'walking' | 'talking' | 'reacting' | 'sleeping';
 
 export type TortiReaction = 'happy' | 'surprised' | 'thinking' | 'sad' | 'wave';
 

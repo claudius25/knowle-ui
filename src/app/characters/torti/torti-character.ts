@@ -18,7 +18,8 @@ export class TortiCharacter {
   private currentFrameSubject = new BehaviorSubject<SpriteFrame>(TORTI_ANIMATIONS.idle.frames[0]);
   private isTalkingSubject = new BehaviorSubject<boolean>(false);
 
-  readonly currentAnimation$: Observable<TortiAnimation> = this.currentAnimationSubject.asObservable();
+  readonly currentAnimation$: Observable<TortiAnimation> =
+    this.currentAnimationSubject.asObservable();
   readonly currentState$: Observable<TortiState> = this.currentStateSubject.asObservable();
   readonly position$: Observable<TortiPosition> = this.positionSubject.asObservable();
   readonly facing$: Observable<FacingDirection> = this.facingSubject.asObservable();
@@ -31,7 +32,10 @@ export class TortiCharacter {
   private activeMoveResolve: (() => void) | null = null;
   private activeAnimationTimeout: number | null = null;
 
-  constructor(initialPosition: TortiPosition = { x: 0, y: 0 }, initialFacing: FacingDirection = 'right') {
+  constructor(
+    initialPosition: TortiPosition = { x: 0, y: 0 },
+    initialFacing: FacingDirection = 'right',
+  ) {
     this.positionSubject.next(initialPosition);
     this.facingSubject.next(initialFacing);
     this.startAnimationLoop('idle');

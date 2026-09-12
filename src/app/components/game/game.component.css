@@ -231,12 +231,26 @@ h2 {
 .torti-stage {
   position: relative;
   width: 100%;
-  height: 180px;
-  background: linear-gradient(180deg, #edf6f4 0%, #dcefe9 100%);
+  height: 220px;
+  background: linear-gradient(180deg, #edf6f4 0%, #d8ece5 78%, #c5dfd6 100%);
   border-radius: 18px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(39, 133, 121, 0.18);
   margin-bottom: 16px;
+  box-shadow: inset 0 2px 8px rgba(39, 133, 121, 0.06);
+}
+
+.torti-stage::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 35px;
+  background: rgba(39, 133, 121, 0.08);
+  border-top: 1px solid rgba(39, 133, 121, 0.12);
+  border-radius: 0 0 18px 18px;
+  pointer-events: none;
 }
 
 .torti-dev-panel {

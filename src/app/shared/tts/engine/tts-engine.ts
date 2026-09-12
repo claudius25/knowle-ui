@@ -13,7 +13,7 @@ import {
 export class Style {
   constructor(
     public readonly ttl: ort.Tensor,
-    public readonly dp: ort.Tensor
+    public readonly dp: ort.Tensor,
   ) {}
 }
 
@@ -42,7 +42,7 @@ export class SupertonicEngine {
 
   async init(
     config: TtsConfig,
-    progressCallback?: (progress: TtsProgress) => void
+    progressCallback?: (progress: TtsProgress) => void,
   ): Promise<ExecutionProvider> {
     const notify = (step: number, total: number, message: string): void => {
       progressCallback?.({ step, total, message });
@@ -97,14 +97,10 @@ export class SupertonicEngine {
         const sessions: ort.InferenceSession[] = [];
         for (let i = 0; i < modelDefinitions.length; i++) {
           const model = modelDefinitions[i];
-          notify(
-            3 + i,
-            6,
-            `Loading ${model.name} (${ep.toUpperCase()})...`
-          );
+          notify(3 + i, 6, `Loading ${model.name} (${ep.toUpperCase()})...`);
           const session = await ort.InferenceSession.create(
             `${config.modelBasePath}/${model.file}`,
-            sessionOptions
+            sessionOptions,
           );
           sessions.push(session);
         }
@@ -134,7 +130,10 @@ export class SupertonicEngine {
 
     // 3. Load default voice
     notify(6, 6, `Loading voice preset (${config.defaultVoice})...`);
-    await this.loadVoiceStyle(config.defaultVoice, `${config.modelBasePath}/../voice_styles/${config.defaultVoice}.json`);
+    await this.loadVoiceStyle(
+      config.defaultVoice,
+      `${config.modelBasePath}/../voice_styles/${config.defaultVoice}.json`,
+    );
 
     this.initialized = true;
     return this.activeProvider;
@@ -180,7 +179,7 @@ export class SupertonicEngine {
     speed = 1.05,
     totalStep = 4,
     silenceDuration = 0.25,
-    progressCallback?: (progress: TtsProgress) => void
+    progressCallback?: (progress: TtsProgress) => void,
   ): Promise<{ wavBuffer: ArrayBuffer; duration: number; sampleRate: number }> {
     if (
       !this.initialized ||
@@ -196,7 +195,10 @@ export class SupertonicEngine {
 
     let style = this.voiceStyles.get(voiceName);
     if (!style) {
-      style = this.voiceStyles.get('F1') || this.voiceStyles.get('M1') || this.voiceStyles.values().next().value;
+      style =
+        this.voiceStyles.get('F1') ||
+        this.voiceStyles.get('M1') ||
+        this.voiceStyles.values().next().value;
       if (!style) {
         throw new Error(`Voice ${voiceName} is not loaded.`);
       }
@@ -228,7 +230,7 @@ export class SupertonicEngine {
             total: totalChunks * maxSteps,
             message: `Synthesizing part ${chunkIndex}/${totalChunks} (Step ${currentStep}/${maxSteps})...`,
           });
-        }
+        },
       );
 
       if (concatenatedWav.length === 0) {
@@ -256,7 +258,7 @@ export class SupertonicEngine {
     style: Style,
     totalStep: number,
     speed: number,
-    stepCallback?: (step: number, total: number) => void
+    stepCallback?: (step: number, total: number) => void,
   ): Promise<{ wav: number[]; duration: number }> {
     const bsz = 1;
     const { textIds, textMask } = this.textProcessor!.call([text], [lang]);
@@ -290,7 +292,7 @@ export class SupertonicEngine {
       this.sampleRate,
       this.cfgs!.ae.base_chunk_size,
       this.cfgs!.ttl.chunk_compress_factor,
-      this.cfgs!.ttl.latent_dim
+      this.cfgs!.ttl.latent_dim,
     );
 
     const latentMaskFlat = new Float32Array(latentMask.flat(2));
@@ -375,7 +377,7 @@ export class SupertonicEngine {
     sampleRate: number,
     baseChunkSize: number,
     chunkCompress: number,
-    latentDim: number
+    latentDim: number,
   ): { xt: number[][][]; latentMask: number[][][] } {
     const bsz = duration.length;
     const maxDur = Math.max(...duration);
@@ -434,7 +436,10 @@ export class SupertonicEngine {
       return [];
     }
 
-    const paragraphs = text.trim().split(/\n\s*\n+/).filter((p) => p.trim());
+    const paragraphs = text
+      .trim()
+      .split(/\n\s*\n+/)
+      .filter((p) => p.trim());
     const chunks: string[] = [];
 
     for (let paragraph of paragraphs) {
@@ -442,7 +447,7 @@ export class SupertonicEngine {
       if (!paragraph) continue;
 
       const sentences = paragraph.split(
-        /(?<!Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.|Sr\.|Jr\.|Ph\.D\.|etc\.|e\.g\.|i\.e\.|vs\.|Inc\.|Ltd\.|Co\.|Corp\.|St\.|Ave\.|Blvd\.)(?<!\b[A-Z]\.)(?<=[.!?])\s+/
+        /(?<!Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.|Sr\.|Jr\.|Ph\.D\.|etc\.|e\.g\.|i\.e\.|vs\.|Inc\.|Ltd\.|Co\.|Corp\.|St\.|Ave\.|Blvd\.)(?<!\b[A-Z]\.)(?<=[.!?])\s+/,
       );
 
       let currentChunk = '';

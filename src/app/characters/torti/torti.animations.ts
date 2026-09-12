@@ -5,35 +5,37 @@ export const SPRITE_SHEET_HEIGHT = 724;
 export const SPRITE_SHEET_URL = '/assets/characters/torti/idle_sprite.png';
 
 export const TORTI_ANIMATIONS: Record<TortiAnimation, SpriteAnimation> = {
-  // New Dedicated Idle Sprite Sheet (3 frames, 2172x724 -> 3 frames of 724x724)
+  // Dedicated Idle Sprite Sheet (4 frames of 543x724 across 2172x724)
   idle: {
-    fps: 3,
+    fps: 4,
     loop: true,
     spriteSheetUrl: '/assets/characters/torti/idle_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
-  // New Dedicated Wave Sprite Sheet (3 frames, 2172x724 -> 3 frames of 724x724)
+  // Dedicated Wave Sprite Sheet (4 frames of 543x724 across 2172x724)
   wave: {
-    fps: 4,
+    fps: 5,
     loop: false,
     spriteSheetUrl: '/assets/characters/torti/wave_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
-  // Existing fallback animations mapped to general sheet or aliasable
+  // Fallback animations mapped to dedicated sheets or general sheet
   walk: {
     fps: 9,
     loop: true,
@@ -54,81 +56,86 @@ export const TORTI_ANIMATIONS: Record<TortiAnimation, SpriteAnimation> = {
   },
 
   talk: {
-    fps: 4,
+    fps: 5,
     loop: true,
     spriteSheetUrl: '/assets/characters/torti/wave_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
   happy: {
-    fps: 4,
+    fps: 5,
     loop: false,
     spriteSheetUrl: '/assets/characters/torti/wave_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
   surprised: {
-    fps: 4,
+    fps: 5,
     loop: false,
     spriteSheetUrl: '/assets/characters/torti/wave_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
   thinking: {
-    fps: 3,
+    fps: 4,
     loop: false,
     spriteSheetUrl: '/assets/characters/torti/idle_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
   point: {
-    fps: 4,
+    fps: 5,
     loop: false,
     spriteSheetUrl: '/assets/characters/torti/wave_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
   sad: {
-    fps: 3,
+    fps: 4,
     loop: false,
     spriteSheetUrl: '/assets/characters/torti/idle_sprite.png',
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 0, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 543, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 0, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 
@@ -139,8 +146,8 @@ export const TORTI_ANIMATIONS: Record<TortiAnimation, SpriteAnimation> = {
     sheetWidth: 2172,
     sheetHeight: 724,
     frames: [
-      { x: 1448, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
-      { x: 724, y: 0, width: 724, height: 724, anchorX: 362, anchorY: 600 },
+      { x: 1629, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
+      { x: 1086, y: 0, width: 543, height: 724, anchorX: 272, anchorY: 542 },
     ],
   },
 };

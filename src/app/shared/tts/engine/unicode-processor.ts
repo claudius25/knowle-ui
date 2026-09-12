@@ -42,7 +42,10 @@ export function isValidLang(lang: string): lang is SupportedTtsLanguage {
 export class UnicodeProcessor {
   constructor(private readonly indexer: number[]) {}
 
-  call(textList: string[], langList: TtsLanguage[]): { textIds: number[][]; textMask: number[][][] } {
+  call(
+    textList: string[],
+    langList: TtsLanguage[],
+  ): { textIds: number[][]; textMask: number[][][] } {
     const processedTexts = textList.map((text, i) => this.preprocessText(text, langList[i]));
     const textIdsLengths = processedTexts.map((text) => text.length);
     const maxLen = Math.max(...textIdsLengths);

@@ -162,14 +162,14 @@ export class GameComponent implements OnInit, OnDestroy {
   protected walkTortiLeft(): void {
     if (!this.torti) return;
     const currentX = this.torti.character.position.x;
-    const targetX = Math.max(40, currentX - 120);
+    const targetX = Math.max(80, currentX - 100);
     this.torti.walkTo(targetX, this.torti.character.position.y);
   }
 
   protected walkTortiRight(): void {
     if (!this.torti) return;
     const currentX = this.torti.character.position.x;
-    const targetX = Math.min(680, currentX + 120);
+    const targetX = Math.min(580, currentX + 100);
     this.torti.walkTo(targetX, this.torti.character.position.y);
   }
 

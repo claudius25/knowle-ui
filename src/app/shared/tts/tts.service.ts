@@ -14,7 +14,9 @@ import { SupertonicEngine } from './engine/tts-engine';
 
 function isMobileBrowser(): boolean {
   if (typeof navigator === 'undefined') return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(
+    navigator.userAgent,
+  );
 }
 
 const DEFAULT_TTS_CONFIG: TtsConfig = {
@@ -38,7 +40,8 @@ export class TtsService implements OnDestroy {
 
   readonly status$: Observable<TtsStatus> = this.statusSubject.asObservable();
   readonly progress$: Observable<TtsProgress | null> = this.progressSubject.asObservable();
-  readonly activeBackend$: Observable<ExecutionProvider | null> = this.activeBackendSubject.asObservable();
+  readonly activeBackend$: Observable<ExecutionProvider | null> =
+    this.activeBackendSubject.asObservable();
   readonly isSpeaking$: Observable<boolean> = this.isSpeakingSubject.asObservable();
   readonly error$: Observable<string | null> = this.errorSubject.asObservable();
 
@@ -86,7 +89,11 @@ export class TtsService implements OnDestroy {
    * Called automatically on the first `speak()` call or manually for preloading.
    */
   async init(customConfig?: Partial<TtsConfig>): Promise<void> {
-    if (this.statusSubject.value === 'ready' || this.statusSubject.value === 'speaking' || this.statusSubject.value === 'generating') {
+    if (
+      this.statusSubject.value === 'ready' ||
+      this.statusSubject.value === 'speaking' ||
+      this.statusSubject.value === 'generating'
+    ) {
       return;
     }
 
@@ -197,7 +204,7 @@ export class TtsService implements OnDestroy {
           speed,
           steps,
           silenceDuration,
-          (prog) => this.progressSubject.next(prog)
+          (prog) => this.progressSubject.next(prog),
         );
         arrayBuffer = result.wavBuffer;
       } else {
@@ -333,7 +340,9 @@ export class TtsService implements OnDestroy {
 
   private getOrCreateAudioContext(): AudioContext {
     if (!this.audioCtx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtxClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.audioCtx = new AudioCtxClass();
     }
     return this.audioCtx;

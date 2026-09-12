@@ -36,13 +36,7 @@ export type TtsLanguage = 'ro' | 'en' | SupportedTtsLanguage;
 
 export type ExecutionProvider = 'webgpu' | 'wasm';
 
-export type TtsStatus =
-  | 'uninitialized'
-  | 'loading'
-  | 'ready'
-  | 'generating'
-  | 'speaking'
-  | 'error';
+export type TtsStatus = 'uninitialized' | 'loading' | 'ready' | 'generating' | 'speaking' | 'error';
 
 export interface TtsProgress {
   step: number;
