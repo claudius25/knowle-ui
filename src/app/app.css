@@ -16,6 +16,7 @@
 
 .home-header {
 	position: relative;
+	width: min(100%, calc(100vw - 32px));
 	z-index: 1;
 	text-align: center;
 }
@@ -27,6 +28,7 @@
 	font-weight: 100;
 	letter-spacing: 0.115em;
 	line-height: 0.95;
+	white-space: nowrap;
 }
 
 .home-header p {
