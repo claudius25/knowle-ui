@@ -4,7 +4,7 @@
 
 .question-label {
   margin: 0 0 10px;
-  color: #278579;
+  color: #b7e08c;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -14,8 +14,8 @@
 h2 {
   max-width: 620px;
   margin: 0;
-  color: #19324a;
-  font-family: Georgia, 'Times New Roman', serif;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
   font-size: clamp(1.7rem, 4vw, 2.55rem);
   line-height: 1.14;
 }
@@ -31,11 +31,12 @@ h2 {
   padding: 16px;
   border: 2px solid #dfeae7;
   border-radius: 14px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .classify-item strong {
-  color: #19324a;
+  color: #ffffff;
   font-size: 1.08rem;
 }
 
@@ -49,21 +50,23 @@ h2 {
 .check-button {
   border-radius: 10px;
   padding: 11px 14px;
-  font: inherit;
-  font-weight: 800;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .category-button {
   min-height: 44px;
-  background: #f8fbfa;
-  color: #315567;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: transparent;
+  color: #ffffff;
 }
 
 .category-button:hover:not(:disabled),
 .category-button.selected {
-  background: #eaf8f4;
-  color: #1a665d;
+  border-color: #b7e08c;
+  background: rgba(183, 224, 140, 0.16);
+  color: #ffffff;
 }
 
 .category-button:disabled {

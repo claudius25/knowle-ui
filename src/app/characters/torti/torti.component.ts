@@ -1,10 +1,14 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  ElementRef,
+  inject,
   EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
+  AfterViewInit,
   OnInit,
   Output,
   SimpleChanges,
@@ -31,8 +35,10 @@ import { TORTI_ANIMATIONS } from './torti.animations';
   styleUrl: './torti.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TortiComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() scale = 0.28;
+export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+  @Input() scale: number | string = 0.28;
+  @Input() fitToContainer = false;
+  @Input() centered = false;
   @Input() x = 0;
   @Input() y = 0;
   @Input() facing: FacingDirection = 'right';
@@ -45,7 +51,15 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
   @Output() characterClick = new EventEmitter<TortiCharacter>();
 
   readonly character = new TortiCharacter();
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private subs = new Subscription();
+  private resizeObserver?: ResizeObserver;
+  private fittedScale = 0.28;
+
+  get currentScale(): number | string {
+    return this.fitToContainer ? this.fittedScale : this.scale;
+  }
 
   ngOnInit(): void {
     this.character.setPosition(this.x, this.y);
@@ -70,6 +84,19 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
+  ngAfterViewInit(): void {
+    if (!this.fitToContainer) {
+      return;
+    }
+
+    this.resizeObserver = new ResizeObserver(([entry]) => {
+      const availableHeight = entry.contentRect.height;
+      this.fittedScale = Math.min(0.55, Math.max(0.18, (availableHeight * 0.72) / 724));
+      this.changeDetector.markForCheck();
+    });
+    this.resizeObserver.observe(this.elementRef.nativeElement);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['x'] || changes['y']) {
       if (!changes['x']?.firstChange && !changes['y']?.firstChange) {
@@ -86,6 +113,7 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+    this.resizeObserver?.disconnect();
     this.character.destroy();
   }
 
@@ -128,6 +156,13 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
 
   // Computed style for outer container positioning
   getContainerStyle(pos: TortiPosition, facing: FacingDirection): Record<string, string> {
+    if (this.centered) {
+      return {
+        left: '50%',
+        top: '50%',
+      };
+    }
+
     return {
       transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
     };
@@ -147,24 +182,35 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
     const sheetUrl = frame.spriteSheetUrl || animDef.spriteSheetUrl;
     const sheetWidth = frame.sheetWidth || animDef.sheetWidth;
     const sheetHeight = frame.sheetHeight || animDef.sheetHeight;
+    const numericScale = typeof this.currentScale === 'number' ? this.currentScale : 0.28;
 
     return {
-      width: `${frame.width}px`,
-      height: `${frame.height}px`,
+      width: `${frame.width * numericScale}px`,
+      height: `${frame.height * numericScale}px`,
       backgroundImage: `url('${sheetUrl}')`,
-      backgroundPosition: `-${frame.x}px -${frame.y}px`,
-      backgroundSize: `${sheetWidth}px ${sheetHeight}px`,
-      transform: `scale(${this.scale}) scaleX(${scaleX}) translate(-${anchorX}px, -${anchorY}px)`,
-      transformOrigin: '0 0',
+      backgroundPosition: `-${frame.x * numericScale}px -${frame.y * numericScale}px`,
+      backgroundSize: `${sheetWidth * numericScale}px ${sheetHeight * numericScale}px`,
+      transform: this.centered
+        ? scaleX === -1
+          ? 'scaleX(-1)'
+          : 'none'
+        : `scale(${this.currentScale}) scaleX(${scaleX}) translate(-${anchorX}px, -${anchorY}px)`,
+      ...(this.centered
+        ? {
+            left: `-${anchorX * numericScale}px`,
+            top: `-${anchorY * numericScale}px`,
+          }
+        : {}),
     };
   }
 
   getBubbleStyle(facing: FacingDirection): Record<string, string> {
-    const headTopPx = 542 * this.scale;
+    const numericScale = typeof this.currentScale === 'number' ? this.currentScale : 0.28;
+    const headTopPx = 542 * numericScale;
     return {
       bottom: `${headTopPx + 16}px`,
-      left: facing === 'left' ? 'auto' : `${20 * this.scale}px`,
-      right: facing === 'left' ? `${20 * this.scale}px` : 'auto',
+      left: facing === 'left' ? 'auto' : `${20 * numericScale}px`,
+      right: facing === 'left' ? `${20 * numericScale}px` : 'auto',
     };
   }
 

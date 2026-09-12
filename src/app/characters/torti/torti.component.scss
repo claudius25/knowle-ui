@@ -1,5 +1,6 @@
 :host {
   display: block;
+  position: relative;
   pointer-events: none;
 }
 
@@ -25,7 +26,7 @@
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   image-rendering: pixelated;
-  will-change: background-position, transform;
+  // will-change: background-position, transform;
 }
 
 .torti-speech-bubble {

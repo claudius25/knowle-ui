@@ -1,33 +1,5 @@
-<main class="game-shell">
-  <mat-card class="game-card" appearance="outlined" aria-live="polite">
-    <header class="game-header">
-      <div>
-        <p class="eyebrow">🧠 {{ text('gameName') }}</p>
-        <h1>{{ text('challenge') }}</h1>
-      </div>
-      <div class="header-actions">
-        <button
-          mat-stroked-button
-          class="tts-button"
-          type="button"
-          (click)="speakHelloWorld()"
-          [disabled]="(tts.status$ | async) === 'loading' || (tts.status$ | async) === 'generating'"
-        >
-          @if ((tts.isSpeaking$ | async)) {
-            🔊 {{ text('ttsSpeaking') }}
-          } @else if ((tts.status$ | async) === 'loading' || (tts.status$ | async) === 'generating') {
-            ⏳ {{ text('loading') }}
-          } @else {
-            🔊 {{ text('ttsTest') }}
-          }
-        </button>
-        <app-language-selector />
-        @if (activity) {
-          <span class="difficulty-badge">{{ activity.difficulty }}</span>
-        }
-      </div>
-    </header>
-
+<main class="game-page">
+  <section class="activity-shell" aria-live="polite">
     @if (state === 'loading') {
       <div class="status-panel">
         <span class="loader" aria-hidden="true"></span>
@@ -92,38 +64,5 @@
       }
     }
 
-    <!-- Torti Character Stage & Interactive Demo Panel -->
-    <section class="torti-stage-section">
-      <div class="torti-stage">
-        <app-torti
-          #torti
-          [x]="150"
-          [y]="185"
-          [scale]="0.28"
-          [speechText]="tortiSpeech"
-          [showBubble]="showTortiBubble"
-          (characterClick)="onTortiClick()"
-        />
-      </div>
-
-      <div class="torti-dev-panel">
-        <div class="torti-panel-header">
-          <span>🐢 <strong>Torti Controls</strong> (Animation & Movement Demo)</span>
-        </div>
-        <div class="torti-panel-actions">
-          <button mat-stroked-button type="button" (click)="playTortiAnim('idle')">Idle 🌿</button>
-          <button mat-stroked-button type="button" (click)="playTortiAnim('wave')">Wave 👋</button>
-          <button mat-stroked-button type="button" (click)="walkTortiLeft()">Walk ⬅️</button>
-          <button mat-stroked-button type="button" (click)="walkTortiRight()">Walk ➡️</button>
-          <button mat-stroked-button type="button" (click)="toggleTortiTalk()">Talk 💬</button>
-          <button mat-stroked-button type="button" (click)="reactTorti('happy')">Happy ✨</button>
-          <button mat-stroked-button type="button" (click)="reactTorti('surprised')">Surprised 😲</button>
-          <button mat-stroked-button type="button" (click)="reactTorti('thinking')">Think 🧐</button>
-          <button mat-stroked-button type="button" (click)="playTortiAnim('point')">Point 👉</button>
-          <button mat-stroked-button type="button" (click)="reactTorti('sad')">Sad 🥺</button>
-          <button mat-stroked-button type="button" (click)="toggleTortiSleep()">Sleep 💤</button>
-        </div>
-      </div>
-    </section>
-  </mat-card>
+  </section>
 </main>

@@ -16,13 +16,20 @@ export class LanguageService {
     return this.languageSubject.value;
   }
 
+  getStoredLanguage(): Language | null {
+    const storedLanguage = localStorage.getItem(STORAGE_KEY);
+    return storedLanguage && this.isSupported(storedLanguage) ? storedLanguage : null;
+  }
+
   setLanguage(language: string): void {
-    if (!this.isSupported(language) || language === this.getCurrentLanguage()) {
+    if (!this.isSupported(language)) {
       return;
     }
 
     localStorage.setItem(STORAGE_KEY, language);
-    this.languageSubject.next(language);
+    if (language !== this.getCurrentLanguage()) {
+      this.languageSubject.next(language);
+    }
   }
 
   private readStoredLanguage(): Language {

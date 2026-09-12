@@ -1,0 +1,129 @@
+:host {
+	display: block;
+}
+
+.home-page {
+	min-height: 100vh;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: clamp(42px, 8vh, 88px) 24px 48px;
+	overflow: hidden;
+	color: #ffffff;
+	background: #123f35;
+}
+
+.home-header {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+}
+
+.home-header h1 {
+	margin: 0;
+	font-family: 'Poppins', sans-serif;
+	font-size: clamp(3.2rem, 10vw, 6.2rem);
+	font-weight: 800;
+	letter-spacing: 0.015em;
+	line-height: 0.95;
+}
+
+.home-header p {
+	margin: 18px 0 0;
+	font-family: 'Poppins', sans-serif;
+	font-size: clamp(1rem, 2.2vw, 1.85rem);
+	font-weight: 400;
+	letter-spacing: 0.2em;
+	color: #b7e08c;
+}
+
+.home-content {
+	width: min(100%, 560px);
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18px;
+	padding-top: 24px;
+}
+
+.torti-home-stage {
+	position: relative;
+	width: min(100%, 390px);
+	flex: 1 1 auto;
+	height: clamp(260px, 38vh, 360px);
+	min-height: 260px;
+	display: grid;
+	place-items: center;
+}
+
+.torti-home-stage app-torti {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.language-buttons {
+	display: flex;
+	gap: 14px;
+}
+
+.language-button,
+.start-button {
+	min-width: 88px;
+	min-height: 50px;
+	border: 1px solid rgba(255, 255, 255, 0.75);
+	border-radius: 8px;
+	padding: 12px 24px;
+	color: #ffffff;
+	background: transparent;
+	font-family: 'Poppins', sans-serif;
+	font-size: 0.9rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	cursor: pointer;
+	transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.language-button:hover,
+.language-button:focus-visible {
+	border-color: #b7e08c;
+	background: rgba(183, 224, 140, 0.16);
+}
+
+.language-button:active,
+.start-button:active {
+	transform: translateY(2px);
+}
+
+.start-button {
+	position: relative;
+	z-index: 100;
+	min-width: 190px;
+	border-color: #b7e08c;
+	color: #123f35;
+	background: #b7e08c;
+	letter-spacing: 0.03em;
+}
+
+.start-button:hover,
+.start-button:focus-visible {
+	background: #c8ee9e;
+}
+
+button:focus-visible {
+	outline: 3px solid #ffffff;
+	outline-offset: 4px;
+}
+
+@media (max-width: 480px) {
+	.home-page {
+		padding-inline: 16px;
+	}
+
+	.home-content {
+		padding-top: 8px;
+	}
+}

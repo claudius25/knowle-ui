@@ -4,7 +4,7 @@
 
 .question-label {
   margin: 0 0 10px;
-  color: #278579;
+  color: #b7e08c;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -14,8 +14,8 @@
 h2 {
   max-width: 620px;
   margin: 0;
-  color: #19324a;
-  font-family: Georgia, 'Times New Roman', serif;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
   font-size: clamp(1.7rem, 4vw, 2.55rem);
   line-height: 1.14;
 }
@@ -30,9 +30,10 @@ h2 {
   min-height: 68px;
   width: 100%;
   border-radius: 14px;
-  color: #19324a;
+  border-color: rgba(255, 255, 255, 0.65) !important;
+  color: #ffffff;
   cursor: pointer;
-  font: inherit;
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -41,7 +42,8 @@ h2 {
 
 .answer-card:hover:not(:disabled),
 .answer-card.selected {
-  background: #f0faf7;
+  border-color: #b7e08c !important;
+  background: rgba(183, 224, 140, 0.16);
   transform: translateY(-2px);
 }
 
