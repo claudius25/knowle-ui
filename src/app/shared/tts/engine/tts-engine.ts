@@ -353,6 +353,20 @@ export class SupertonicEngine {
     });
 
     const wavData = Array.from(vocoderOutputs['wav_tts'].data as Float32Array);
+
+    // Sanitize and check for NaN or infinite values produced by GPU driver bugs
+    let hasInvalid = false;
+    for (let i = 0; i < wavData.length; i++) {
+      if (!isFinite(wavData[i]) || isNaN(wavData[i])) {
+        wavData[i] = 0;
+        hasInvalid = true;
+      }
+    }
+
+    if (hasInvalid) {
+      console.warn('Supertonic TTS: Detected NaN or non-finite audio samples in model output.');
+    }
+
     return { wav: wavData, duration };
   }
 

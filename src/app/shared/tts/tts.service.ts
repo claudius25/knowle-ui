@@ -12,11 +12,16 @@ import {
 import { LanguageService } from '../services/language.service';
 import { SupertonicEngine } from './engine/tts-engine';
 
+function isMobileBrowser(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+}
+
 const DEFAULT_TTS_CONFIG: TtsConfig = {
   modelBasePath: '/tts/onnx',
   wasmBasePath: '/tts/wasm/',
   defaultVoice: 'F1',
-  preferWebGpu: true,
+  preferWebGpu: !isMobileBrowser(),
   totalStep: 4,
   speed: 1.05,
 };
@@ -44,6 +49,8 @@ export class TtsService implements OnDestroy {
 
   private audioCtx: AudioContext | null = null;
   private currentAudioSource: AudioBufferSourceNode | null = null;
+  private currentAudioElement: HTMLAudioElement | null = null;
+  private currentBlobUrl: string | null = null;
   private pendingRequests = new Map<
     string,
     {
@@ -212,6 +219,18 @@ export class TtsService implements OnDestroy {
    * Stops current playback immediately.
    */
   stop(): void {
+    if (this.currentAudioElement) {
+      try {
+        this.currentAudioElement.pause();
+        this.currentAudioElement.removeAttribute('src');
+        this.currentAudioElement.load();
+      } catch {}
+      this.currentAudioElement = null;
+    }
+    if (this.currentBlobUrl) {
+      URL.revokeObjectURL(this.currentBlobUrl);
+      this.currentBlobUrl = null;
+    }
     if (this.currentAudioSource) {
       try {
         this.currentAudioSource.stop();
@@ -229,6 +248,9 @@ export class TtsService implements OnDestroy {
    * Pauses audio playback.
    */
   pause(): void {
+    if (this.currentAudioElement) {
+      this.currentAudioElement.pause();
+    }
     if (this.audioCtx && this.audioCtx.state === 'running') {
       this.audioCtx.suspend();
     }
@@ -238,12 +260,48 @@ export class TtsService implements OnDestroy {
    * Resumes paused audio playback.
    */
   resume(): void {
+    if (this.currentAudioElement) {
+      this.currentAudioElement.play().catch(() => {});
+    }
     if (this.audioCtx && this.audioCtx.state === 'suspended') {
       this.audioCtx.resume();
     }
   }
 
   private async playAudioBlob(blob: Blob): Promise<void> {
+    this.stop();
+
+    return new Promise((resolve, reject) => {
+      try {
+        const url = URL.createObjectURL(blob);
+        this.currentBlobUrl = url;
+        const audio = new Audio(url);
+        this.currentAudioElement = audio;
+
+        audio.onended = () => {
+          this.stop();
+          resolve();
+        };
+
+        audio.onerror = () => {
+          console.warn('HTMLAudioElement error, falling back to AudioContext...');
+          this.playAudioContextFallback(blob).then(resolve).catch(reject);
+        };
+
+        this.isSpeakingSubject.next(true);
+        this.statusSubject.next('speaking');
+
+        audio.play().catch((err) => {
+          console.warn('Audio play() failed or blocked, falling back to AudioContext:', err);
+          this.playAudioContextFallback(blob).then(resolve).catch(reject);
+        });
+      } catch (err) {
+        this.playAudioContextFallback(blob).then(resolve).catch(reject);
+      }
+    });
+  }
+
+  private async playAudioContextFallback(blob: Blob): Promise<void> {
     const audioContext = this.getOrCreateAudioContext();
     if (audioContext.state === 'suspended') {
       await audioContext.resume();
@@ -251,8 +309,6 @@ export class TtsService implements OnDestroy {
 
     const arrayBuffer = await blob.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-    this.stop();
 
     return new Promise((resolve) => {
       const source = audioContext.createBufferSource();

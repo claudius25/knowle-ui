@@ -39,8 +39,12 @@ export function writeWavFile(audioData: Float32Array | number[], sampleRate: num
   // Write PCM samples (convert float32 in [-1.0, 1.0] to int16)
   let offset = 44;
   for (let i = 0; i < audioData.length; i++) {
-    const s = Math.max(-1, Math.min(1, audioData[i]));
-    const sample = s < 0 ? s * 0x8000 : s * 0x7fff;
+    let s = audioData[i];
+    if (typeof s !== 'number' || !isFinite(s) || isNaN(s)) {
+      s = 0;
+    }
+    s = Math.max(-1, Math.min(1, s));
+    const sample = s < 0 ? Math.round(s * 0x8000) : Math.round(s * 0x7fff);
     view.setInt16(offset, sample, true);
     offset += 2;
   }
