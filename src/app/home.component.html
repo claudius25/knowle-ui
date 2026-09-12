@@ -1,36 +1,29 @@
 <main class="home-page">
+  <div class="decorations" aria-hidden="true">
+    <span class="decoration decoration-bulb">✦</span>
+    <span class="decoration decoration-globe">○</span>
+    <span class="decoration decoration-books">▤</span>
+    <span class="decoration decoration-star">✧</span>
+    <span class="decoration decoration-doodle">⌁</span>
+  </div>
+
   <header class="home-header">
-
-    <!-- <svg viewBox="0 0 600 180" class="curved-title">
-  <defs>
-    <path
-      id="titleCurve"
-      d="M 40 130 Q 300 55 560 130"
-      fill="none"
-    />
-  </defs>
-
-  <text>
-    <textPath
-      href="#titleCurve"
-      startOffset="50%"
-      text-anchor="middle">
-      KNOWLEUS
-    </textPath>
-  </text>
-</svg> -->
-
     <h1 #homeTitle [style.font-size.px]="titleFontSize || null">KNOWLEUS</h1>
     <p>Mereu ai cate ceva de-nvatat</p>
   </header>
 
-  <section class="home-content" aria-label="Alege limba jocului">
+  <section class="character-area" aria-label="Personajul Knowleus">
     <div class="torti-home-stage">
       <app-torti [centered]="true" [fitToContainer]="true" initialAnimation="wave" />
     </div>
+  </section>
 
+  <footer class="home-footer" aria-label="Incepe jocul">
     @if (selectedLanguage) {
-      <button class="start-button" type="button" (click)="startGame()">Sa incepem</button>
+      <button class="start-button" type="button" (click)="startGame()">
+        <span>Sa incepem</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
     } @else {
       <div class="language-buttons" role="group" aria-label="Selecteaza limba">
         <button
@@ -51,5 +44,11 @@
         </button>
       </div>
     }
-  </section>
+
+    <div class="pagination" aria-hidden="true">
+      <span class="pagination-dot active"></span>
+      <span class="pagination-dot"></span>
+      <span class="pagination-dot"></span>
+    </div>
+  </footer>
 </main>
