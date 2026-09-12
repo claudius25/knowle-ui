@@ -11,7 +11,7 @@
   place-items: center;
   padding: clamp(32px, 7vh, 72px) 20px;
   background: #123f35;
-  font-family: 'Fredoka', sans-serif;
+  font-family: 'Nunito', sans-serif;
 }
 
 .activity-shell {
@@ -20,13 +20,13 @@
 
 .activity-shell ::ng-deep .mat-mdc-button,
 .activity-shell ::ng-deep .mat-mdc-raised-button {
-  font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
 }
 
 .activity-shell ::ng-deep .mat-mdc-raised-button.mat-primary {
-  color: #123f35;
-  background: #b7e08c;
+  color: #063F37;
+  background: #B5EE82;
 }
 
 .question-label {
@@ -103,6 +103,8 @@ h2 {
   padding: 14px 20px;
   font: inherit;
   font-weight: 800;
+  color: #063F37;
+  background: #B5EE82;
   cursor: pointer;
 }
 

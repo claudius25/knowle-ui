@@ -15,7 +15,7 @@ h2 {
   max-width: 620px;
   margin: 0;
   color: #ffffff;
-  font-family: 'Fredoka', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: clamp(1.7rem, 4vw, 2.55rem);
   line-height: 1.14;
 }
@@ -37,9 +37,9 @@ h2 {
   border-color: rgba(255, 255, 255, 0.65) !important;
   color: #ffffff;
   cursor: pointer;
-  font-family: 'Fredoka', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 1.08rem;
-  font-weight: 600;
+  font-weight: 800;
   text-align: left;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }

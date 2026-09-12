@@ -23,21 +23,20 @@
 
 .home-header h1 {
 	margin: 0;
-	font-family: 'Climate Crisis', sans-serif;
+	font-family: 'Lilita One', sans-serif;
 	font-size: clamp(3.2rem, 10vw, 6.2rem);
-	font-weight: 100;
 	letter-spacing: 0.115em;
 	line-height: 0.95;
 	white-space: nowrap;
 }
 
 .home-header p {
-	margin: 18px 0 0;
-	font-family: 'Chango', sans-serif;
-	font-size: clamp(1rem, 2.2vw, 1.85rem);
-	font-weight: 400;
+	margin: 5px 0 0;
+	font-family: 'Kalam', cursive;
+	font-size: clamp(0.8rem, 2.2vw, 1.85rem);
+	font-weight: 700;
 	letter-spacing: 0.2em;
-	color: #b7e08c;
+	color: #9BE36C;
 }
 
 .home-content {
@@ -81,9 +80,9 @@
 	padding: 12px 24px;
 	color: #ffffff;
 	background: transparent;
-	font-family: 'Fredoka', sans-serif;
+	font-family: 'Nunito', sans-serif;
 	font-size: 0.9rem;
-	font-weight: 600;
+	font-weight: 800;
 	letter-spacing: 0.12em;
 	cursor: pointer;
 	transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
@@ -104,15 +103,15 @@
 	position: relative;
 	z-index: 100;
 	min-width: 190px;
-	border-color: #b7e08c;
-	color: #123f35;
-	background: #b7e08c;
+	border-color: #B5EE82;
+	color: #063F37;
+	background: #B5EE82;
 	letter-spacing: 0.03em;
 }
 
 .start-button:hover,
 .start-button:focus-visible {
-	background: #c8ee9e;
+	background: #c5f49c;
 }
 
 button:focus-visible {

@@ -1,5 +1,5 @@
 @use '@angular/material' as mat;
-@import url('https://fonts.googleapis.com/css2?family=Chango&family=Climate+Crisis&family=Fredoka:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Lilita+One&family=Nunito:wght@800&display=swap');
 
 @include mat.core();
 
@@ -10,8 +10,8 @@ $knowle-theme: mat.define-theme((
     tertiary: mat.$orange-palette,
   ),
   typography: (
-    plain-family: 'Fredoka, sans-serif',
-    brand-family: 'Fredoka, sans-serif',
+    plain-family: 'Nunito, sans-serif',
+    brand-family: 'Nunito, sans-serif',
     bold-weight: 700,
   ),
   density: (
@@ -25,10 +25,22 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Fredoka', sans-serif;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
   background: #f4f8f5;
 }
 
 * {
   box-sizing: border-box;
+}
+
+.curved-title {
+  width: 100%;
+  overflow: visible;
+}
+
+.curved-title text {
+  font-family: "Lilita One", sans-serif;
+  font-size: 82px;
+  fill: white;
 }
