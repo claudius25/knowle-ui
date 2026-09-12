@@ -3,8 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Activity, AnswerResponse, Difficulty, GameStartResponse } from '../models/game.types';
 import { LanguageService } from './language.service';
-
-const GAME_API_URL = 'http://localhost:3000';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
@@ -17,16 +16,16 @@ export class GameService {
       .set('age', '9')
       .set('difficulty', '1');
 
-    return this.http.get<GameStartResponse>(`${GAME_API_URL}/game/start`, { params });
+    return this.http.get<GameStartResponse>(`${environment.apiUrl}/game/start`, { params });
   }
 
   getActivity(activityId: string): Observable<Activity> {
     const params = new HttpParams().set('language', this.languageService.getCurrentLanguage());
-    return this.http.get<Activity>(`${GAME_API_URL}/game/activity/${activityId}`, { params });
+    return this.http.get<Activity>(`${environment.apiUrl}/game/activity/${activityId}`, { params });
   }
 
   submitAnswer(activityId: string, answer: unknown, difficulty: Difficulty): Observable<AnswerResponse> {
-    return this.http.post<AnswerResponse>(`${GAME_API_URL}/game/answer`, {
+    return this.http.post<AnswerResponse>(`${environment.apiUrl}/game/answer`, {
       activityId,
       answer,
       language: this.languageService.getCurrentLanguage(),
