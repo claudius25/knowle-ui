@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://knowle-api.onrender.com',
+  API_URL: 'https://knowle-api.onrender.com',
 };
