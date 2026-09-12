@@ -22,16 +22,16 @@
 
 .home-header h1 {
 	margin: 0;
-	font-family: 'Poppins', sans-serif;
+	font-family: 'Climate Crisis', sans-serif;
 	font-size: clamp(3.2rem, 10vw, 6.2rem);
-	font-weight: 800;
-	letter-spacing: 0.015em;
+	font-weight: 100;
+	letter-spacing: 0.115em;
 	line-height: 0.95;
 }
 
 .home-header p {
 	margin: 18px 0 0;
-	font-family: 'Poppins', sans-serif;
+	font-family: 'Chango', sans-serif;
 	font-size: clamp(1rem, 2.2vw, 1.85rem);
 	font-weight: 400;
 	letter-spacing: 0.2em;
@@ -79,7 +79,7 @@
 	padding: 12px 24px;
 	color: #ffffff;
 	background: transparent;
-	font-family: 'Poppins', sans-serif;
+	font-family: 'Fredoka', sans-serif;
 	font-size: 0.9rem;
 	font-weight: 600;
 	letter-spacing: 0.12em;

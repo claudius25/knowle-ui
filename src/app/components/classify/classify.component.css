@@ -15,7 +15,7 @@ h2 {
   max-width: 620px;
   margin: 0;
   color: #ffffff;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Fredoka', sans-serif;
   font-size: clamp(1.7rem, 4vw, 2.55rem);
   line-height: 1.14;
 }
@@ -50,7 +50,7 @@ h2 {
 .check-button {
   border-radius: 10px;
   padding: 11px 14px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Fredoka', sans-serif;
   font-weight: 600;
   cursor: pointer;
 }

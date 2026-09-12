@@ -11,7 +11,7 @@
   place-items: center;
   padding: clamp(32px, 7vh, 72px) 20px;
   background: #123f35;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Fredoka', sans-serif;
 }
 
 .activity-shell {
@@ -20,7 +20,7 @@
 
 .activity-shell ::ng-deep .mat-mdc-button,
 .activity-shell ::ng-deep .mat-mdc-raised-button {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Fredoka', sans-serif;
   font-weight: 600;
 }
 

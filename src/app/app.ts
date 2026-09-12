@@ -1,28 +1,10 @@
-import { Component, inject } from '@angular/core';
-import { GameComponent } from './components/game/game.component';
-import { TortiComponent } from './characters/torti/torti.component';
-import { Language, LanguageService } from './shared/services/language.service';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [GameComponent, TortiComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
-  private readonly languageService = inject(LanguageService);
-
-  protected showGame = false;
-  protected selectedLanguage: Language | null = this.languageService.getStoredLanguage();
-
-  protected selectLanguage(language: Language): void {
-    this.languageService.setLanguage(language);
-    this.selectedLanguage = language;
-  }
-
-  protected startGame(): void {
-    if (this.selectedLanguage) {
-      this.showGame = true;
-    }
-  }
-}
+export class App {}
