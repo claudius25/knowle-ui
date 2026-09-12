@@ -1,0 +1,80 @@
+<main class="game-shell">
+  <mat-card class="game-card" appearance="outlined" aria-live="polite">
+    <header class="game-header">
+      <div>
+        <p class="eyebrow">🧠 {{ text('gameName') }}</p>
+        <h1>{{ text('challenge') }}</h1>
+      </div>
+      <div class="header-actions">
+        <app-language-selector />
+        @if (activity) {
+          <span class="difficulty-badge">{{ activity.difficulty }}</span>
+        }
+      </div>
+    </header>
+
+    @if (state === 'loading') {
+      <div class="status-panel">
+        <span class="loader" aria-hidden="true"></span>
+        <p>{{ text('loading') }}</p>
+      </div>
+    } @else if (state === 'error') {
+      <div class="status-panel error-panel">
+        <span class="status-icon" aria-hidden="true">!</span>
+        <h1>{{ text('errorTitle') }}</h1>
+        <p>{{ errorMessage }}</p>
+        <button mat-raised-button color="primary" type="button" (click)="reload()">{{ text('retry') }}</button>
+      </div>
+    } @else if (activity) {
+      @if (multipleChoiceData; as data) {
+        <app-multiple-choice
+          [data]="data"
+          [disabled]="state === 'answering' || state === 'correct'"
+          [selectedAnswer]="selectedMultipleChoiceAnswer"
+          (answerSelected)="chooseAnswer($event)"
+        />
+      } @else if (trueFalseData; as data) {
+        <app-true-false
+          [data]="data"
+          [disabled]="state === 'answering' || state === 'correct'"
+          [selectedAnswer]="selectedTrueFalseAnswer"
+          (answerSelected)="chooseAnswer($event)"
+        />
+      } @else if (classifyData; as data) {
+        <app-classify
+          [data]="data"
+          [disabled]="state === 'answering' || state === 'correct'"
+          (answerSubmitted)="chooseAnswer($event)"
+        />
+      } @else {
+        <div class="status-panel">
+          <span class="status-icon" aria-hidden="true">i</span>
+          <h2>{{ text('unsupportedTitle') }}</h2>
+          <p>{{ text('unsupportedMessage') }}</p>
+        </div>
+      }
+
+      @if (state === 'answering') {
+        <p class="feedback neutral">{{ text('checking') }}</p>
+      } @else if (state === 'correct') {
+        <div class="feedback success">
+          <span class="feedback-icon" aria-hidden="true">✓</span>
+          <div>
+            <strong>{{ text('correct') }}</strong>
+            <p>{{ text('correctPrompt') }}</p>
+          </div>
+        </div>
+        <button mat-raised-button color="primary" class="continue-button" type="button" (click)="continueGame()">{{ text('continue') }}</button>
+      } @else if (state === 'incorrect') {
+        <div class="feedback mistake">
+          <span class="feedback-icon" aria-hidden="true">↻</span>
+          <div>
+            <strong>{{ text('tryAgain') }}</strong>
+            <p>{{ text('incorrectPrompt') }}</p>
+          </div>
+        </div>
+        <button mat-stroked-button color="accent" class="secondary-button" type="button" (click)="retry()">{{ text('retry') }}</button>
+      }
+    }
+  </mat-card>
+</main>

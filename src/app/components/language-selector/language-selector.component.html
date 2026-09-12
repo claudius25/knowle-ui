@@ -1,0 +1,8 @@
+<mat-form-field class="language-control" appearance="outline" subscriptSizing="dynamic">
+  <mat-label>{{ uiText.text('language') }}</mat-label>
+  <mat-select [value]="currentLanguage" (selectionChange)="selectLanguage($event.value)" [attr.aria-label]="uiText.text('language')">
+    @for (language of languages; track language.code) {
+      <mat-option [value]="language.code">{{ language.flag }} {{ language.shortLabel }} · {{ language.label }}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>

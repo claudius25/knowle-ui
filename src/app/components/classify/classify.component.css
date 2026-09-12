@@ -1,0 +1,81 @@
+.question-block {
+  padding: 42px 0 30px;
+}
+
+.question-label {
+  margin: 0 0 10px;
+  color: #278579;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h2 {
+  max-width: 620px;
+  margin: 0;
+  color: #19324a;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.7rem, 4vw, 2.55rem);
+  line-height: 1.14;
+}
+
+.classify-list {
+  display: grid;
+  gap: 14px;
+}
+
+.classify-item {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid #dfeae7;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.classify-item strong {
+  color: #19324a;
+  font-size: 1.08rem;
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-button,
+.check-button {
+  border-radius: 10px;
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.category-button {
+  min-height: 44px;
+  background: #f8fbfa;
+  color: #315567;
+}
+
+.category-button:hover:not(:disabled),
+.category-button.selected {
+  background: #eaf8f4;
+  color: #1a665d;
+}
+
+.category-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.check-button {
+  display: block;
+  margin: 20px 0 0 auto;
+}
+
+.check-button:disabled {
+  cursor: not-allowed;
+}
