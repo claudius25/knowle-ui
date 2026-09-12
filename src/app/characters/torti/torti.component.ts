@@ -21,11 +21,7 @@ import {
   WalkOptions,
 } from './torti.types';
 import { TortiCharacter } from './torti-character';
-import {
-  SPRITE_SHEET_HEIGHT,
-  SPRITE_SHEET_URL,
-  SPRITE_SHEET_WIDTH,
-} from './torti.animations';
+import { TORTI_ANIMATIONS } from './torti.animations';
 
 @Component({
   selector: 'app-torti',
@@ -36,7 +32,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TortiComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() scale = 1;
+  @Input() scale = 0.28;
   @Input() x = 0;
   @Input() y = 0;
   @Input() facing: FacingDirection = 'right';
@@ -50,8 +46,6 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
 
   readonly character = new TortiCharacter();
   private subs = new Subscription();
-
-  protected readonly spriteSheetUrl = SPRITE_SHEET_URL;
 
   ngOnInit(): void {
     this.character.setPosition(this.x, this.y);
@@ -140,17 +134,22 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   // Computed style for the inner sprite slice
-  getSpriteStyle(frame: SpriteFrame, facing: FacingDirection): Record<string, string> {
+  getSpriteStyle(frame: SpriteFrame, facing: FacingDirection, anim: TortiAnimation): Record<string, string> {
     const scaleX = facing === 'left' ? -1 : 1;
     const anchorX = frame.anchorX ?? frame.width / 2;
     const anchorY = frame.anchorY ?? frame.height;
 
+    const animDef = TORTI_ANIMATIONS[anim] || TORTI_ANIMATIONS.idle;
+    const sheetUrl = frame.spriteSheetUrl || animDef.spriteSheetUrl;
+    const sheetWidth = frame.sheetWidth || animDef.sheetWidth;
+    const sheetHeight = frame.sheetHeight || animDef.sheetHeight;
+
     return {
       width: `${frame.width}px`,
       height: `${frame.height}px`,
-      backgroundImage: `url('${this.spriteSheetUrl}')`,
+      backgroundImage: `url('${sheetUrl}')`,
       backgroundPosition: `-${frame.x}px -${frame.y}px`,
-      backgroundSize: `${SPRITE_SHEET_WIDTH}px ${SPRITE_SHEET_HEIGHT}px`,
+      backgroundSize: `${sheetWidth}px ${sheetHeight}px`,
       transform: `scale(${this.scale}) scaleX(${scaleX}) translate(-${anchorX}px, -${anchorY}px)`,
       transformOrigin: '0 0',
     };
@@ -158,9 +157,9 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy {
 
   getBubbleStyle(facing: FacingDirection): Record<string, string> {
     return {
-      bottom: `${140 * this.scale}px`,
-      left: facing === 'left' ? 'auto' : `${20 * this.scale}px`,
-      right: facing === 'left' ? `${20 * this.scale}px` : 'auto',
+      bottom: `${200 * this.scale + 80}px`,
+      left: facing === 'left' ? 'auto' : `${40 * this.scale}px`,
+      right: facing === 'left' ? `${40 * this.scale}px` : 'auto',
     };
   }
 

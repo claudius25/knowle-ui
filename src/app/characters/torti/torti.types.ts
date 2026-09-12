@@ -1,5 +1,6 @@
 export type TortiAnimation =
   | 'idle'
+  | 'wave'
   | 'walk'
   | 'talk'
   | 'happy'
@@ -11,12 +12,13 @@ export type TortiAnimation =
 
 export type TortiState =
   | 'idle'
+  | 'waving'
   | 'walking'
   | 'talking'
   | 'reacting'
   | 'sleeping';
 
-export type TortiReaction = 'happy' | 'surprised' | 'thinking' | 'sad';
+export type TortiReaction = 'happy' | 'surprised' | 'thinking' | 'sad' | 'wave';
 
 export type FacingDirection = 'left' | 'right';
 
@@ -27,12 +29,18 @@ export interface SpriteFrame {
   height: number;
   anchorX?: number; // relative horizontal center in pixels
   anchorY?: number; // relative bottom ground baseline in pixels
+  spriteSheetUrl?: string; // Optional per-frame or per-animation sprite sheet
+  sheetWidth?: number;
+  sheetHeight?: number;
 }
 
 export interface SpriteAnimation {
   frames: SpriteFrame[];
   fps: number;
   loop: boolean;
+  spriteSheetUrl: string;
+  sheetWidth: number;
+  sheetHeight: number;
 }
 
 export interface TortiPosition {

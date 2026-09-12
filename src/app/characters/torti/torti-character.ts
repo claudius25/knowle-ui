@@ -123,6 +123,11 @@ export class TortiCharacter {
     return this.playAnimation('point', true);
   }
 
+  wave(): Promise<void> {
+    this.currentStateSubject.next('waving');
+    return this.playAnimation('wave', true);
+  }
+
   sleep(): void {
     this.currentStateSubject.next('sleeping');
     this.playAnimation('sleep', false);
