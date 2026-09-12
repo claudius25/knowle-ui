@@ -45,6 +45,17 @@
   justify-content: flex-end;
 }
 
+.tts-button {
+  border-radius: 999px;
+  font-weight: 600;
+  border-color: #278579;
+  color: #19324a;
+}
+
+.tts-button:hover:not(:disabled) {
+  background-color: rgba(39, 133, 121, 0.08);
+}
+
 .eyebrow,
 .question-label {
   margin: 0 0 10px;

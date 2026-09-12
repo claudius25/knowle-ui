@@ -6,6 +6,21 @@
         <h1>{{ text('challenge') }}</h1>
       </div>
       <div class="header-actions">
+        <button
+          mat-stroked-button
+          class="tts-button"
+          type="button"
+          (click)="speakHelloWorld()"
+          [disabled]="(tts.status$ | async) === 'loading' || (tts.status$ | async) === 'generating'"
+        >
+          @if ((tts.isSpeaking$ | async)) {
+            🔊 {{ text('ttsSpeaking') }}
+          } @else if ((tts.status$ | async) === 'loading' || (tts.status$ | async) === 'generating') {
+            ⏳ {{ text('loading') }}
+          } @else {
+            🔊 {{ text('ttsTest') }}
+          }
+        </button>
         <app-language-selector />
         @if (activity) {
           <span class="difficulty-badge">{{ activity.difficulty }}</span>

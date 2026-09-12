@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -9,6 +10,7 @@ import { TrueFalseComponent } from '../true-false/true-false.component';
 import { GameService } from '../../shared/services/game.service';
 import { LanguageService } from '../../shared/services/language.service';
 import { UiTextService } from '../../shared/services/ui-text.service';
+import { TtsService } from '../../shared/tts/tts.service';
 import { Activity, AnswerResponse, ClassifyActivityData, MultipleChoiceActivityData, NextActivity, TrueFalseActivityData } from '../../shared/models/game.types';
 
 type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'incorrect';
@@ -16,7 +18,7 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [MultipleChoiceComponent, TrueFalseComponent, ClassifyComponent, LanguageSelectorComponent, MatButtonModule, MatCardModule],
+  imports: [AsyncPipe, MultipleChoiceComponent, TrueFalseComponent, ClassifyComponent, LanguageSelectorComponent, MatButtonModule, MatCardModule],
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',
 })
@@ -24,6 +26,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private readonly gameService = inject(GameService);
   private readonly languageService = inject(LanguageService);
   protected readonly uiText = inject(UiTextService);
+  protected readonly tts = inject(TtsService);
   private languageSubscription?: Subscription;
 
   protected state: GameState = 'loading';
@@ -97,6 +100,16 @@ export class GameComponent implements OnInit, OnDestroy {
 
   protected reload(): void {
     this.loadInitialActivity();
+  }
+
+  protected speakHelloWorld(): void {
+    const currentLang = this.languageService.getCurrentLanguage();
+    const textToSpeak = currentLang === 'ro' ? 'Salut, Lume! Bine ați venit la Knowledge Adventure.' : 'Hello World! Welcome to Knowledge Adventure.';
+    this.tts.speak(textToSpeak, {
+      lang: currentLang,
+      speed: 1.05,
+      steps: 4,
+    });
   }
 
   private loadInitialActivity(): void {

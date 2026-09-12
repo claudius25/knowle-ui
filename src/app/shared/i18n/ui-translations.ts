@@ -25,7 +25,9 @@ export type UiTextKey =
   | 'trueFalse'
   | 'trueLabel'
   | 'falseLabel'
-  | 'classify';
+  | 'classify'
+  | 'ttsTest'
+  | 'ttsSpeaking';
 
 const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
   ro: {
@@ -54,6 +56,8 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     trueLabel: 'ADEVĂRAT',
     falseLabel: 'FALS',
     classify: 'Clasifică elementele',
+    ttsTest: 'Ascultă „Hello World”',
+    ttsSpeaking: 'Redare audio...',
   },
   en: {
     gameName: 'Knowledge Adventure',
@@ -81,6 +85,8 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     trueLabel: 'TRUE',
     falseLabel: 'FALSE',
     classify: 'Classify the items',
+    ttsTest: 'Speak "Hello World"',
+    ttsSpeaking: 'Playing audio...',
   },
 };
 

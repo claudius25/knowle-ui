@@ -360,43 +360,80 @@ The application includes real-time bilingual support without requiring a full pa
 
 ---
 
+## Local Browser Text-to-Speech (Supertonic 3)
+
+The application includes an offline, on-device neural TTS engine using **Supertonic 3** via `onnxruntime-web`:
+
+- **Zero Cloud Latency & Zero External Calls**: Speech synthesis runs entirely inside the client's browser.
+- **Multilingual Support**: Supports both **Romanian (`ro`)** and **English (`en`)** through Supertonic 3's unified 31-language token model.
+- **Hardware Acceleration**: Automatic WebGPU acceleration when available, with WebAssembly (WASM) fallback.
+- **Non-Blocking Web Worker**: Heavy ONNX tensor operations and the flow-matching denoising loop execute in a dedicated background worker (`tts.worker.ts`), leaving Angular's UI thread responsive at 60+ FPS.
+- **Clean Service Encapsulation**: Exposed through `TtsService` ([src/app/shared/tts/tts.service.ts](src/app/shared/tts/tts.service.ts)).
+
+### TTS Usage Example
+
+```typescript
+import { Component, inject } from '@angular/core';
+import { TtsService } from './shared/tts/tts.service';
+
+@Component({
+  selector: 'app-example',
+  standalone: true,
+  template: `
+    <button (click)="speakPrompt()" [disabled]="tts.isSpeaking$ | async">🔊 Speak Question</button>
+  `,
+})
+export class ExampleComponent {
+  protected readonly tts = inject(TtsService);
+
+  async speakPrompt() {
+    // Speaks in Romanian by default (or the user's selected language)
+    await this.tts.speak('Care este planeta cunoscută drept Planeta Roșie?', {
+      lang: 'ro',
+      speed: 1.05,
+      steps: 4,
+    });
+  }
+}
+```
+
+---
+
 ## Project Directory Structure
 
 ```
+public/
+└── tts/
+    ├── onnx/                                   # Supertonic 3 ONNX models & Unicode indexer
+    ├── voice_styles/                           # Voice embedding presets (F1, M1)
+    └── wasm/                                   # ONNX Runtime WebAssembly binaries
 src/
 ├── app/
 │   ├── app.config.ts                           # Global application providers (HttpClient, animations)
 │   ├── app.ts                                  # Root shell component
 │   ├── components/
 │   │   ├── classify/                           # Categorization activity component
-│   │   │   ├── classify.component.css
-│   │   │   ├── classify.component.html
-│   │   │   └── classify.component.ts
 │   │   ├── game/                               # Core game container and state controller
-│   │   │   ├── game.component.css
-│   │   │   ├── game.component.html
-│   │   │   └── game.component.ts
 │   │   ├── language-selector/                  # Language picker component
-│   │   │   ├── language-selector.component.css
-│   │   │   ├── language-selector.component.html
-│   │   │   └── language-selector.component.ts
 │   │   ├── multiple-choice/                    # Multiple choice activity component
-│   │   │   ├── multiple-choice.component.css
-│   │   │   ├── multiple-choice.component.html
-│   │   │   └── multiple-choice.component.ts
 │   │   └── true-false/                         # True / False activity component
-│   │       ├── true-false.component.css
-│   │       ├── true-false.component.html
-│   │       └── true-false.component.ts
 │   └── shared/
 │       ├── i18n/
 │       │   └── ui-translations.ts              # Dictionary for UI text strings (RO / EN)
 │       ├── models/
 │       │   └── game.types.ts                   # Data models and API contract interfaces
-│       └── services/
-│           ├── game.service.ts                 # Backend communication service
-│           ├── language.service.ts             # Language state & storage management
-│           └── ui-text.service.ts              # UI translation lookup service
+│       ├── services/
+│       │   ├── game.service.ts                 # Backend communication service
+│       │   ├── language.service.ts             # Language state & storage management
+│       │   └── ui-text.service.ts              # UI translation lookup service
+│       └── tts/
+│           ├── engine/
+│           │   ├── tts-engine.ts               # Supertonic 3 ONNX pipeline
+│           │   ├── unicode-processor.ts        # Unicode indexer and <ro>/<en> formatter
+│           │   └── wav-writer.ts               # 16-bit PCM WAV encoder
+│           ├── tts.service.ts                  # Main-thread Angular TTS service & audio playback
+│           ├── tts.types.ts                    # TTS type definitions and worker protocol
+│           └── tts.worker.ts                   # Web Worker for non-blocking inference
 ├── main.ts                                     # Angular application entry point
 ├── styles.css                                  # Global styles and layout defaults
 └── styles.scss                                 # Material theme and SCSS definitions
