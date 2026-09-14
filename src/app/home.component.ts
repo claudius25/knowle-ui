@@ -61,21 +61,40 @@ export class HomeComponent implements OnDestroy, OnInit {
   protected readonly uiText = inject(UiTextService);
   private resizeObserver?: ResizeObserver;
   private lastHeaderWidth = 0;
+  private ttsToastTimeout?: number;
 
   protected selectedLanguage: Language | null = this.languageService.getStoredLanguage();
   protected tortiSpeech = '';
   protected tortiShowBubble = false;
   protected showIntroButton = !this.introService.hasSeenIntro();
+  protected ttsToastVisible = false;
 
   ngOnInit(): void {
-    // Preload TTS models/voices in the background so the game doesn't have to wait for them.
-    this.tts.init().catch(() => {});
-    this.tts.loadVoice('M1').catch(() => {});
+    void this.initializeTts();
+  }
+
+  private async initializeTts(): Promise<void> {
+    try {
+      await this.tts.init();
+      await this.tts.loadVoice('M1');
+      this.showTtsReadyToast();
+    } catch {
+      // Ignore background init failures; the app can keep working and retry on speech.
+    }
+  }
+
+  private showTtsReadyToast(): void {
+    this.ttsToastVisible = true;
+    window.clearTimeout(this.ttsToastTimeout);
+    this.ttsToastTimeout = window.setTimeout(() => {
+      this.ttsToastVisible = false;
+    }, 2200);
   }
 
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     this.tts.stop();
+    window.clearTimeout(this.ttsToastTimeout);
   }
 
   protected selectLanguage(language: Language): void {
