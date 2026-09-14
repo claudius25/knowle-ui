@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { Language, LanguageService } from '../../shared/services/language.service';
-import { UiTextService } from '../../shared/services/ui-text.service';
+import { Language, LanguageService } from '../../../shared/services/language.service';
+import { UiTextService } from '../../../shared/services/ui-text.service';
 
 @Component({
   selector: 'app-language-selector',

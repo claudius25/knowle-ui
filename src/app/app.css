@@ -36,7 +36,7 @@
 .home-header p {
 	margin: clamp(8px, 1.5vw, 14px) 0 0;
 	font-family: 'Kalam', cursive;
-	font-size: clamp(1.15rem, 2.2vw, 1.4rem);
+	font-size: clamp(1rem, 2.2vw, 1.4rem);
 	font-weight: 700;
 	letter-spacing: 0.05em;
 	color: #9BE36C;
@@ -84,43 +84,25 @@
 	gap: 14px;
 }
 
-.language-button,
-.start-button {
+.language-button.duo-button,
+.start-button.duo-button {
 	min-width: 88px;
 	min-height: 50px;
-	border: 1px solid rgba(255, 255, 255, 0.65);
-	border-radius: 999px;
-	padding: 12px 24px;
-	color: #ffffff;
-	background: transparent;
-	font-family: 'Nunito', sans-serif;
-	font-size: 0.9rem;
-	font-weight: 800;
 	letter-spacing: 0.12em;
-	cursor: pointer;
-	transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
-.language-button:hover,
-.language-button:focus-visible {
-	border-color: #b7e08c;
-	background: rgba(183, 224, 140, 0.16);
+.language-button.duo-button {
+	width: auto;
+	height: 50px;
+	font-size: 0.9rem;
 }
 
-.language-button:active,
-.start-button:active {
-	transform: translateY(2px);
-}
-
-.start-button {
+.start-button.duo-button {
 	position: relative;
 	z-index: 100;
 	width: 100%;
 	min-width: 0;
 	height: clamp(60px, 8vh, 64px);
-	border-color: #B5EE82;
-	color: #063F37;
-	background: #B5EE82;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -132,11 +114,6 @@
 .arrow {
 	font-size: 1.35rem;
 	line-height: 1;
-}
-
-.start-button:hover,
-.start-button:focus-visible {
-	background: #c5f49c;
 }
 
 button:focus-visible {
@@ -161,59 +138,6 @@ button:focus-visible {
 	width: 9px;
 	height: 9px;
 	background: #9BE36C;
-}
-
-.decorations {
-	position: absolute;
-	inset: 0;
-	overflow: hidden;
-	pointer-events: none;
-}
-
-.decoration {
-	position: absolute;
-	display: block;
-	color: #579B7C;
-	opacity: 0.28;
-	font-family: 'Nunito', sans-serif;
-	font-weight: 800;
-	line-height: 1;
-}
-
-.decoration-bulb {
-	top: 24%;
-	left: 11%;
-	font-size: clamp(2.2rem, 8vw, 4rem);
-}
-
-.decoration-globe {
-	top: 35%;
-	right: 10%;
-	width: clamp(2.2rem, 8vw, 4rem);
-	height: clamp(2.2rem, 8vw, 4rem);
-	border: 3px solid currentColor;
-	border-radius: 50%;
-	font-size: 0;
-}
-
-.decoration-books {
-	left: 8%;
-	bottom: 24%;
-	font-size: clamp(2rem, 7vw, 3.5rem);
-	transform: rotate(-12deg);
-}
-
-.decoration-star {
-	right: 16%;
-	bottom: 30%;
-	font-size: clamp(1.8rem, 6vw, 3rem);
-}
-
-.decoration-doodle {
-	top: 16%;
-	right: 25%;
-	font-size: clamp(2rem, 7vw, 3.5rem);
-	transform: rotate(18deg);
 }
 
 @media (max-width: 480px) {

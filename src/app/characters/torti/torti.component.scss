@@ -12,7 +12,6 @@
   height: 0;
   pointer-events: auto;
   cursor: pointer;
-  user-select: none;
   z-index: 50;
   transition: opacity 0.2s ease;
 }
@@ -21,13 +20,46 @@
   position: absolute;
   top: 0;
   left: 0;
-  background-repeat: no-repeat;
-  overflow: hidden;
+  display: block;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.26s ease;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
-  image-rendering: pixelated;
-  // will-change: background-position, transform;
+  cursor: pointer;
+  pointer-events: none;
+
+  &.torti-sprite--visible {
+    pointer-events: auto;
+    opacity: 1;
+  }
 }
+
+.torti-talk-indicator {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #278579;
+  transform: translateX(-50%);
+  animation: talkPulse 0.6s ease-in-out infinite;
+}
+
+@keyframes talkPulse {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.15);
+    opacity: 1;
+  }
+}
+
 
 .torti-speech-bubble {
   position: absolute;

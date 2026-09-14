@@ -1,27 +1,33 @@
 @if (character.position$ | async; as pos) {
   @if (character.facing$ | async; as facing) {
-    @if (character.currentAnimation$ | async; as anim) {
-      <div
-        class="torti-container"
-        [ngStyle]="getContainerStyle(pos, facing)"
-        (click)="onClick()"
-        role="button"
-        tabindex="0"
-        aria-label="Torti the Explorer"
-      >
-        @if (character.currentFrame$ | async; as frame) {
-          <div
-            class="torti-sprite"
-            [ngStyle]="getSpriteStyle(frame, facing, anim)"
-          ></div>
-        }
+    <div
+      class="torti-container"
+      [ngStyle]="getContainerStyle(pos)"
+      (click)="onClick()"
+      role="button"
+      tabindex="0"
+      aria-label="Torti the Explorer"
+    >
+      @for (layer of layers; track layer.id) {
+        <img
+          class="torti-sprite"
+          [class.torti-sprite--visible]="layer.visible"
+          [ngStyle]="getSpriteStyle(facing)"
+          [src]="poseUrl(layer.pose)"
+          alt=""
+        />
+      }
 
-        @if (showBubble && speechText) {
-          <div class="torti-speech-bubble" [ngStyle]="getBubbleStyle(facing)">
-            <p>{{ speechText }}</p>
-          </div>
-        }
-      </div>
-    }
+      @if (character.isTalking$ | async) {
+        <div class="torti-talk-indicator"></div>
+      }
+
+      @if (showBubble && speechText) {
+        <div class="torti-speech-bubble" [ngStyle]="getBubbleStyle(facing)">
+          <p>{{ speechText }}</p>
+        </div>
+      }
+    </div>
   }
 }
+

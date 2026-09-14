@@ -1,0 +1,9 @@
+<button
+  class="duo-button continue-button"
+  [class.duo-button--green]="variant === 'green'"
+  [class.duo-button--grey]="variant === 'grey'"
+  type="button"
+  (click)="continue.emit()"
+>
+  <ng-content />
+</button>

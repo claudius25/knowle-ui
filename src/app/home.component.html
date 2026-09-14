@@ -1,33 +1,30 @@
 <main class="home-page">
-  <div class="decorations" aria-hidden="true">
-    <span class="decoration decoration-bulb">✦</span>
-    <span class="decoration decoration-globe">○</span>
-    <span class="decoration decoration-books">▤</span>
-    <span class="decoration decoration-star">✧</span>
-    <span class="decoration decoration-doodle">⌁</span>
-  </div>
-
   <header class="home-header">
-    <h1 #homeTitle [style.font-size.px]="titleFontSize || null">KNOWLEUS</h1>
-    <p>Mereu ai cate ceva de-nvatat</p>
+    <h1 #homeTitle [style.font-size.px]="titleFontSize || null">GNOSIS</h1>
   </header>
 
   <section class="character-area" aria-label="Personajul Knowleus">
     <div class="torti-home-stage">
-      <app-torti [centered]="true" [fitToContainer]="true" initialAnimation="wave" />
+      <app-torti
+        [centered]="true"
+        [fitToContainer]="true"
+        initialPose="idle"
+        [speechText]="tortiSpeech"
+        [showBubble]="tortiShowBubble"
+        (characterClick)="onTortiClick($event)"
+      />
     </div>
   </section>
 
   <footer class="home-footer" aria-label="Incepe jocul">
     @if (selectedLanguage) {
-      <button class="start-button" type="button" (click)="startGame()">
+      <button class="duo-button duo-button--green start-button" type="button" (click)="startGame()">
         <span>Sa incepem</span>
-        <span class="arrow" aria-hidden="true">→</span>
       </button>
     } @else {
       <div class="language-buttons" role="group" aria-label="Selecteaza limba">
         <button
-          class="language-button"
+          class="duo-button duo-button--neutral language-button"
           type="button"
           [class.selected]="selectedLanguage === 'en'"
           (click)="selectLanguage('en')"
@@ -35,7 +32,7 @@
           EN
         </button>
         <button
-          class="language-button"
+          class="duo-button duo-button--neutral language-button"
           type="button"
           [class.selected]="selectedLanguage === 'ro'"
           (click)="selectLanguage('ro')"
@@ -45,10 +42,5 @@
       </div>
     }
 
-    <div class="pagination" aria-hidden="true">
-      <span class="pagination-dot active"></span>
-      <span class="pagination-dot"></span>
-      <span class="pagination-dot"></span>
-    </div>
   </footer>
 </main>

@@ -150,8 +150,24 @@ export class TtsService implements OnDestroy {
   }
 
   /**
-   * Synthesizes and plays the provided text aloud.
+   * Preloads an additional voice style (e.g. 'M1' for a male voice) so it can be used with `speak()`.
    */
+  async loadVoice(voiceName: string): Promise<void> {
+    await this.init();
+    const voicePath = `${this.config.modelBasePath}/../voice_styles/${voiceName}.json`;
+
+    if (this.worker) {
+      await this.sendWorkerRequest<WorkerResponse>({
+        id: this.generateRequestId(),
+        type: 'LOAD_VOICE',
+        voice: voiceName,
+        voicePath,
+      });
+    } else if (this.fallbackEngine) {
+      await this.fallbackEngine.loadVoiceStyle(voiceName, voicePath);
+    }
+  }
+
   /**
    * Synthesizes and plays the provided text aloud.
    */

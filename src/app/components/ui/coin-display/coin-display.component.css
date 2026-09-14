@@ -1,0 +1,26 @@
+:host {
+  display: inline-flex;
+}
+
+.coin-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #3a3a3a;
+  white-space: nowrap;
+}
+
+.coin-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.coin-value {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #ffd23f;
+}

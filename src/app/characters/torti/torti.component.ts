@@ -15,17 +15,18 @@ import {
 } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import {
-  FacingDirection,
-  SpriteFrame,
-  TortiAnimation,
-  TortiPosition,
-  TortiReaction,
-  TortiState,
-  WalkOptions,
-} from './torti.types';
+import { FacingDirection, TortiPose, TortiPosition, WalkOptions } from './torti.types';
 import { TortiCharacter } from './torti-character';
-import { TORTI_ANIMATIONS } from './torti.animations';
+import { TORTI_POSE_BASE_HEIGHT, tortiPoseUrl } from './torti.poses';
+
+/** How long the crossfade between two poses takes, in ms. Keep in sync with the CSS transition. */
+const POSE_TRANSITION_MS = 260;
+
+interface PoseLayer {
+  id: number;
+  pose: TortiPose;
+  visible: boolean;
+}
 
 @Component({
   selector: 'app-torti',
@@ -42,20 +43,24 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   @Input() x = 0;
   @Input() y = 0;
   @Input() facing: FacingDirection = 'right';
-  @Input() initialAnimation: TortiAnimation = 'idle';
+  @Input() initialPose: TortiPose = 'idle';
   @Input() speechText = '';
   @Input() showBubble = false;
 
   @Output() movementFinished = new EventEmitter<void>();
-  @Output() animationFinished = new EventEmitter<TortiAnimation>();
+  @Output() poseChanged = new EventEmitter<TortiPose>();
   @Output() characterClick = new EventEmitter<TortiCharacter>();
 
   readonly character = new TortiCharacter();
+  protected layers: PoseLayer[] = [];
+
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private subs = new Subscription();
   private resizeObserver?: ResizeObserver;
   private fittedScale = 0.28;
+  private nextLayerId = 0;
+  private cleanupTimeout: number | null = null;
 
   get currentScale(): number | string {
     return this.fitToContainer ? this.fittedScale : this.scale;
@@ -64,22 +69,23 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   ngOnInit(): void {
     this.character.setPosition(this.x, this.y);
     this.character.setFacing(this.facing);
+    this.layers = [{ id: this.nextLayerId++, pose: this.initialPose, visible: true }];
 
-    if (this.initialAnimation !== 'idle') {
-      this.character.playAnimation(this.initialAnimation);
+    if (this.initialPose === 'idle') {
+      this.character.setPose('idle');
+    } else {
+      // Show the initial pose briefly, then settle back to idle.
+      this.character.react(this.initialPose);
     }
 
     this.subs.add(
-      this.character.currentState$.subscribe((state) => {
-        if (state === 'idle') {
-          this.movementFinished.emit();
+      this.character.pose$.subscribe((pose) => {
+        // Skip the very first emission; it's already reflected in the initial layer above.
+        if (this.layers.length === 1 && this.layers[0].pose === pose) {
+          return;
         }
-      }),
-    );
-
-    this.subs.add(
-      this.character.currentAnimation$.subscribe((anim) => {
-        this.animationFinished.emit(anim);
+        this.pushPoseLayer(pose);
+        this.poseChanged.emit(pose);
       }),
     );
   }
@@ -106,28 +112,31 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     if (changes['facing'] && !changes['facing'].firstChange) {
       this.character.setFacing(this.facing);
     }
-    if (changes['initialAnimation'] && !changes['initialAnimation'].firstChange) {
-      this.character.playAnimation(this.initialAnimation);
+    if (changes['initialPose'] && !changes['initialPose'].firstChange) {
+      this.character.setPose(this.initialPose);
     }
   }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
     this.resizeObserver?.disconnect();
+    if (this.cleanupTimeout !== null) {
+      window.clearTimeout(this.cleanupTimeout);
+    }
     this.character.destroy();
   }
 
   // Public Proxy API for template refs (#torti)
   walkTo(x: number, y: number, options?: WalkOptions): Promise<void> {
-    return this.character.walkTo(x, y, options);
+    return this.character.walkTo(x, y, options).then(() => this.movementFinished.emit());
   }
 
-  playAnimation(animation: TortiAnimation): Promise<void> {
-    return this.character.playAnimation(animation);
+  setPose(pose: TortiPose): Promise<void> {
+    return this.character.setPose(pose);
   }
 
-  react(type: TortiReaction): Promise<void> {
-    return this.character.react(type);
+  react(pose: TortiPose, holdMs?: number): Promise<void> {
+    return this.character.react(pose, holdMs);
   }
 
   startTalking(): void {
@@ -142,20 +151,8 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.character.setTalking(talking);
   }
 
-  point(): Promise<void> {
-    return this.character.point();
-  }
-
-  sleep(): void {
-    this.character.sleep();
-  }
-
-  wakeUp(): void {
-    this.character.wakeUp();
-  }
-
   // Computed style for outer container positioning
-  getContainerStyle(pos: TortiPosition, facing: FacingDirection): Record<string, string> {
+  getContainerStyle(pos: TortiPosition): Record<string, string> {
     if (this.centered) {
       return {
         left: '50%',
@@ -168,47 +165,34 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     };
   }
 
-  // Computed style for the inner sprite slice
-  getSpriteStyle(
-    frame: SpriteFrame,
-    facing: FacingDirection,
-    anim: TortiAnimation,
-  ): Record<string, string> {
-    const scaleX = facing === 'left' ? -1 : 1;
-    const anchorX = frame.anchorX ?? frame.width / 2;
-    const anchorY = frame.anchorY ?? frame.height;
+  poseUrl(pose: TortiPose): string {
+    return tortiPoseUrl(pose);
+  }
 
-    const animDef = TORTI_ANIMATIONS[anim] || TORTI_ANIMATIONS.idle;
-    const sheetUrl = frame.spriteSheetUrl || animDef.spriteSheetUrl;
-    const sheetWidth = frame.sheetWidth || animDef.sheetWidth;
-    const sheetHeight = frame.sheetHeight || animDef.sheetHeight;
+  // Computed style for the static pose image
+  getSpriteStyle(facing: FacingDirection): Record<string, string> {
+    const scaleX = facing === 'left' ? -1 : 1;
     const numericScale = typeof this.currentScale === 'number' ? this.currentScale : 0.28;
+    const heightPx = TORTI_POSE_BASE_HEIGHT * numericScale;
 
     return {
-      width: `${frame.width * numericScale}px`,
-      height: `${frame.height * numericScale}px`,
-      backgroundImage: `url('${sheetUrl}')`,
-      backgroundPosition: `-${frame.x * numericScale}px -${frame.y * numericScale}px`,
-      backgroundSize: `${sheetWidth * numericScale}px ${sheetHeight * numericScale}px`,
+      height: `${heightPx}px`,
+      width: 'auto',
       transform: this.centered
-        ? scaleX === -1
-          ? 'scaleX(-1)'
-          : 'none'
-        : `scale(${this.currentScale}) scaleX(${scaleX}) translate(-${anchorX}px, -${anchorY}px)`,
-      ...(this.centered
-        ? {
-            left: `-${anchorX * numericScale}px`,
-            top: `-${anchorY * numericScale}px`,
-          }
-        : {}),
+        ? `translate(-50%, -50%) scaleX(${scaleX})`
+        : `translate(-50%, -100%) scaleX(${scaleX})`,
     };
   }
 
   getBubbleStyle(facing: FacingDirection): Record<string, string> {
     const numericScale = typeof this.currentScale === 'number' ? this.currentScale : 0.28;
+    const heightPx = TORTI_POSE_BASE_HEIGHT * numericScale;
     const headTopPx = 542 * numericScale;
+    // In centered mode the sprite is anchored at its own vertical middle, so shift the
+    // bubble down by half the sprite height to keep it near the head instead of floating off-screen.
+    const bottomPx = this.centered ? headTopPx + 16 - heightPx / 2 : headTopPx + 16;
     return {
-      bottom: `${headTopPx + 16}px`,
+      bottom: `${bottomPx}px`,
       left: facing === 'left' ? 'auto' : `${20 * numericScale}px`,
       right: facing === 'left' ? `${20 * numericScale}px` : 'auto',
     };
@@ -216,5 +200,28 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   onClick(): void {
     this.characterClick.emit(this.character);
+  }
+
+  private pushPoseLayer(pose: TortiPose): void {
+    const id = this.nextLayerId++;
+    this.layers.forEach((layer) => (layer.visible = false));
+    this.layers = [...this.layers, { id, pose, visible: false }];
+    this.changeDetector.markForCheck();
+
+    requestAnimationFrame(() => {
+      this.layers = this.layers.map((layer) =>
+        layer.id === id ? { ...layer, visible: true } : layer,
+      );
+      this.changeDetector.markForCheck();
+
+      if (this.cleanupTimeout !== null) {
+        window.clearTimeout(this.cleanupTimeout);
+      }
+      this.cleanupTimeout = window.setTimeout(() => {
+        this.cleanupTimeout = null;
+        this.layers = this.layers.filter((layer) => layer.id === id);
+        this.changeDetector.markForCheck();
+      }, POSE_TRANSITION_MS);
+    });
   }
 }

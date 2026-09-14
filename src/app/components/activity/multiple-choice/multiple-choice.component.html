@@ -1,0 +1,30 @@
+<div class="question-block">
+  <div class="question-row">
+    <div class="question-character">
+      <app-torti
+        [centered]="true"
+        [fitToContainer]="true"
+        [initialPose]="characterPose"
+        [speechText]="characterSpeech"
+        [showBubble]="!!characterSpeech"
+      />
+    </div>
+    <h2>{{ data.question }}</h2>
+  </div>
+</div>
+
+<div class="activity-image"></div>
+
+<div class="answers" [class.answers--two-columns]="data.options.length === 4" [attr.aria-label]="uiText.text('answers')">
+  @for (option of data.options; track option) {
+    <button
+      class="duo-button duo-button--neutral answer-card"
+      type="button"
+      [class.selected]="selectedAnswer === option"
+      [disabled]="disabled"
+      (click)="select(option)"
+    >
+      <span>{{ option }}</span>
+    </button>
+  }
+</div>

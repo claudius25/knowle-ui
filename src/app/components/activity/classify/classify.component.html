@@ -1,0 +1,47 @@
+<div class="question-block">
+  <div class="question-row">
+    <div class="question-character">
+      <app-torti
+        [centered]="true"
+        [fitToContainer]="true"
+        [initialPose]="characterPose"
+        [speechText]="characterSpeech"
+        [showBubble]="!!characterSpeech"
+      />
+    </div>
+    <h2>{{ data.question }}</h2>
+  </div>
+</div>
+
+<div cdkDropListGroup>
+  <div
+    class="classify-pool"
+    cdkDropList
+    [cdkDropListData]="pool"
+    [cdkDropListDisabled]="disabled"
+    (cdkDropListDropped)="drop($event)"
+  >
+    @for (item of pool; track item.id) {
+      <div class="classify-chip" cdkDrag [cdkDragDisabled]="disabled">{{ item.label }}</div>
+    }
+  </div>
+
+  <div class="classify-categories">
+    @for (category of data.categories; track category.id) {
+      <div class="classify-category">
+        <strong class="category-title">{{ category.label }}</strong>
+        <div
+          class="classify-category-list"
+          cdkDropList
+          [cdkDropListData]="categoryItems[category.id]"
+          [cdkDropListDisabled]="disabled"
+          (cdkDropListDropped)="drop($event)"
+        >
+          @for (item of categoryItems[category.id]; track item.id) {
+            <div class="classify-chip classify-chip--placed" cdkDrag [cdkDragDisabled]="disabled">{{ item.label }}</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

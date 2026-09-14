@@ -1,5 +1,21 @@
 .question-block {
-  padding: 42px 0 30px;
+  padding: 12px 0 30px;
+}
+
+.question-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.question-character {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  position: relative;
 }
 
 .question-label {
@@ -14,15 +30,29 @@
 h2 {
   max-width: 620px;
   margin: 0;
+  align-self: center;
   color: #ffffff;
   font-family: 'Nunito', sans-serif;
   font-size: clamp(1.7rem, 4vw, 2.55rem);
   line-height: 1.14;
 }
 
+.activity-image {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 24px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
 .answers {
   display: grid;
   gap: 12px;
+}
+
+.answers--two-columns {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .answer-card {
@@ -34,20 +64,26 @@ h2 {
   gap: 16px;
   padding: 16px 20px !important;
   border-radius: 14px;
-  border-color: rgba(255, 255, 255, 0.65) !important;
-  color: #ffffff;
   cursor: pointer;
   font-family: 'Nunito', sans-serif;
   font-size: 1.08rem;
   font-weight: 800;
   text-align: left;
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  transition: transform 160ms ease;
 }
 
-.answer-card:hover:not(:disabled),
-.answer-card.selected {
-  border-color: #b7e08c !important;
-  background: rgba(183, 224, 140, 0.16);
+.answer-card.duo-button {
+  max-width: none;
+  height: auto;
+}
+
+.answer-card.duo-button.selected {
+  --button-color: #1e90ff;
+  --button-depth: #1465c2;
+  color: #ffffff;
+}
+
+.answer-card:hover:not(:disabled) {
   transform: translateY(-2px);
 }
 
@@ -56,10 +92,3 @@ h2 {
   opacity: 0.72;
 }
 
-.answer-marker {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
-  border: 2px solid #b7e08c;
-  border-radius: 50%;
-}

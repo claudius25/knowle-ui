@@ -1,7 +1,38 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TortiComponent } from './characters/torti/torti.component';
+import { TortiCharacter } from './characters/torti/torti-character';
+import { TortiPose } from './characters/torti/torti.types';
 import { Language, LanguageService } from './shared/services/language.service';
+import { TtsService } from './shared/tts/tts.service';
+
+const HAPPY_POSES: readonly TortiPose[] = [
+  'happy',
+  'wave',
+  'heart',
+  'thumbs-up',
+  'gotyou',
+  'elvis',
+  'tennis',
+  'jako',
+];
+
+const HAPPY_PHRASES: Record<Language, readonly string[]> = {
+  ro: [
+    'Bravo tie!',
+    'Esti grozav!',
+    'Hai sa invatam ceva nou!',
+    'Imi place energia ta!',
+    'Sa continuam aventura!',
+  ],
+  en: [
+    'You rock!',
+    'Great to see you!',
+    'Let\'s learn something new!',
+    'I love your energy!',
+    'Let\'s keep exploring!',
+  ],
+};
 
 @Component({
   selector: 'app-home',
@@ -15,11 +46,14 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
+  private readonly tts = inject(TtsService);
   private resizeObserver?: ResizeObserver;
   private lastHeaderWidth = 0;
 
   protected selectedLanguage: Language | null = this.languageService.getStoredLanguage();
   protected titleFontSize = 0;
+  protected tortiSpeech = '';
+  protected tortiShowBubble = false;
 
   ngAfterViewInit(): void {
     this.resizeObserver = new ResizeObserver(() => this.fitTitleToViewport());
@@ -29,6 +63,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
+    this.tts.stop();
   }
 
   private fitTitleToViewport(force = false): void {
@@ -44,11 +79,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     }
 
     this.lastHeaderWidth = availableWidth;
-    const maxFontSize = Math.min(window.innerWidth * 0.1, 99.2);
+    const maxFontSize = Math.min(window.innerWidth * 0.12, 115);
     title.style.fontSize = `${maxFontSize}px`;
 
     if (title.scrollWidth > header.clientWidth) {
-      this.titleFontSize = Math.max(28, maxFontSize * (availableWidth / title.scrollWidth) * 0.96);
+      this.titleFontSize = Math.max(28, maxFontSize * (availableWidth / title.scrollWidth) * 0.98);
     } else {
       this.titleFontSize = maxFontSize;
     }
@@ -64,6 +99,24 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   protected startGame(): void {
     if (this.selectedLanguage) {
       this.router.navigate(['/game']);
+    }
+  }
+
+  protected async onTortiClick(character: TortiCharacter): Promise<void> {
+    const pose = HAPPY_POSES[Math.floor(Math.random() * HAPPY_POSES.length)];
+    character.setPose(pose);
+
+    const language = this.selectedLanguage ?? this.languageService.getCurrentLanguage();
+    const phrases = HAPPY_PHRASES[language];
+    this.tortiSpeech = phrases[Math.floor(Math.random() * phrases.length)];
+    this.tortiShowBubble = true;
+    character.startTalking();
+
+    try {
+      await this.tts.speak(this.tortiSpeech, { lang: language });
+    } finally {
+      character.stopTalking();
+      this.tortiShowBubble = false;
     }
   }
 }

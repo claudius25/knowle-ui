@@ -1,0 +1,16 @@
+<div class="health-display">
+  <svg class="battery-icon" viewBox="0 0 28 16" aria-hidden="true">
+    <rect x="1" y="1" width="23" height="14" rx="2.5" fill="none" stroke="#dcdcdc" stroke-width="1.5" />
+    <rect x="25" y="5.5" width="2.5" height="5" rx="1" fill="#dcdcdc" />
+    <rect
+      class="battery-fill"
+      x="3"
+      y="3"
+      [attr.width]="(20 * value) / 100"
+      height="10"
+      rx="1.5"
+      [attr.fill]="fillColor"
+    />
+  </svg>
+  <span class="health-value">{{ value }}%</span>
+</div>

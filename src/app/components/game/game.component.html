@@ -1,4 +1,9 @@
 <main class="game-page">
+  <div class="game-header">
+    <app-progress-bar class="game-progress" [value]="progress" />
+    <app-health-display [value]="health" />
+    <app-coin-display [amount]="coins" />
+  </div>
   <section class="activity-shell" aria-live="polite">
     @if (state === 'loading') {
       <div class="status-panel">
@@ -10,7 +15,7 @@
         <span class="status-icon" aria-hidden="true">!</span>
         <h1>{{ text('errorTitle') }}</h1>
         <p>{{ errorMessage }}</p>
-        <button mat-raised-button color="primary" type="button" (click)="reload()">{{ text('retry') }}</button>
+        <button class="duo-button duo-button--green" type="button" (click)="reload()">{{ text('retry') }}</button>
       </div>
     } @else if (activity) {
       @if (multipleChoiceData; as data) {
@@ -18,6 +23,8 @@
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
           [selectedAnswer]="selectedMultipleChoiceAnswer"
+          [characterPose]="characterPose"
+          [characterSpeech]="characterSpeech"
           (answerSelected)="chooseAnswer($event)"
         />
       } @else if (trueFalseData; as data) {
@@ -25,12 +32,16 @@
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
           [selectedAnswer]="selectedTrueFalseAnswer"
+          [characterPose]="characterPose"
+          [characterSpeech]="characterSpeech"
           (answerSelected)="chooseAnswer($event)"
         />
       } @else if (classifyData; as data) {
         <app-classify
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
+          [characterPose]="characterPose"
+          [characterSpeech]="characterSpeech"
           (answerSubmitted)="chooseAnswer($event)"
         />
       } @else {
@@ -43,26 +54,25 @@
 
       @if (state === 'answering') {
         <p class="feedback neutral">{{ text('checking') }}</p>
-      } @else if (state === 'correct') {
-        <div class="feedback success">
-          <span class="feedback-icon" aria-hidden="true">✓</span>
-          <div>
-            <strong>{{ text('correct') }}</strong>
-            <p>{{ text('correctPrompt') }}</p>
-          </div>
-        </div>
-        <button mat-raised-button color="primary" class="continue-button" type="button" (click)="continueGame()">{{ text('continue') }}</button>
-      } @else if (state === 'incorrect') {
-        <div class="feedback mistake">
-          <span class="feedback-icon" aria-hidden="true">↻</span>
-          <div>
-            <strong>{{ text('tryAgain') }}</strong>
-            <p>{{ text('incorrectPrompt') }}</p>
-          </div>
-        </div>
-        <button mat-stroked-button color="accent" class="secondary-button" type="button" (click)="retry()">{{ text('retry') }}</button>
       }
     }
 
   </section>
+
+  @if (state === 'correct') {
+    <div class="game-footer">
+      <app-continue-button (continue)="continueGame()">{{ text('continue') }}</app-continue-button>
+    </div>
+  } @else if (state === 'incorrect') {
+    <div class="game-footer incorrect-footer">
+      <app-try-again-button (retry)="retry()">{{ text('retry') }}</app-try-again-button>
+      <app-continue-button variant="grey" (continue)="continueGame()">{{ text('continue') }}</app-continue-button>
+    </div>
+  } @else if (classifyData) {
+    <div class="game-footer">
+      <app-check-button [disabled]="state === 'answering' || !classifyComplete" (check)="checkClassifyAnswer()">
+        {{ text('check') }}
+      </app-check-button>
+    </div>
+  }
 </main>

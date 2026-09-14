@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.progress-track {
+  width: 100%;
+  height: 24px;
+  border-radius: 999px;
+  background: #3a3a3a;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #39ff14;
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
+  transition: width 320ms ease;
+}

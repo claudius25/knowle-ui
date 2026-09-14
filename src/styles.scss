@@ -44,3 +44,92 @@ body {
   font-size: 82px;
   fill: white;
 }
+
+.duo-button {
+  --button-color: #58cc02;
+  --button-depth: #46a302;
+
+  position: relative;
+
+  width: 100%;
+  max-width: 520px;
+  height: 64px;
+
+  padding: 0 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--button-color);
+  color: white;
+
+  border: none;
+  border-radius: 18px;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  /* the "height" under the button */
+  box-shadow: 0 7px 0 var(--button-depth);
+
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease;
+}
+
+.duo-button .arrow {
+  position: absolute;
+  right: 24px;
+
+  font-size: 32px;
+  line-height: 1;
+}
+
+/* CLICK / PRESSED STATE */
+
+.duo-button:active:not(:disabled) {
+  /* move button downward */
+  transform: translateY(5px);
+
+  /* depth goes from 7px → 2px */
+  box-shadow: 0 2px 0 var(--button-depth);
+}
+
+.duo-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Color variants: reuse the app's existing button colors */
+.duo-button--green {
+  --button-color: #b5ee82;
+  --button-depth: #8fd35c;
+  color: #063f37;
+}
+
+.duo-button--orange {
+  --button-color: #e48459;
+  --button-depth: #bb6640;
+  color: #ffffff;
+}
+
+.duo-button--neutral {
+  --button-color: #0f5049;
+  --button-depth: #0b3a35;
+  color: #ffffff;
+}
+
+.duo-button--neutral.selected {
+  --button-color: #b5ee82;
+  --button-depth: #8fd35c;
+  color: #063f37;
+}
+
+.duo-button--grey {
+  --button-color: #9aa0a6;
+  --button-depth: #757b82;
+  color: #ffffff;
+}
