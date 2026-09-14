@@ -17,13 +17,11 @@ import {
 } from '@angular/cdk/drag-drop';
 import { ClassifyActivityData, ClassifyItem } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
-import { TortiComponent } from '../../../characters/torti/torti.component';
-import { TortiPose } from '../../../characters/torti/torti.types';
 
 @Component({
   selector: 'app-classify',
   standalone: true,
-  imports: [TortiComponent, CdkDropListGroup, CdkDropList, CdkDrag],
+  imports: [CdkDropListGroup, CdkDropList, CdkDrag],
   templateUrl: './classify.component.html',
   styleUrl: './classify.component.css',
 })
@@ -31,8 +29,6 @@ export class ClassifyComponent implements OnChanges {
   protected readonly uiText = inject(UiTextService);
   @Input({ required: true }) data!: ClassifyActivityData;
   @Input() disabled = false;
-  @Input() characterPose: TortiPose = 'idle';
-  @Input() characterSpeech = '';
   @Output() answerSubmitted = new EventEmitter<Record<string, string>>();
 
   protected pool: ClassifyItem[] = [];

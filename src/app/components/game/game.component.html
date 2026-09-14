@@ -24,26 +24,20 @@
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
           [selectedAnswer]="selectedMultipleChoiceAnswer"
-          [characterPose]="characterPose"
-          [characterSpeech]="characterSpeech"
-          (answerSelected)="chooseAnswer($event)"
+          (answerSelected)="selectAnswer($event)"
         />
       } @else if (trueFalseData; as data) {
         <app-true-false
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
           [selectedAnswer]="selectedTrueFalseAnswer"
-          [characterPose]="characterPose"
-          [characterSpeech]="characterSpeech"
-          (answerSelected)="chooseAnswer($event)"
+          (answerSelected)="selectAnswer($event)"
         />
       } @else if (classifyData; as data) {
         <app-classify
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
-          [characterPose]="characterPose"
-          [characterSpeech]="characterSpeech"
-          (answerSubmitted)="chooseAnswer($event)"
+          (answerSubmitted)="selectAnswer($event)"
         />
       } @else {
         <div class="status-panel">
@@ -58,31 +52,23 @@
 
   </section>
 
-   @if (state === 'answering') {
-    <div class="game-footer">
-        <p class="feedback neutral">{{ text('checking') }}</p>
-    </div>
-      }
-  @if (state === 'correct') {
-    <div class="game-footer">
-      @if (sessionComplete) {
-        <app-chapter-button (chapter)="continueGame()">{{ text('chapterComplete') }}</app-chapter-button>
-      } @else {
-        <app-continue-button (continue)="continueGame()">{{ text('continue') }}</app-continue-button>
-      }
-    </div>
-  } @else if (state === 'incorrect') {
-    <div class="game-footer incorrect-footer">
-      <app-try-again-button (retry)="retry()">{{ text('retry') }}</app-try-again-button>
-      <app-continue-button variant="grey" (continue)="continueGame()">{{ text('continue') }}</app-continue-button>
-    </div>
-  } @else if (classifyData) {
-    <div class="game-footer">
-      <app-check-button [disabled]="state === 'answering' || !classifyComplete" (check)="checkClassifyAnswer()">
-        {{ text('check') }}
-      </app-check-button>
-    </div>
-  }
+  <app-game-footer
+    [mode]="footerMode"
+    [checkingText]="text('checking')"
+    [sessionComplete]="sessionComplete"
+    [chapterText]="text('chapterComplete')"
+    [continueText]="text('continue')"
+    [retryText]="text('retry')"
+    [classifyComplete]="classifyComplete"
+    [disabled]="state === 'answering' || selectedAnswer === null"
+    [checkText]="text('check')"
+    [characterPose]="characterPose"
+    [characterSpeech]="characterSpeech"
+    (chapter)="continueGame()"
+    (continue)="continueGame()"
+    (retry)="retry()"
+    (check)="classifyData ? checkClassifyAnswer() : checkSelectedAnswer()"
+  />
 
   @if (showExitConfirm) {
     <div class="exit-overlay" role="dialog" aria-modal="true">

@@ -6,11 +6,8 @@ import { TrueFalseComponent } from '../activity/true-false/true-false.component'
 import { ProgressBarComponent } from '../ui/progress-bar/progress-bar.component';
 import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
 import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
-import { ContinueButtonComponent } from '../ui/continue-button/continue-button.component';
-import { ChapterButtonComponent } from '../ui/chapter-button/chapter-button.component';
-import { TryAgainButtonComponent } from '../ui/try-again-button/try-again-button.component';
-import { CheckButtonComponent } from '../ui/check-button/check-button.component';
 import { GameService } from '../../shared/services/game.service';
+import { GameFooterComponent } from '../game-footer/game-footer.component';
 import { UiTextService } from '../../shared/services/ui-text.service';
 import { TtsService } from '../../shared/tts/tts.service';
 import { TortiPose } from '../../characters/torti/torti.types';
@@ -40,10 +37,7 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     ProgressBarComponent,
     CoinDisplayComponent,
     HealthDisplayComponent,
-    ContinueButtonComponent,
-    ChapterButtonComponent,
-    TryAgainButtonComponent,
-    CheckButtonComponent,
+    GameFooterComponent,
   ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',
@@ -97,12 +91,20 @@ export class GameComponent implements OnInit {
     this.loadInitialActivity();
   }
 
-  protected chooseAnswer(answer: unknown): void {
+  protected selectAnswer(answer: unknown): void {
     if (this.state !== 'playing' || !this.activity) {
       return;
     }
 
     this.selectedAnswer = answer;
+  }
+
+  protected checkSelectedAnswer(): void {
+    if (this.state !== 'playing' || !this.activity || this.selectedAnswer === null) {
+      return;
+    }
+
+    const answer = this.selectedAnswer;
     this.state = 'answering';
     this.gameService
       .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
@@ -137,6 +139,22 @@ export class GameComponent implements OnInit {
 
   protected get classifyComplete(): boolean {
     return this.classifyComponent?.isComplete ?? false;
+  }
+
+  protected get footerMode(): 'waiting' | 'checking' | 'correct' | 'incorrect' | 'classify' {
+    if (this.state === 'answering') {
+      return 'checking';
+    }
+    if (this.state === 'correct') {
+      return 'correct';
+    }
+    if (this.state === 'incorrect') {
+      return 'incorrect';
+    }
+    if (this.classifyData) {
+      return 'classify';
+    }
+    return 'waiting';
   }
 
   protected checkClassifyAnswer(): void {

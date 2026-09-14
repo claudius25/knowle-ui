@@ -1,0 +1,40 @@
+<div class="game-footer">
+  <div class="game-footer__character">
+    <app-torti
+      [centered]="true"
+      [fitToContainer]="true"
+      [initialPose]="characterPose"
+      [speechText]="characterSpeech"
+      [showBubble]="!!characterSpeech"
+    />
+  </div>
+
+  @switch (mode) {
+    @case ('waiting') {
+      <app-check-button [disabled]="disabled" (check)="check.emit()">
+        {{ checkText }}
+      </app-check-button>
+    }
+    @case ('checking') {
+      <p class="feedback neutral">{{ checkingText }}</p>
+    }
+    @case ('correct') {
+      @if (sessionComplete) {
+        <app-chapter-button (chapter)="chapter.emit()">{{ chapterText }}</app-chapter-button>
+      } @else {
+        <app-continue-button (continue)="continue.emit()">{{ continueText }}</app-continue-button>
+      }
+    }
+    @case ('incorrect') {
+      <div class="incorrect-footer">
+        <app-try-again-button (retry)="retry.emit()">{{ retryText }}</app-try-again-button>
+        <app-continue-button variant="grey" (continue)="continue.emit()">{{ continueText }}</app-continue-button>
+      </div>
+    }
+    @case ('classify') {
+      <app-check-button [disabled]="disabled || !classifyComplete" (check)="check.emit()">
+        {{ checkText }}
+      </app-check-button>
+    }
+  }
+</div>

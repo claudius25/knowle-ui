@@ -1,0 +1,42 @@
+.game-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px 16px;
+  background: #123f35;
+}
+
+.game-footer__character {
+  width: min(170px, 36vw);
+  height: 120px;
+  display: grid;
+  place-items: center;
+  margin-top: -14px;
+}
+
+.game-footer__character app-torti {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.incorrect-footer {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.feedback {
+  margin: 0;
+}
+
+.neutral {
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 700;
+}
