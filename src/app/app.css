@@ -9,10 +9,22 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: space-between;
 	padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
 	overflow: hidden;
 	color: #ffffff;
 	background: #064B3F;
+}
+
+.hero-panel {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: min(100%, 360px);
+	flex: 1 1 auto;
+	margin-top: auto;
+	margin-bottom: 30px;
 }
 
 .intro-button {
@@ -30,20 +42,24 @@
 
 .home-header {
 	position: relative;
-	width: min(100%, 760px);
+	width: min(100%, 360px);
 	z-index: 1;
 	text-align: center;
-	padding-top: clamp(2vh, 3vw, 4vh);
+	padding-top: 0;
+	margin-top: -18px;
 }
 
 .home-header h1 {
 	margin: 0;
 	font-family: 'Lilita One', sans-serif;
 	font-size: clamp(3rem, 13vw, 7rem);
-	letter-spacing: 0.08em;
-	line-height: 0.95;
+	letter-spacing: 0;
+	line-height: 0.8;
+	letter-spacing: 0.06em;
 	white-space: nowrap;
-	text-shadow: 0 5px 0 rgba(3, 61, 53, 0.28);
+	color: white;
+	text-shadow: none;
+	transform: translateY(-2px);
 }
 
 .home-header p {
@@ -59,11 +75,11 @@
 	position: relative;
 	z-index: 1;
 	width: min(100%, 360px);
-	flex: 1 1 auto;
+	flex: 0 0 auto;
 	display: grid;
 	place-items: center;
 	min-height: 0;
-	padding: clamp(20px, 4vh, 56px) 0;
+	padding: 0;
 }
 
 .torti-home-stage {
@@ -89,12 +105,16 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 16px;
+	margin-top: 0;
 	padding-bottom: clamp(1vh, 2vw, 3vh);
 }
 
 .language-buttons {
 	display: flex;
-	gap: 14px;
+	gap: 18px;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
 }
 
 .language-button.duo-button,
@@ -105,9 +125,53 @@
 }
 
 .language-button.duo-button {
-	width: auto;
-	height: 50px;
-	font-size: 0.9rem;
+	width: min(42vw, 175px);
+	height: 64px;
+	padding: 8px 18px 8px 10px;
+	border-radius: 999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	font-size: 2.3rem;
+	line-height: 1;
+	font-family: 'Nunito', sans-serif;
+	font-weight: 800;
+	color: #ffffff;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.18));
+	border: 2px solid rgba(255, 255, 255, 0.25);
+	box-shadow: 0 12px 0 rgba(0, 0, 0, 0.12);
+	transform: translateY(0);
+}
+
+.language-button .language-flag {
+	display: grid;
+	place-items: center;
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.9);
+	font-size: 2rem;
+	line-height: 1;
+	box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.06);
+	flex-shrink: 0;
+}
+
+.language-button .language-label {
+	display: block;
+	font-size: clamp(1.9rem, 5vw, 2.8rem);
+	font-weight: 800;
+	letter-spacing: 0.02em;
+	line-height: 0.9;
+	color: #ffffff;
+	text-shadow: none;
+	font-family: 'Nunito', sans-serif;
+}
+
+.language-button.selected {
+	background: linear-gradient(135deg, rgba(125, 221, 121, 0.9), rgba(175, 238, 111, 0.9));
+	border-color: rgba(255, 255, 255, 0.3);
+	box-shadow: 0 12px 0 rgba(0, 0, 0, 0.12);
 }
 
 .start-button.duo-button {
@@ -156,10 +220,6 @@ button:focus-visible {
 @media (max-width: 480px) {
 	.home-page {
 		padding-inline: 16px;
-	}
-
-	.character-area {
-		padding-block: 12px;
 	}
 
 	.torti-home-stage {

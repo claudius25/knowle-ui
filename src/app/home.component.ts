@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { TortiComponent } from './characters/torti/torti.component';
 import { TortiCharacter } from './characters/torti/torti-character';
@@ -30,9 +38,9 @@ const HAPPY_PHRASES: Record<Language, readonly string[]> = {
   en: [
     'You rock!',
     'Great to see you!',
-    'Let\'s learn something new!',
+    "Let's learn something new!",
     'I love your energy!',
-    'Let\'s keep exploring!',
+    "Let's keep exploring!",
   ],
 };
 
@@ -43,7 +51,7 @@ const HAPPY_PHRASES: Record<Language, readonly string[]> = {
   templateUrl: './home.component.html',
   styleUrl: './app.css',
 })
-export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
+export class HomeComponent implements OnDestroy, OnInit {
   @ViewChild('homeTitle') private readonly homeTitle?: ElementRef<HTMLHeadingElement>;
 
   private readonly languageService = inject(LanguageService);
@@ -55,7 +63,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   private lastHeaderWidth = 0;
 
   protected selectedLanguage: Language | null = this.languageService.getStoredLanguage();
-  protected titleFontSize = 0;
   protected tortiSpeech = '';
   protected tortiShowBubble = false;
   protected showIntroButton = !this.introService.hasSeenIntro();
@@ -66,40 +73,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     this.tts.loadVoice('M1').catch(() => {});
   }
 
-  ngAfterViewInit(): void {
-    this.resizeObserver = new ResizeObserver(() => this.fitTitleToViewport());
-    this.resizeObserver.observe(this.homeTitle?.nativeElement.parentElement ?? document.body);
-    this.fitTitleToViewport(true);
-  }
-
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     this.tts.stop();
-  }
-
-  private fitTitleToViewport(force = false): void {
-    const title = this.homeTitle?.nativeElement;
-    const header = title?.parentElement;
-    if (!title || !header) {
-      return;
-    }
-
-    const availableWidth = header.clientWidth;
-    if (!force && availableWidth === this.lastHeaderWidth) {
-      return;
-    }
-
-    this.lastHeaderWidth = availableWidth;
-    const maxFontSize = Math.min(window.innerWidth * 0.12, 115);
-    title.style.fontSize = `${maxFontSize}px`;
-
-    if (title.scrollWidth > header.clientWidth) {
-      this.titleFontSize = Math.max(28, maxFontSize * (availableWidth / title.scrollWidth) * 0.98);
-    } else {
-      this.titleFontSize = maxFontSize;
-    }
-
-    title.style.fontSize = `${this.titleFontSize}px`;
   }
 
   protected selectLanguage(language: Language): void {
