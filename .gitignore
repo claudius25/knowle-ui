@@ -41,3 +41,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Original full-resolution character art (kept locally only)
+/src/assets/torti/original

@@ -52,13 +52,16 @@
         </div>
       }
 
-      @if (state === 'answering') {
-        <p class="feedback neutral">{{ text('checking') }}</p>
-      }
+     
     }
 
   </section>
 
+   @if (state === 'answering') {
+    <div class="game-footer">
+        <p class="feedback neutral">{{ text('checking') }}</p>
+    </div>
+      }
   @if (state === 'correct') {
     <div class="game-footer">
       <app-continue-button (continue)="continueGame()">{{ text('continue') }}</app-continue-button>
