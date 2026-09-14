@@ -1,0 +1,24 @@
+<main class="intro-page">
+
+  <section class="intro-slide" aria-live="polite">
+    <h1>{{ uiText.text(pages[currentIndex].titleKey) }}</h1>
+    <p>{{ uiText.text(pages[currentIndex].bodyKey) }}</p>
+  </section>
+
+  <div class="intro-dots" role="tablist" [attr.aria-label]="uiText.text('introButton')">
+    @for (page of pages; track $index) {
+      <button
+        class="intro-dot"
+        type="button"
+        role="tab"
+        [class.active]="$index === currentIndex"
+        [attr.aria-selected]="$index === currentIndex"
+        (click)="goTo($index)"
+      ></button>
+    }
+  </div>
+
+  <button class="duo-button duo-button--green next-button" type="button" (click)="next()">
+    {{ isLastPage ? uiText.text('introStart') : uiText.text('introNext') }}
+  </button>
+</main>

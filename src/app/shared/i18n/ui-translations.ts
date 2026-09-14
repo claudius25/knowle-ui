@@ -27,7 +27,21 @@ export type UiTextKey =
   | 'falseLabel'
   | 'classify'
   | 'ttsTest'
-  | 'ttsSpeaking';
+  | 'ttsSpeaking'
+  | 'introButton'
+  | 'introSkip'
+  | 'introNext'
+  | 'introStart'
+  | 'introPage1Title'
+  | 'introPage1Body'
+  | 'introPage2Title'
+  | 'introPage2Body'
+  | 'introPage3Title'
+  | 'introPage3Body'
+  | 'exitConfirmTitle'
+  | 'exitConfirmMessage'
+  | 'exitConfirmYes'
+  | 'exitConfirmNo';
 
 const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
   ro: {
@@ -58,6 +72,20 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     classify: 'Clasifică elementele',
     ttsTest: 'Ascultă „Hello World”',
     ttsSpeaking: 'Redare audio...',
+    introButton: 'Intro',
+    introSkip: 'Sari peste',
+    introNext: 'Continuă',
+    introStart: 'Începe jocul',
+    introPage1Title: 'Bine ai venit!',
+    introPage1Body: 'Descoperă lumea GNOSIS alături de Torti, ghidul tău prietenos.',
+    introPage2Title: 'Învață jucându-te',
+    introPage2Body: 'Răspunde la întrebări, clasifică elemente și testează-ți cunoștințele.',
+    introPage3Title: 'Câștigă monede și progres',
+    introPage3Body: 'Adună monede, urmărește-ți progresul și ai grijă de sănătatea ta.',
+    exitConfirmTitle: 'Părăsești jocul?',
+    exitConfirmMessage: 'Progresul acestei sesiuni se va pierde dacă te întorci acum la pagina principală.',
+    exitConfirmYes: 'Da, ieși',
+    exitConfirmNo: 'Nu, rămân',
   },
   en: {
     gameName: 'Knowledge Adventure',
@@ -87,6 +115,20 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     classify: 'Classify the items',
     ttsTest: 'Speak "Hello World"',
     ttsSpeaking: 'Playing audio...',
+    introButton: 'Intro',
+    introSkip: 'Skip',
+    introNext: 'Next',
+    introStart: 'Start the game',
+    introPage1Title: 'Welcome!',
+    introPage1Body: 'Discover the world of GNOSIS together with Torti, your friendly guide.',
+    introPage2Title: 'Learn by playing',
+    introPage2Body: 'Answer questions, classify items, and test your knowledge.',
+    introPage3Title: 'Earn coins and progress',
+    introPage3Body: 'Collect coins, track your progress, and take care of your health.',
+    exitConfirmTitle: 'Leave the game?',
+    exitConfirmMessage: 'Your progress in this session will be lost if you go back to the home page now.',
+    exitConfirmYes: 'Yes, leave',
+    exitConfirmNo: 'No, stay',
   },
 };
 

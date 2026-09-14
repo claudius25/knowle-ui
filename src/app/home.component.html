@@ -1,6 +1,6 @@
 <main class="home-page">
   <header class="home-header">
-    <h1 #homeTitle [style.font-size.px]="titleFontSize || null">GNOSIS</h1>
+    <h1 #homeTitle [style.font-size.px]="titleFontSize || null">GNOSY</h1>
   </header>
 
   <section class="character-area" aria-label="Personajul Knowleus">
@@ -18,9 +18,13 @@
 
   <footer class="home-footer" aria-label="Incepe jocul">
     @if (selectedLanguage) {
-      <button class="duo-button duo-button--green start-button" type="button" (click)="startGame()">
-        <span>Sa incepem</span>
-      </button>
+      @if (showIntroButton) {
+        <button class="intro-button" type="button" (click)="goToIntro()">{{ uiText.text('introButton') }}</button>
+      } @else {
+        <button class="duo-button duo-button--green start-button" type="button" (click)="startGame()">
+          <span>Sa incepem</span>
+        </button>
+      }
     } @else {
       <div class="language-buttons" role="group" aria-label="Selecteaza limba">
         <button

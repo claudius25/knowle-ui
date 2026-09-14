@@ -1,0 +1,75 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+.intro-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 24px;
+  background: #064b3f;
+  font-family: 'Nunito', sans-serif;
+  text-align: center;
+}
+
+.skip-button {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.intro-slide {
+  width: min(100%, 480px);
+  display: grid;
+  gap: 16px;
+}
+
+.intro-slide h1 {
+  margin: 0;
+  font-family: 'Lilita One', sans-serif;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+}
+
+.intro-slide p {
+  margin: 0;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.intro-dots {
+  display: flex;
+  gap: 10px;
+}
+
+.intro-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.intro-dot.active {
+  background: #b5ee82;
+  transform: scale(1.3);
+}
+
+.next-button {
+  width: min(100%, 320px);
+}

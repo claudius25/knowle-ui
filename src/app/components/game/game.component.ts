@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { ClassifyComponent } from '../activity/classify/classify.component';
 import { MultipleChoiceComponent } from '../activity/multiple-choice/multiple-choice.component';
 import { TrueFalseComponent } from '../activity/true-false/true-false.component';
@@ -49,6 +50,7 @@ export class GameComponent implements OnInit {
   private readonly gameService = inject(GameService);
   protected readonly uiText = inject(UiTextService);
   private readonly tts = inject(TtsService);
+  private readonly router = inject(Router);
 
   @ViewChild(ClassifyComponent) private classifyComponent?: ClassifyComponent;
 
@@ -67,6 +69,7 @@ export class GameComponent implements OnInit {
   protected coins = 0;
   protected health = 100;
   protected characterSpeech = '';
+  protected showExitConfirm = false;
 
   protected get progress(): number {
     return (this.completedActivities / GameComponent.ACTIVITIES_PER_SESSION) * 100;
@@ -134,16 +137,18 @@ export class GameComponent implements OnInit {
   }
 
   protected continueGame(): void {
+    console.log('Continuing game...');
+    console.log('Next activity:', this.nextActivity);
     if (!this.nextActivity) {
       this.loadInitialActivity();
       return;
     }
 
-    this.loadActivity(this.nextActivity.activityId);
+    this.loadActivity(this.nextActivity.activityId, true);
   }
 
   protected retry(): void {
-    this.coins = Math.max(0, this.coins - GameComponent.COINS_LOST_PER_RETRY);
+    this.coins = this.coins - GameComponent.COINS_LOST_PER_RETRY;
     this.selectedAnswer = null;
     this.characterSpeech = '';
     this.state = 'playing';
@@ -151,6 +156,19 @@ export class GameComponent implements OnInit {
 
   protected reload(): void {
     this.loadInitialActivity();
+  }
+
+  protected confirmExit(): void {
+    this.showExitConfirm = true;
+  }
+
+  protected cancelExit(): void {
+    this.showExitConfirm = false;
+  }
+
+  protected exitToHome(): void {
+    this.showExitConfirm = false;
+    this.router.navigate(['/']);
   }
 
   private loadInitialActivity(): void {

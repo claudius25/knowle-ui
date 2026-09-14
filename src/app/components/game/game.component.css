@@ -34,6 +34,62 @@
   min-width: 0;
 }
 
+.exit-button {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: #0f5049;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.exit-button:hover {
+  background: #0b3a35;
+}
+
+.exit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(6, 26, 22, 0.72);
+}
+
+.exit-dialog {
+  width: min(100%, 380px);
+  padding: 24px;
+  border-radius: 16px;
+  background: #123f35;
+  text-align: center;
+  display: grid;
+  gap: 12px;
+}
+
+.exit-dialog h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.exit-dialog p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.exit-dialog-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 
 .activity-shell {
   width: min(100%, 760px);

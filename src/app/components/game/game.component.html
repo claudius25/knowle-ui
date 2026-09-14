@@ -1,5 +1,6 @@
 <main class="game-page">
   <div class="game-header">
+    <button class="exit-button" type="button" aria-label="Close" (click)="confirmExit()">✕</button>
     <app-progress-bar class="game-progress" [value]="progress" />
     <app-health-display [value]="health" />
     <app-coin-display [amount]="coins" />
@@ -76,6 +77,19 @@
       <app-check-button [disabled]="state === 'answering' || !classifyComplete" (check)="checkClassifyAnswer()">
         {{ text('check') }}
       </app-check-button>
+    </div>
+  }
+
+  @if (showExitConfirm) {
+    <div class="exit-overlay" role="dialog" aria-modal="true">
+      <div class="exit-dialog">
+        <h2>{{ text('exitConfirmTitle') }}</h2>
+        <p>{{ text('exitConfirmMessage') }}</p>
+        <div class="exit-dialog-actions">
+          <button class="duo-button duo-button--orange" type="button" (click)="exitToHome()">{{ text('exitConfirmYes') }}</button>
+          <button class="duo-button duo-button--neutral" type="button" (click)="cancelExit()">{{ text('exitConfirmNo') }}</button>
+        </div>
+      </div>
     </div>
   }
 </main>
