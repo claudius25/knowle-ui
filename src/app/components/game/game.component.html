@@ -65,7 +65,11 @@
       }
   @if (state === 'correct') {
     <div class="game-footer">
-      <app-continue-button (continue)="continueGame()">{{ text('continue') }}</app-continue-button>
+      @if (sessionComplete) {
+        <app-chapter-button (chapter)="continueGame()">{{ text('chapterComplete') }}</app-chapter-button>
+      } @else {
+        <app-continue-button (continue)="continueGame()">{{ text('continue') }}</app-continue-button>
+      }
     </div>
   } @else if (state === 'incorrect') {
     <div class="game-footer incorrect-footer">

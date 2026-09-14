@@ -41,7 +41,8 @@ export type UiTextKey =
   | 'exitConfirmTitle'
   | 'exitConfirmMessage'
   | 'exitConfirmYes'
-  | 'exitConfirmNo';
+  | 'exitConfirmNo'
+  | 'chapterComplete';
 
 const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
   ro: {
@@ -86,6 +87,7 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     exitConfirmMessage: 'Progresul acestei sesiuni se va pierde dacă te întorci acum la pagina principală.',
     exitConfirmYes: 'Da, ieși',
     exitConfirmNo: 'Nu, rămân',
+    chapterComplete: 'Capitol finalizat!',
   },
   en: {
     gameName: 'Knowledge Adventure',
@@ -129,6 +131,7 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     exitConfirmMessage: 'Your progress in this session will be lost if you go back to the home page now.',
     exitConfirmYes: 'Yes, leave',
     exitConfirmNo: 'No, stay',
+    chapterComplete: 'Chapter complete!',
   },
 };
 

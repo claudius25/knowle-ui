@@ -7,6 +7,7 @@ import { ProgressBarComponent } from '../ui/progress-bar/progress-bar.component'
 import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
 import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
 import { ContinueButtonComponent } from '../ui/continue-button/continue-button.component';
+import { ChapterButtonComponent } from '../ui/chapter-button/chapter-button.component';
 import { TryAgainButtonComponent } from '../ui/try-again-button/try-again-button.component';
 import { CheckButtonComponent } from '../ui/check-button/check-button.component';
 import { GameService } from '../../shared/services/game.service';
@@ -40,6 +41,7 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     CoinDisplayComponent,
     HealthDisplayComponent,
     ContinueButtonComponent,
+    ChapterButtonComponent,
     TryAgainButtonComponent,
     CheckButtonComponent,
   ],
@@ -73,6 +75,11 @@ export class GameComponent implements OnInit {
 
   protected get progress(): number {
     return (this.completedActivities / GameComponent.ACTIVITIES_PER_SESSION) * 100;
+  }
+
+  protected get sessionComplete(): boolean {
+    console.log('Completed activities:', this.completedActivities);
+    return this.completedActivities >= GameComponent.ACTIVITIES_PER_SESSION;
   }
 
   protected get characterPose(): TortiPose {
@@ -144,7 +151,7 @@ export class GameComponent implements OnInit {
       return;
     }
 
-    this.loadActivity(this.nextActivity.activityId, true);
+    this.loadActivity(this.nextActivity.activityId);
   }
 
   protected retry(): void {

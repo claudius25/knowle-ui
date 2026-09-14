@@ -94,6 +94,7 @@
 .activity-shell {
   width: min(100%, 760px);
   margin-top: clamp(14px, 6vh, 60px);
+  z-index: 20;
 }
 
 .question-label {
