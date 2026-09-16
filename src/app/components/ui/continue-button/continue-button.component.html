@@ -1,9 +1,9 @@
-<button
-  class="duo-button continue-button"
-  [class.duo-button--green]="variant === 'green'"
-  [class.duo-button--grey]="variant === 'grey'"
-  type="button"
-  (click)="continue.emit()"
+<g-button
+  labelKey=""
+  [colors]="variant === 'green'
+    ? ['#b5ee82', '#8fd35c', '#8fd35c']
+    : ['#9aa0a6', '#757b82', '#757b82']"
+  (clicked)="continue.emit()"
 >
   <ng-content />
-</button>
+</g-button>

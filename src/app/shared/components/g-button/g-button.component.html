@@ -1,0 +1,16 @@
+<button
+  class="duo-button g-button"
+  type="button"
+  [disabled]="disabled"
+  [class.g-button--selected]="selected"
+  [style.--button-color]="defaultColor"
+  [style.--button-depth]="depthColor"
+  [style.--button-selected-color]="selectedColor"
+  (mousedown)="handleMouseDown()"
+  (click)="handleClick()"
+>
+  <span class="g-button__label">{{ uiText.text(labelKey) }}</span>
+  <span class="g-button__content">
+    <ng-content />
+  </span>
+</button>

@@ -4,8 +4,8 @@
   left: 0;
   right: 0;
   z-index: 10;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: min-content 1fr;
   align-items: center;
   gap: 12px;
   padding: 12px 20px 8px;
@@ -13,7 +13,7 @@
 }
 
 .game-footer__character {
-  width: min(170px, 36vw);
+  width: min(170px, 18vw);
   height: 120px;
   display: grid;
   place-items: center;
@@ -30,6 +30,10 @@
   display: flex;
   flex-direction: row;
   gap: 12px;
+  width: 100%;
+  & g-button {
+    flex: 1;
+  }
 }
 
 .feedback {

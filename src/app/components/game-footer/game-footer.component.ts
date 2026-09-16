@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { GButtonComponent } from '../../shared/components/g-button/g-button.component';
 import { TortiComponent } from '../../characters/torti/torti.component';
 import { TortiPose } from '../../characters/torti/torti.types';
 import { ChapterButtonComponent } from '../ui/chapter-button/chapter-button.component';
@@ -15,6 +16,7 @@ import { TryAgainButtonComponent } from '../ui/try-again-button/try-again-button
     ContinueButtonComponent,
     TryAgainButtonComponent,
     CheckButtonComponent,
+    GButtonComponent,
   ],
   templateUrl: './game-footer.component.html',
   styleUrl: './game-footer.component.css',

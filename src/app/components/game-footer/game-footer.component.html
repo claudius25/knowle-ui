@@ -27,8 +27,18 @@
     }
     @case ('incorrect') {
       <div class="incorrect-footer">
-        <app-try-again-button (retry)="retry.emit()">{{ retryText }}</app-try-again-button>
-        <app-continue-button variant="grey" (continue)="continue.emit()">{{ continueText }}</app-continue-button>
+        <g-button
+          labelKey="retry"
+          [colors]="['#e48459', '#bb6640', '#bb6640']"
+          (clicked)="retry.emit()"
+        >
+        </g-button>
+        <g-button
+          labelKey="continue"
+          [colors]="['#9aa0a6', '#757b82', '#757b82']"
+          (clicked)="continue.emit()"
+        >
+        </g-button>
       </div>
     }
     @case ('classify') {

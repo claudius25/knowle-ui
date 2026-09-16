@@ -7,6 +7,7 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
+import { GButtonComponent } from './shared/components/g-button/g-button.component';
 import { Router } from '@angular/router';
 import { TortiComponent } from './characters/torti/torti.component';
 import { TortiCharacter } from './characters/torti/torti-character';
@@ -31,7 +32,7 @@ const HAPPY_POSES: readonly TortiPose[] = [
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [TortiComponent],
+  imports: [TortiComponent, GButtonComponent],
   templateUrl: './home.component.html',
   styleUrl: './app.css',
 })
@@ -50,7 +51,6 @@ export class HomeComponent implements OnDestroy, OnInit {
   protected selectedLanguage: Language | null = this.languageService.getStoredLanguage();
   protected tortiSpeech = '';
   protected tortiShowBubble = false;
-  protected showIntroButton = !this.introService.hasSeenIntro();
 
   ngOnInit(): void {}
 

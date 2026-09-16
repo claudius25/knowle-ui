@@ -65,7 +65,7 @@ body {
   justify-content: center;
 
   background: var(--button-color);
-  color: white;
+  color: #063f37;;
 
   border: none;
   border-radius: 18px;
@@ -146,4 +146,12 @@ body {
 mat-icon {
   font-family: 'Material Icons' !important;
   padding-top: 2px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.language-flag {
+  width: 32px;
 }

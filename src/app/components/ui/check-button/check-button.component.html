@@ -1,3 +1,8 @@
-<button class="duo-button duo-button--green check-button" type="button" [disabled]="disabled" (click)="check.emit()">
+<g-button
+  labelKey=""
+  [disabled]="disabled"
+  [colors]="['#b5ee82', '#8fd35c', '#8fd35c']"
+  (clicked)="check.emit()"
+>
   <ng-content />
-</button>
+</g-button>

@@ -1,0 +1,19 @@
+.g-button {
+  gap: 12px;
+}
+
+.g-button.g-button--selected {
+  background: var(--button-selected-color);
+  transform: translateY(5px);
+  box-shadow: 0 2px 0 var(--button-depth);
+}
+
+.g-button__label,
+.g-button__content {
+  display: inline-flex;
+  align-items: center;
+}
+
+.g-button__content:empty {
+  display: none;
+}

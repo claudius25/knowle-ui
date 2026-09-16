@@ -1,7 +1,7 @@
 <main class="home-page">
-  <button class="admin-link-btn" type="button" (click)="goToAdmin()" title="Admin Content Editor">
+  <!-- <button class="admin-link-btn" type="button" (click)="goToAdmin()" title="Admin Content Editor">
     ⚙️ Admin
-  </button>
+  </button> -->
 
   <div class="hero-panel">
     <section class="character-area" aria-label="Personajul Gnosy">
@@ -24,35 +24,24 @@
 
   <footer class="home-footer" aria-label="Incepe jocul">
     @if (selectedLanguage) {
-      @if (showIntroButton) {
-        <button class="intro-button" type="button" (click)="goToIntro()">{{ uiText.text('introButton') }}</button>
-      } @else {
-        <button class="duo-button duo-button--green start-button" type="button" (click)="startGame()">
-          <span>{{ text('introStart') }}</span>
-        </button>
-      }
+          <!-- @if (showIntroButton) {
+            <button class="intro-button" type="button" (click)="goToIntro()">{{ uiText.text('introButton') }}</button>
+          } @else { -->
+        <g-button class="w-100" labelKey="introStart" (clicked)="startGame()"></g-button>
     } @else {
       <div class="language-buttons" role="group" aria-label="Selecteaza limba">
-        <button
-          class="duo-button duo-button--neutral language-button"
-          type="button"
-          [class.selected]="selectedLanguage === 'en'"
-          (click)="selectLanguage('en')"
-        >
-          <img class="language-flag" src="assets/home/en.png" alt="English" />
-          <span class="language-label">En</span>
-        </button>
-        <button
-          class="duo-button duo-button--neutral language-button"
-          type="button"
-          [class.selected]="selectedLanguage === 'ro'"
-          (click)="selectLanguage('ro')"
-        >
-          <img class="language-flag" src="assets/home/ro.png" alt="Română" />
-          <span class="language-label">Ro</span>
-        </button>
+        <g-button class="w-100" labelKey="EN" (clicked)="selectLanguage('en')"
+        [colors]="['#4B9E58','#327F45','#58cc02']" [selected]="selectedLanguage === 'en'">
+          <img  class="language-flag" src="assets/home/en.png" alt="English" />
+        </g-button>
+        <g-button class="w-100" labelKey="RO" (clicked)="selectLanguage('ro')"
+        [colors]="['#4B9E58','#327F45','#58cc02']" [selected]="selectedLanguage === 'ro'">
+          <img  class="language-flag" src="assets/home/ro.png" alt="Română" />
+        </g-button>
       </div>
     }
+
+    
 
   </footer>
 </main>

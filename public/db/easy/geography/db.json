@@ -182,12 +182,15 @@
               "text": "easy_geo_6_op_3"
             }
           ],
-          "answer": "c",
+          "answer": "b",
           "hint": "easy_geo_6_hint",
           "reward": {
             "coins": 10,
             "energy": 0
-          }
+          },
+          "pictures": [
+            "commet.png"
+          ]
         },
         {
           "id": "easy_geo_7",
@@ -195,12 +198,15 @@
           "title": "easy_geo_7_title",
           "description": "easy_geo_7_desc",
           "question": "easy_geo_7_question",
-          "answer": false,
+          "answer": true,
           "hint": "easy_geo_7_hint",
           "reward": {
             "coins": 10,
             "energy": 0
-          }
+          },
+          "pictures": [
+            "gravity.png"
+          ]
         },
         {
           "id": "easy_geo_8",

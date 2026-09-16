@@ -1,3 +1,7 @@
-<button class="duo-button duo-button--orange try-again-button" type="button" (click)="retry.emit()">
+<g-button
+  labelKey=""
+  [colors]="['#e48459', '#bb6640', '#bb6640']"
+  (clicked)="retry.emit()"
+>
   <ng-content />
-</button>
+</g-button>
