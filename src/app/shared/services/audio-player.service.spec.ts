@@ -34,6 +34,9 @@ describe('AudioPlayerService', () => {
       format: 'mp3',
     });
     expect(urlEn).toBe('/db/easy/geography/audio/easy_geo_1_question_en.mp3');
+
+    const globalUrl = service.getAudioUrl('happyLine1', { global: true });
+    expect(globalUrl).toBe('/audio/happyLine1_ro.webm');
   });
 
   it('should update isPlaying state and stop audio', () => {

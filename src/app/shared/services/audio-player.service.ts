@@ -7,6 +7,7 @@ export interface PlayAudioKeyOptions {
   domain?: string;
   lang?: Language;
   format?: 'webm' | 'mp3' | 'ogg' | 'wav';
+  global?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,13 +39,16 @@ export class AudioPlayerService implements OnDestroy {
   /**
    * Resolves the URL for an audio file given a key, language, domain, and difficulty.
    * Defaults to .webm (Opus), supporting .mp3 or others via options.format.
-   * e.g. /db/easy/geography/audio/easy_geo_1_desc_ro.webm
+   * e.g. /db/easy/geography/audio/easy_geo_1_desc_ro.webm or /audio/happyLine1_ro.webm
    */
   getAudioUrl(key: string, options?: PlayAudioKeyOptions): string {
-    const diff = (options?.difficulty || 'easy').toLowerCase();
-    const dom = (options?.domain || 'geography').toLowerCase();
     const lang = options?.lang || this.languageService.getCurrentLanguage() || 'ro';
     const ext = options?.format || 'webm';
+    if (options?.global) {
+      return `/audio/${key}_${lang}.${ext}`;
+    }
+    const diff = (options?.difficulty || 'easy').toLowerCase();
+    const dom = (options?.domain || 'geography').toLowerCase();
     return `/db/${diff}/${dom}/audio/${key}_${lang}.${ext}`;
   }
 

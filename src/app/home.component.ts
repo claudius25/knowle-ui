@@ -12,9 +12,13 @@ import { TortiComponent } from './characters/torti/torti.component';
 import { TortiCharacter } from './characters/torti/torti-character';
 import { TortiPose } from './characters/torti/torti.types';
 import { Language, LanguageService } from './shared/services/language.service';
-import { TtsService } from './shared/tts/tts.service';
 import { IntroService } from './shared/services/intro.service';
 import { UiTextService } from './shared/services/ui-text.service';
+import { AudioPlayerService } from './shared/services/audio-player.service';
+import {
+  TORTI_HAPPY_LINES,
+  pickRandomLine,
+} from './characters/torti/torti-speech.constants';
 
 const HAPPY_POSES: readonly TortiPose[] = [
   'happy',
@@ -26,23 +30,6 @@ const HAPPY_POSES: readonly TortiPose[] = [
   'tennis',
   'jako',
 ];
-
-const HAPPY_PHRASES: Record<Language, readonly string[]> = {
-  ro: [
-    'Bravo tie!',
-    'Esti grozav!',
-    'Hai sa invatam ceva nou!',
-    'Imi place energia ta!',
-    'Sa continuam aventura!',
-  ],
-  en: [
-    'You rock!',
-    'Great to see you!',
-    "Let's learn something new!",
-    'I love your energy!',
-    "Let's keep exploring!",
-  ],
-};
 
 @Component({
   selector: 'app-home',
@@ -56,49 +43,28 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
-  private readonly tts = inject(TtsService);
   private readonly introService = inject(IntroService);
+  private readonly audioPlayer = inject(AudioPlayerService);
   protected readonly uiText = inject(UiTextService);
   private resizeObserver?: ResizeObserver;
   private lastHeaderWidth = 0;
-  private ttsToastTimeout?: number;
+  private speechTimeout?: number;
 
   protected selectedLanguage: Language | null = this.languageService.getStoredLanguage();
   protected tortiSpeech = '';
   protected tortiShowBubble = false;
   protected showIntroButton = !this.introService.hasSeenIntro();
-  protected ttsToastVisible = false;
 
-  ngOnInit(): void {
-    void this.initializeTts();
-  }
+  ngOnInit(): void {}
 
   protected text(key: Parameters<UiTextService['text']>[0]): string {
     return this.uiText.text(key);
   }
 
-  private async initializeTts(): Promise<void> {
-    try {
-      await this.tts.init();
-      await this.tts.loadVoice('M1');
-      this.showTtsReadyToast();
-    } catch {
-      // Ignore background init failures; the app can keep working and retry on speech.
-    }
-  }
-
-  private showTtsReadyToast(): void {
-    this.ttsToastVisible = true;
-    window.clearTimeout(this.ttsToastTimeout);
-    this.ttsToastTimeout = window.setTimeout(() => {
-      this.ttsToastVisible = false;
-    }, 2200);
-  }
-
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
-    this.tts.stop();
-    window.clearTimeout(this.ttsToastTimeout);
+    this.audioPlayer.stop();
+    window.clearTimeout(this.speechTimeout);
   }
 
   protected selectLanguage(language: Language): void {
@@ -120,21 +86,26 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.router.navigate(['/admin']);
   }
 
-  protected async onTortiClick(character: TortiCharacter): Promise<void> {
+  protected onTortiClick(character: TortiCharacter): void {
     const pose = HAPPY_POSES[Math.floor(Math.random() * HAPPY_POSES.length)];
     character.setPose(pose);
 
     const language = this.selectedLanguage ?? this.languageService.getCurrentLanguage();
-    const phrases = HAPPY_PHRASES[language];
-    this.tortiSpeech = phrases[Math.floor(Math.random() * phrases.length)];
+    const lineKey = pickRandomLine(TORTI_HAPPY_LINES);
+    this.tortiSpeech = this.uiText.text(lineKey);
     this.tortiShowBubble = true;
     character.startTalking();
 
-    try {
-      await this.tts.speak(this.tortiSpeech, { lang: language });
-    } finally {
+    window.clearTimeout(this.speechTimeout);
+
+    void this.audioPlayer.playKey(lineKey, { global: true, lang: language }).then(() => {
       character.stopTalking();
       this.tortiShowBubble = false;
-    }
+    });
+
+    this.speechTimeout = window.setTimeout(() => {
+      character.stopTalking();
+      this.tortiShowBubble = false;
+    }, 4000);
   }
 }

@@ -30,8 +30,8 @@ export type UiTextKey =
   | 'matchingInstruction'
   | 'ordering'
   | 'orderingInstruction'
-  | 'ttsTest'
-  | 'ttsSpeaking'
+  | 'audioListen'
+  | 'audioSpeaking'
   | 'introButton'
   | 'introSkip'
   | 'introNext'
@@ -48,7 +48,17 @@ export type UiTextKey =
   | 'exitConfirmNo'
   | 'chapterComplete'
   | 'chapterDoneSubtitle'
-  | 'playAgain';
+  | 'playAgain'
+  | 'happyLine1'
+  | 'happyLine2'
+  | 'happyLine3'
+  | 'happyLine4'
+  | 'happyLine5'
+  | 'sadLine1'
+  | 'sadLine2'
+  | 'sadLine3'
+  | 'sadLine4'
+  | 'sadLine5';
 
 const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
   ro: {
@@ -81,8 +91,8 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     matchingInstruction: 'Alege un element din stânga și perechea lui din dreapta',
     ordering: 'Ordonează elementele',
     orderingInstruction: 'Așază elementele în ordinea corectă',
-    ttsTest: 'Ascultă „Hello World”',
-    ttsSpeaking: 'Redare audio...',
+    audioListen: 'Ascultă',
+    audioSpeaking: 'Redare audio...',
     introButton: 'Intro',
     introSkip: 'Sari peste',
     introNext: 'Continuă',
@@ -101,6 +111,16 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     chapterComplete: 'Capitol finalizat!',
     chapterDoneSubtitle: 'Ai demonstrat cunoștințe excelente și ai învățat lucruri noi!',
     playAgain: 'Joacă din nou',
+    happyLine1: 'Felicitări!',
+    happyLine2: 'Ai făcut o treabă grozavă!',
+    happyLine3: 'Continuă să explorezi și să înveți!',
+    happyLine4: 'Bucură-te de fiecare moment al aventurii tale!',
+    happyLine5: 'Animalule',
+    sadLine1: 'Ups, nu chiar.',
+    sadLine2: 'Nu-ți face griji, încearcă din nou!',
+    sadLine3: 'A fost aproape! Mai încearcă o dată.',
+    sadLine4: 'Hmm, nu este corect.',
+    sadLine5: 'Esti patetic!',
   },
   en: {
     gameName: 'Knowledge Adventure',
@@ -132,8 +152,8 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     matchingInstruction: 'Tap an item on the left, then its match on the right',
     ordering: 'Order the items',
     orderingInstruction: 'Arrange the items in the correct order',
-    ttsTest: 'Speak "Hello World"',
-    ttsSpeaking: 'Playing audio...',
+    audioListen: 'Listen',
+    audioSpeaking: 'Playing audio...',
     introButton: 'Intro',
     introSkip: 'Skip',
     introNext: 'Next',
@@ -152,6 +172,16 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     chapterComplete: 'Chapter complete!',
     chapterDoneSubtitle: 'You demonstrated great knowledge and learned new things!',
     playAgain: 'Play again',
+    happyLine1: 'Congratulations!',
+    happyLine2: 'You did a great job!',
+    happyLine3: 'Keep exploring and learning!',
+    happyLine4: 'Enjoy every moment of your adventure!',
+    happyLine5: 'You little animal',
+    sadLine1: 'Oops, not quite.',
+    sadLine2: "Don't worry, try again!",
+    sadLine3: 'So close! Give it another shot.',
+    sadLine4: 'Hmm, that is not it.',
+    sadLine5: 'You are pathetic!',
   },
 };
 

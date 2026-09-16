@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClassifyComponent } from '../activity/classify/classify.component';
 import { MatchingComponent } from '../activity/matching/matching.component';
@@ -11,7 +11,7 @@ import { HealthDisplayComponent } from '../ui/health-display/health-display.comp
 import { GameService } from '../../shared/services/game.service';
 import { GameFooterComponent } from '../game-footer/game-footer.component';
 import { UiTextService } from '../../shared/services/ui-text.service';
-import { TtsService } from '../../shared/tts/tts.service';
+import { AudioPlayerService } from '../../shared/services/audio-player.service';
 import { TortiPose } from '../../characters/torti/torti.types';
 import {
   TORTI_HAPPY_LINES,
@@ -48,10 +48,10 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
   private readonly gameService = inject(GameService);
   protected readonly uiText = inject(UiTextService);
-  private readonly tts = inject(TtsService);
+  private readonly audioPlayer = inject(AudioPlayerService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -63,7 +63,6 @@ export class GameComponent implements OnInit {
   private static readonly COINS_PER_CORRECT_ANSWER = 10;
   private static readonly COINS_LOST_PER_RETRY = 20;
   private static readonly HEALTH_LOSS_PER_MISTAKE = 20;
-  private static readonly CHARACTER_VOICE = 'M1';
 
   protected state: GameState = 'loading';
   protected activity: Activity | null = null;
@@ -95,7 +94,6 @@ export class GameComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.tts.loadVoice(GameComponent.CHARACTER_VOICE).catch(() => {});
     this.loadInitialActivity();
   }
 
@@ -276,7 +274,14 @@ export class GameComponent implements OnInit {
     return this.selectedAnswer === null;
   }
 
+  ngOnDestroy(): void {
+    this.audioPlayer.stop();
+  }
+
   protected continueGame(): void {
+    this.audioPlayer.stop();
+    this.characterSpeech = '';
+
     if (this.sessionComplete || !this.nextActivity) {
       this.router.navigate(['/chapter-done'], {
         state: {
@@ -291,6 +296,7 @@ export class GameComponent implements OnInit {
   }
 
   protected retry(): void {
+    this.audioPlayer.stop();
     this.coins = this.coins - GameComponent.COINS_LOST_PER_RETRY;
     this.selectedAnswer = null;
     this.characterSpeech = '';
@@ -310,11 +316,13 @@ export class GameComponent implements OnInit {
   }
 
   protected exitToHome(): void {
+    this.audioPlayer.stop();
     this.showExitConfirm = false;
     this.router.navigate(['/']);
   }
 
   private loadInitialActivity(): void {
+    this.audioPlayer.stop();
     this.state = 'loading';
     this.errorMessage = '';
     this.coins = 0;
@@ -353,6 +361,7 @@ export class GameComponent implements OnInit {
     this.errorMessage = '';
     if (!preserveState) {
       this.characterSpeech = '';
+      this.audioPlayer.stop();
     }
     this.gameService.getActivity(activityId).subscribe({
       next: (activity) => {
@@ -370,29 +379,22 @@ export class GameComponent implements OnInit {
     return this.uiText.text(key);
   }
 
-  private speakCharacterLine(): void {
-    if (!this.characterSpeech) {
-      return;
-    }
-    this.tts
-      .speak(this.characterSpeech, { lang: 'en', voice: GameComponent.CHARACTER_VOICE })
-      .catch(() => {});
-  }
-
   private handleAnswer(response: AnswerResponse): void {
     if (response.correct) {
       this.completedActivities += 1;
       this.coins += GameComponent.COINS_PER_CORRECT_ANSWER;
       this.nextActivity = response.nextActivity;
-      this.characterSpeech = pickRandomLine(TORTI_HAPPY_LINES);
-      this.speakCharacterLine();
+      const speechKey = pickRandomLine(TORTI_HAPPY_LINES);
+      this.characterSpeech = this.text(speechKey);
+      void this.audioPlayer.playKey(speechKey, { global: true });
       this.state = 'correct';
       return;
     }
 
     this.health = Math.max(0, this.health - GameComponent.HEALTH_LOSS_PER_MISTAKE);
-    this.characterSpeech = pickRandomLine(TORTI_SAD_LINES);
-    this.speakCharacterLine();
+    const speechKey = pickRandomLine(TORTI_SAD_LINES);
+    this.characterSpeech = this.text(speechKey);
+    void this.audioPlayer.playKey(speechKey, { global: true });
     this.state = 'incorrect';
   }
 }

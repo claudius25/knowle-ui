@@ -13,7 +13,7 @@
         type="button"
         [class.speaking]="isSpeaking$ | async"
         (click)="speak()"
-        [attr.aria-label]="uiText.text('ttsTest', 'Ascultă')"
+        [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
         title="Ascultă descrierea și întrebarea"
       >
         <mat-icon>record_voice_over</mat-icon>

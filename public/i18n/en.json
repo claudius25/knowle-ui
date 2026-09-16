@@ -98,8 +98,8 @@
   "matchingInstruction": "Tap an item on the left, then its match on the right",
   "ordering": "Order the items",
   "orderingInstruction": "Arrange the items in the correct order",
-  "ttsTest": "Speak \"Hello World\"",
-  "ttsSpeaking": "Playing audio...",
+  "audioListen": "Listen",
+  "audioSpeaking": "Playing audio...",
   "introButton": "Intro",
   "introSkip": "Skip",
   "introNext": "Next",
@@ -116,5 +116,17 @@
   "exitConfirmNo": "No, stay",
   "chapterComplete": "Chapter complete!",
   "chapterDoneSubtitle": "You demonstrated great knowledge and learned new things!",
-  "playAgain": "Play again"
+  "playAgain": "Play again",
+
+  "happyLine1": "Congratulations!",
+  "happyLine2": "You did a great job!",
+  "happyLine3": "Keep exploring and learning!",
+  "happyLine4": "Enjoy every moment of your adventure!",
+  "happyLine5": "You little animal",
+
+  "sadLine1": "Oops, not quite.",
+  "sadLine2": "Don't worry, try again!",
+  "sadLine3": "So close! Give it another shot.",
+  "sadLine4": "Hmm, that is not it.",
+  "sadLine5": "You are pathetic!"
 }

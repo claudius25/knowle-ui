@@ -98,8 +98,8 @@
   "matchingInstruction": "Alege un element din stânga și perechea lui din dreapta",
   "ordering": "Ordonează elementele",
   "orderingInstruction": "Așază elementele în ordinea corectă",
-  "ttsTest": "Ascultă „Hello World”",
-  "ttsSpeaking": "Redare audio...",
+  "audioListen": "Ascultă",
+  "audioSpeaking": "Redare audio...",
   "introButton": "Intro",
   "introSkip": "Sari peste",
   "introNext": "Continuă",
@@ -116,5 +116,17 @@
   "exitConfirmNo": "Nu, rămân",
   "chapterComplete": "Capitol finalizat!",
   "chapterDoneSubtitle": "Ai demonstrat cunoștințe excelente și ai învățat lucruri noi!",
-  "playAgain": "Joacă din nou"
+  "playAgain": "Joacă din nou",
+
+  "happyLine1": "Felicitări!",
+  "happyLine2": "Ai făcut o treabă grozavă!",
+  "happyLine3": "Continuă să explorezi și să înveți!",
+  "happyLine4": "Bucură-te de fiecare moment al aventurii tale!",
+  "happyLine5": "Animalule",
+
+  "sadLine1": "Ups, nu chiar.",
+  "sadLine2": "Nu-ți face griji, încearcă din nou!",
+  "sadLine3": "A fost aproape! Mai încearcă o dată.",
+  "sadLine4": "Hmm, nu este corect.",
+  "sadLine5": "Esti patetic!"
 }

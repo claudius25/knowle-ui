@@ -130,31 +130,6 @@
 	padding-bottom: clamp(1vh, 2vw, 3vh);
 }
 
-.tts-toast {
-	position: fixed;
-	left: 50%;
-	bottom: 24px;
-	transform: translate(-50%, 12px);
-	background: rgba(11, 27, 24, 0.88);
-	color: #ffffff;
-	padding: 10px 16px;
-	border-radius: 999px;
-	font-family: 'Nunito', sans-serif;
-	font-size: 0.9rem;
-	font-weight: 700;
-	letter-spacing: 0.03em;
-	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 0.2s ease, transform 0.2s ease;
-	z-index: 999;
-}
-
-.tts-toast.visible {
-	opacity: 1;
-	transform: translate(-50%, 0);
-}
-
 .language-buttons {
 	display: flex;
 	gap: 18px;

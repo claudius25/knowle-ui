@@ -24,11 +24,6 @@
                 "input": "public"
               },
               {
-                "glob": "*.{wasm,mjs}",
-                "input": "node_modules/onnxruntime-web/dist",
-                "output": "tts/wasm"
-              },
-              {
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
@@ -96,11 +91,6 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              {
-                "glob": "*.{wasm,mjs}",
-                "input": "node_modules/onnxruntime-web/dist",
-                "output": "tts/wasm"
               },
               {
                 "glob": "**/*",
