@@ -110,5 +110,7 @@
   "exitConfirmMessage": "Progresul acestei sesiuni se va pierde dacă te întorci acum la pagina principală.",
   "exitConfirmYes": "Da, ieși",
   "exitConfirmNo": "Nu, rămân",
-  "chapterComplete": "Capitol finalizat!"
+  "chapterComplete": "Capitol finalizat!",
+  "chapterDoneSubtitle": "Ai demonstrat cunoștințe excelente și ai învățat lucruri noi!",
+  "playAgain": "Joacă din nou"
 }

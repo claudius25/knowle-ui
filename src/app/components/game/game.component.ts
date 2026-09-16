@@ -72,7 +72,6 @@ export class GameComponent implements OnInit {
   }
 
   protected get sessionComplete(): boolean {
-    console.log('Completed activities:', this.completedActivities);
     return this.completedActivities >= GameComponent.ACTIVITIES_PER_SESSION;
   }
 
@@ -138,6 +137,7 @@ export class GameComponent implements OnInit {
   }
 
   protected get classifyComplete(): boolean {
+    console.log('Classify complete:', this.classifyComponent, this.classifyComponent?.isComplete);
     return this.classifyComponent?.isComplete ?? false;
   }
 
@@ -161,11 +161,42 @@ export class GameComponent implements OnInit {
     this.classifyComponent?.submit();
   }
 
+  protected submitClassifyAnswer(answer: Record<string, string>): void {
+    if (this.state !== 'playing' || !this.activity) {
+      return;
+    }
+
+    this.selectedAnswer = answer;
+    this.state = 'answering';
+    this.gameService
+      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
+      .subscribe({
+        next: (response) => this.handleAnswer(response),
+        error: () => {
+          this.state = 'error';
+          this.errorMessage = this.text('activityError');
+        },
+      });
+  }
+
+  protected get isCheckDisabled(): boolean {
+    if (this.state === 'answering') {
+      return true;
+    }
+    if (this.classifyData) {
+      return !this.classifyComplete;
+    }
+    return this.selectedAnswer === null;
+  }
+
   protected continueGame(): void {
-    console.log('Continuing game...');
-    console.log('Next activity:', this.nextActivity);
-    if (!this.nextActivity) {
-      this.loadInitialActivity();
+    if (this.sessionComplete || !this.nextActivity) {
+      this.router.navigate(['/chapter-done'], {
+        state: {
+          coins: this.coins,
+          health: this.health,
+        },
+      });
       return;
     }
 

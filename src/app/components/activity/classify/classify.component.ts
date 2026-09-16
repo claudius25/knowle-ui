@@ -62,6 +62,7 @@ export class ClassifyComponent implements OnChanges {
   }
 
   get isComplete(): boolean {
+    console.log('Pool length:', this.pool.length);
     return this.pool.length === 0;
   }
 

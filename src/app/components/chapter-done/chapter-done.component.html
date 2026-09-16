@@ -1,0 +1,44 @@
+<main class="chapter-done-page">
+  <div class="stats-bar">
+    <app-health-display [value]="health" />
+    <app-coin-display [amount]="coins" />
+  </div>
+
+  <section class="celebration-card" aria-live="polite">
+    <div class="character-container">
+      <app-torti
+        [centered]="true"
+        [initialPose]="'happy'"
+        [speechText]="speechBubble"
+        [showBubble]="true"
+      />
+    </div>
+
+    <div class="title-group">
+      <h1 class="celebration-title">{{ uiText.text('chapterComplete') }}</h1>
+      <p class="celebration-subtitle">
+        {{ uiText.text('chapterDoneSubtitle', 'Ai demonstrat cunoștințe excelente și ai învățat lucruri noi!') }}
+      </p>
+    </div>
+
+    <div class="rewards-summary">
+      <div class="reward-pill">
+        <span class="reward-icon">🪙</span>
+        <span class="reward-text">+{{ coins }} {{ uiText.text('common_coins', 'Monede') }}</span>
+      </div>
+      <div class="reward-pill">
+        <span class="reward-icon">⭐</span>
+        <span class="reward-text">100% {{ uiText.text('quiz_finish', 'Finalizat') }}</span>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="duo-button duo-button--green action-btn" type="button" (click)="goHome()">
+        {{ uiText.text('navigation_home', 'Acasă') }}
+      </button>
+      <button class="duo-button duo-button--neutral action-btn" type="button" (click)="playAgain()">
+        {{ uiText.text('playAgain', 'Joacă din nou') }}
+      </button>
+    </div>
+  </section>
+</main>

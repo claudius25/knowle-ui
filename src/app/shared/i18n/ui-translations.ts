@@ -42,7 +42,9 @@ export type UiTextKey =
   | 'exitConfirmMessage'
   | 'exitConfirmYes'
   | 'exitConfirmNo'
-  | 'chapterComplete';
+  | 'chapterComplete'
+  | 'chapterDoneSubtitle'
+  | 'playAgain';
 
 const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
   ro: {
@@ -84,10 +86,13 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     introPage3Title: 'Câștigă monede și progres',
     introPage3Body: 'Adună monede, urmărește-ți progresul și ai grijă de sănătatea ta.',
     exitConfirmTitle: 'Părăsești jocul?',
-    exitConfirmMessage: 'Progresul acestei sesiuni se va pierde dacă te întorci acum la pagina principală.',
+    exitConfirmMessage:
+      'Progresul acestei sesiuni se va pierde dacă te întorci acum la pagina principală.',
     exitConfirmYes: 'Da, ieși',
     exitConfirmNo: 'Nu, rămân',
     chapterComplete: 'Capitol finalizat!',
+    chapterDoneSubtitle: 'Ai demonstrat cunoștințe excelente și ai învățat lucruri noi!',
+    playAgain: 'Joacă din nou',
   },
   en: {
     gameName: 'Knowledge Adventure',
@@ -128,10 +133,13 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     introPage3Title: 'Earn coins and progress',
     introPage3Body: 'Collect coins, track your progress, and take care of your health.',
     exitConfirmTitle: 'Leave the game?',
-    exitConfirmMessage: 'Your progress in this session will be lost if you go back to the home page now.',
+    exitConfirmMessage:
+      'Your progress in this session will be lost if you go back to the home page now.',
     exitConfirmYes: 'Yes, leave',
     exitConfirmNo: 'No, stay',
     chapterComplete: 'Chapter complete!',
+    chapterDoneSubtitle: 'You demonstrated great knowledge and learned new things!',
+    playAgain: 'Play again',
   },
 };
 

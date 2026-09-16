@@ -110,5 +110,7 @@
   "exitConfirmMessage": "Your progress in this session will be lost if you go back to the home page now.",
   "exitConfirmYes": "Yes, leave",
   "exitConfirmNo": "No, stay",
-  "chapterComplete": "Chapter complete!"
+  "chapterComplete": "Chapter complete!",
+  "chapterDoneSubtitle": "You demonstrated great knowledge and learned new things!",
+  "playAgain": "Play again"
 }

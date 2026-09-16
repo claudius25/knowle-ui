@@ -1,40 +1,26 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Activity, AnswerResponse, Difficulty, GameStartResponse } from '../models/game.types';
-import { LanguageService } from './language.service';
-import { environment } from '../../../environments/environment';
+import { ContentDatabaseService } from './content-database.service';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  private readonly http = inject(HttpClient);
-  private readonly languageService = inject(LanguageService);
+  private readonly contentDb = inject(ContentDatabaseService);
 
-  startGame(): Observable<GameStartResponse> {
-    const params = new HttpParams()
-      .set('language', this.languageService.getCurrentLanguage())
-      .set('age', '9')
-      .set('difficulty', '1');
-
-    return this.http.get<GameStartResponse>(`${environment.API_URL}/game/start`, { params });
+  startGame(difficulty: Difficulty = 'EASY', domain = 'geography'): Observable<GameStartResponse> {
+    return this.contentDb.startGame(difficulty, domain);
   }
 
-  getActivity(activityId: string): Observable<Activity> {
-    const params = new HttpParams().set('language', this.languageService.getCurrentLanguage());
-    return this.http.get<Activity>(`${environment.API_URL}/game/activity/${activityId}`, { params });
+  getActivity(activityId: string, difficulty: Difficulty = 'EASY', domain = 'geography'): Observable<Activity> {
+    return this.contentDb.getActivity(activityId, difficulty, domain);
   }
 
-  submitAnswer(activityId: string, answer: unknown, difficulty: Difficulty): Observable<AnswerResponse> {
-    return this.http.post<AnswerResponse>(`${environment.API_URL}/game/answer`, {
-      activityId,
-      answer,
-      language: this.languageService.getCurrentLanguage(),
-      age: 9,
-      difficulty: this.difficultyValue(difficulty),
-    });
-  }
-
-  private difficultyValue(difficulty: Difficulty): number {
-    return { EASY: 1, MEDIUM: 2, HARD: 3 }[difficulty];
+  submitAnswer(
+    activityId: string,
+    answer: unknown,
+    difficulty: Difficulty = 'EASY',
+    domain = 'geography',
+  ): Observable<AnswerResponse> {
+    return this.contentDb.submitAnswer(activityId, answer, difficulty, domain);
   }
 }

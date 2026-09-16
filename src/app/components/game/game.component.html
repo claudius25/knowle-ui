@@ -37,7 +37,7 @@
         <app-classify
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
-          (answerSubmitted)="selectAnswer($event)"
+          (answerSubmitted)="submitClassifyAnswer($event)"
         />
       } @else {
         <div class="status-panel">
@@ -60,7 +60,7 @@
     [continueText]="text('continue')"
     [retryText]="text('retry')"
     [classifyComplete]="classifyComplete"
-    [disabled]="state === 'answering' || selectedAnswer === null"
+    [disabled]="isCheckDisabled"
     [checkText]="text('check')"
     [characterPose]="characterPose"
     [characterSpeech]="characterSpeech"

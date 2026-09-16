@@ -32,7 +32,7 @@
       </div>
     }
     @case ('classify') {
-      <app-check-button [disabled]="disabled || !classifyComplete" (check)="check.emit()">
+      <app-check-button [disabled]="disabled" (check)="check.emit()">
         {{ checkText }}
       </app-check-button>
     }
