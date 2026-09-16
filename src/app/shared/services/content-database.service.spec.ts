@@ -52,6 +52,33 @@ const MOCK_DB: DbDatabase = {
             item_2: 'water',
           },
         },
+        {
+          id: 'easy_geo_8',
+          type: 'MATCHING',
+          title: 'easy_geo_8_title',
+          description: 'easy_geo_8_desc',
+          question: 'easy_geo_8_question',
+          pairs: [
+            { id: 'pair_1', left: 'easy_geo_8_left_1', right: 'easy_geo_8_right_1' },
+            { id: 'pair_2', left: 'easy_geo_8_left_2', right: 'easy_geo_8_right_2' },
+          ],
+          answer: [
+            { left: 'easy_geo_8_left_1', right: 'easy_geo_8_right_1' },
+            { left: 'easy_geo_8_left_2', right: 'easy_geo_8_right_2' },
+          ],
+        },
+        {
+          id: 'easy_geo_9',
+          type: 'ORDERING',
+          title: 'easy_geo_9_title',
+          description: 'easy_geo_9_desc',
+          question: 'easy_geo_9_question',
+          items: [
+            { id: 'item_1', text: 'easy_geo_9_item_1' },
+            { id: 'item_2', text: 'easy_geo_9_item_2' },
+          ],
+          answer: ['item_1', 'item_2'],
+        },
       ],
     },
   ],
@@ -71,6 +98,16 @@ const MOCK_RO_DICT: Record<string, string> = {
   easy_geo_5_cat_2: 'Apă',
   easy_geo_5_item_1: 'Munte',
   easy_geo_5_item_2: 'Ocean',
+  easy_geo_8_title: 'Instrumente',
+  easy_geo_8_question: 'Potrivește instrumentele:',
+  easy_geo_8_left_1: 'Busola',
+  easy_geo_8_right_1: 'Nordul',
+  easy_geo_8_left_2: 'Globul',
+  easy_geo_8_right_2: 'Model 3D',
+  easy_geo_9_title: 'Înălțimi',
+  easy_geo_9_question: 'Ordonează formele de relief:',
+  easy_geo_9_item_1: 'Câmpie',
+  easy_geo_9_item_2: 'Munte',
   quiz_incorrect: 'Răspuns greșit!',
 };
 
@@ -114,6 +151,30 @@ describe('ContentDatabaseService', () => {
     const i18nReq = httpMock.expectOne('/db/easy/geography/i18n/ro.json');
     expect(i18nReq.request.method).toBe('GET');
     i18nReq.flush(MOCK_RO_DICT);
+  });
+
+  it('should start game with specific 1-based index (e.g. 3rd activity)', (done) => {
+    service.startGame('EASY', 'geography', 3).subscribe((res) => {
+      expect(res.activityId).toBe('easy_geo_5');
+      expect(res.title).toBe('Forme de relief');
+      expect(res.type).toBe('CLASSIFY');
+      done();
+    });
+
+    httpMock.expectOne('/db/easy/geography/db.json').flush(MOCK_DB);
+    httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO_DICT);
+  });
+
+  it('should start game with specific activity ID string', (done) => {
+    service.startGame('EASY', 'geography', 'easy_geo_5').subscribe((res) => {
+      expect(res.activityId).toBe('easy_geo_5');
+      expect(res.title).toBe('Forme de relief');
+      expect(res.type).toBe('CLASSIFY');
+      done();
+    });
+
+    httpMock.expectOne('/db/easy/geography/db.json').flush(MOCK_DB);
+    httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO_DICT);
   });
 
   it('should load multiple choice activity with translated options', (done) => {
@@ -170,7 +231,29 @@ describe('ContentDatabaseService', () => {
   it('should validate classify activity correctly', (done) => {
     service.submitAnswer('easy_geo_5', { item_1: 'land', item_2: 'water' }).subscribe((res) => {
       expect(res.correct).toBeTrue();
-      expect(res.nextActivity).toBeNull(); // last activity in mock chapter
+      expect(res.nextActivity?.activityId).toBe('easy_geo_8');
+      done();
+    });
+
+    httpMock.expectOne('/db/easy/geography/db.json').flush(MOCK_DB);
+    httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO_DICT);
+  });
+
+  it('should validate matching activity correctly', (done) => {
+    service.submitAnswer('easy_geo_8', { pair_1: 'pair_1', pair_2: 'pair_2' }).subscribe((res) => {
+      expect(res.correct).toBeTrue();
+      expect(res.nextActivity?.activityId).toBe('easy_geo_9');
+      done();
+    });
+
+    httpMock.expectOne('/db/easy/geography/db.json').flush(MOCK_DB);
+    httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO_DICT);
+  });
+
+  it('should validate ordering activity correctly', (done) => {
+    service.submitAnswer('easy_geo_9', ['item_1', 'item_2']).subscribe((res) => {
+      expect(res.correct).toBeTrue();
+      expect(res.nextActivity).toBeNull();
       done();
     });
 

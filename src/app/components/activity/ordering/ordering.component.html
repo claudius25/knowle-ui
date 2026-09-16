@@ -1,0 +1,36 @@
+<div class="question-block">
+  <div class="question-row">
+    <h2>{{ data.question }}</h2>
+  </div>
+  <p class="instruction-label">{{ uiText.text('orderingInstruction') }}</p>
+</div>
+
+<div
+  class="ordering-list"
+  cdkDropList
+  [cdkDropListData]="items"
+  [cdkDropListDisabled]="disabled"
+  (cdkDropListDropped)="drop($event)"
+  [attr.aria-label]="uiText.text('ordering')"
+>
+  @for (item of items; track item.id; let i = $index) {
+    <div
+      class="duo-button duo-button--neutral ordering-card"
+      cdkDrag
+      [cdkDragDisabled]="disabled"
+    >
+      <span class="order-badge">{{ i + 1 }}</span>
+      <span class="ordering-card__text">{{ item.text }}</span>
+      <span class="drag-handle-indicator" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <circle cx="8.5" cy="6.5" r="1.5"/>
+          <circle cx="15.5" cy="6.5" r="1.5"/>
+          <circle cx="8.5" cy="12" r="1.5"/>
+          <circle cx="15.5" cy="12" r="1.5"/>
+          <circle cx="8.5" cy="17.5" r="1.5"/>
+          <circle cx="15.5" cy="17.5" r="1.5"/>
+        </svg>
+      </span>
+    </div>
+  }
+</div>

@@ -1,0 +1,113 @@
+.question-block {
+  padding: 12px 0 20px;
+}
+
+.question-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+h2 {
+  max-width: 620px;
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(1.6rem, 3.8vw, 2.4rem);
+  line-height: 1.15;
+}
+
+.instruction-label {
+  margin: 8px 0 0;
+  color: #b5ee82;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.matching-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .matching-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+.matching-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.match-card {
+  position: relative;
+  min-height: 64px;
+  width: 100%;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px !important;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: left;
+  line-height: 1.3;
+  transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+  max-width: none;
+  height: auto;
+}
+
+.card-text {
+  flex: 1 1 auto;
+}
+
+.match-card.selected {
+  border-color: #1cb0f6 !important;
+  background-color: rgba(28, 176, 246, 0.25) !important;
+  box-shadow: 0 0 0 2px #1cb0f6;
+  transform: scale(1.02);
+}
+
+.match-card.mismatch {
+  border-color: #ea2b2b !important;
+  background-color: rgba(234, 43, 43, 0.25) !important;
+  box-shadow: 0 0 0 2px #ea2b2b;
+  animation: shake 0.35s ease-in-out;
+}
+
+.match-card.matched {
+  opacity: 0.45;
+  background-color: rgba(88, 204, 2, 0.12) !important;
+  border-color: #58cc02 !important;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+.check-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #58cc02;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 0.85rem;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}

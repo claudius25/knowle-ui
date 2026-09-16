@@ -26,6 +26,10 @@ export type UiTextKey =
   | 'trueLabel'
   | 'falseLabel'
   | 'classify'
+  | 'matching'
+  | 'matchingInstruction'
+  | 'ordering'
+  | 'orderingInstruction'
   | 'ttsTest'
   | 'ttsSpeaking'
   | 'introButton'
@@ -73,6 +77,10 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     trueLabel: 'ADEVĂRAT',
     falseLabel: 'FALS',
     classify: 'Clasifică elementele',
+    matching: 'Potrivește perechile',
+    matchingInstruction: 'Alege un element din stânga și perechea lui din dreapta',
+    ordering: 'Ordonează elementele',
+    orderingInstruction: 'Așază elementele în ordinea corectă',
     ttsTest: 'Ascultă „Hello World”',
     ttsSpeaking: 'Redare audio...',
     introButton: 'Intro',
@@ -120,6 +128,10 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     trueLabel: 'TRUE',
     falseLabel: 'FALSE',
     classify: 'Classify the items',
+    matching: 'Match the pairs',
+    matchingInstruction: 'Tap an item on the left, then its match on the right',
+    ordering: 'Order the items',
+    orderingInstruction: 'Arrange the items in the correct order',
     ttsTest: 'Speak "Hello World"',
     ttsSpeaking: 'Playing audio...',
     introButton: 'Intro',

@@ -39,7 +39,24 @@ describe('GameService', () => {
 
     service.startGame().subscribe((res) => {
       expect(res).toEqual(mockStart);
-      expect(contentDbSpy.startGame).toHaveBeenCalledWith('EASY', 'geography');
+      expect(contentDbSpy.startGame).toHaveBeenCalledWith('EASY', 'geography', undefined);
+      done();
+    });
+  });
+
+  it('should delegate startGame with startIndex to ContentDatabaseService', (done) => {
+    const mockStart: GameStartResponse = {
+      activityId: 'easy_geo_5',
+      title: 'Forme de relief',
+      type: 'CLASSIFY',
+      difficulty: 'EASY',
+    };
+
+    contentDbSpy.startGame.and.returnValue(of(mockStart));
+
+    service.startGame('EASY', 'geography', 5).subscribe((res) => {
+      expect(res).toEqual(mockStart);
+      expect(contentDbSpy.startGame).toHaveBeenCalledWith('EASY', 'geography', 5);
       done();
     });
   });

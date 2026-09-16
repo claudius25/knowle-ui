@@ -39,6 +39,18 @@
           [disabled]="state === 'answering' || state === 'correct'"
           (answerSubmitted)="submitClassifyAnswer($event)"
         />
+      } @else if (matchingData; as data) {
+        <app-matching
+          [data]="data"
+          [disabled]="state === 'answering' || state === 'correct'"
+          (answerSubmitted)="submitMatchingAnswer($event)"
+        />
+      } @else if (orderingData; as data) {
+        <app-ordering
+          [data]="data"
+          [disabled]="state === 'answering' || state === 'correct'"
+          (answerSubmitted)="submitOrderingAnswer($event)"
+        />
       } @else {
         <div class="status-panel">
           <span class="status-icon" aria-hidden="true">i</span>
@@ -67,7 +79,7 @@
     (chapter)="continueGame()"
     (continue)="continueGame()"
     (retry)="retry()"
-    (check)="classifyData ? checkClassifyAnswer() : checkSelectedAnswer()"
+    (check)="classifyData ? checkClassifyAnswer() : (matchingData ? checkMatchingAnswer() : (orderingData ? checkOrderingAnswer() : checkSelectedAnswer()))"
   />
 
   @if (showExitConfirm) {

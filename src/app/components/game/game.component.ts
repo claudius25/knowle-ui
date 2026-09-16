@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ClassifyComponent } from '../activity/classify/classify.component';
+import { MatchingComponent } from '../activity/matching/matching.component';
+import { OrderingComponent } from '../activity/ordering/ordering.component';
 import { MultipleChoiceComponent } from '../activity/multiple-choice/multiple-choice.component';
 import { TrueFalseComponent } from '../activity/true-false/true-false.component';
 import { ProgressBarComponent } from '../ui/progress-bar/progress-bar.component';
@@ -20,8 +22,10 @@ import {
   Activity,
   AnswerResponse,
   ClassifyActivityData,
+  MatchingActivityData,
   MultipleChoiceActivityData,
   NextActivity,
+  OrderingActivityData,
   TrueFalseActivityData,
 } from '../../shared/models/game.types';
 
@@ -34,6 +38,8 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     MultipleChoiceComponent,
     TrueFalseComponent,
     ClassifyComponent,
+    MatchingComponent,
+    OrderingComponent,
     ProgressBarComponent,
     CoinDisplayComponent,
     HealthDisplayComponent,
@@ -47,8 +53,11 @@ export class GameComponent implements OnInit {
   protected readonly uiText = inject(UiTextService);
   private readonly tts = inject(TtsService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   @ViewChild(ClassifyComponent) private classifyComponent?: ClassifyComponent;
+  @ViewChild(MatchingComponent) private matchingComponent?: MatchingComponent;
+  @ViewChild(OrderingComponent) private orderingComponent?: OrderingComponent;
 
   private static readonly ACTIVITIES_PER_SESSION = 10;
   private static readonly COINS_PER_CORRECT_ANSWER = 10;
@@ -137,11 +146,33 @@ export class GameComponent implements OnInit {
   }
 
   protected get classifyComplete(): boolean {
-    console.log('Classify complete:', this.classifyComponent, this.classifyComponent?.isComplete);
     return this.classifyComponent?.isComplete ?? false;
   }
 
-  protected get footerMode(): 'waiting' | 'checking' | 'correct' | 'incorrect' | 'classify' {
+  protected get matchingData(): MatchingActivityData | null {
+    return this.activity?.type === 'MATCHING' ? this.activity.data : null;
+  }
+
+  protected get matchingComplete(): boolean {
+    return this.matchingComponent?.isComplete ?? false;
+  }
+
+  protected get orderingData(): OrderingActivityData | null {
+    return this.activity?.type === 'ORDERING' ? this.activity.data : null;
+  }
+
+  protected get orderingComplete(): boolean {
+    return this.orderingComponent?.isComplete ?? false;
+  }
+
+  protected get footerMode():
+    | 'waiting'
+    | 'checking'
+    | 'correct'
+    | 'incorrect'
+    | 'classify'
+    | 'matching'
+    | 'ordering' {
     if (this.state === 'answering') {
       return 'checking';
     }
@@ -153,6 +184,12 @@ export class GameComponent implements OnInit {
     }
     if (this.classifyData) {
       return 'classify';
+    }
+    if (this.matchingData) {
+      return 'matching';
+    }
+    if (this.orderingData) {
+      return 'ordering';
     }
     return 'waiting';
   }
@@ -179,12 +216,62 @@ export class GameComponent implements OnInit {
       });
   }
 
+  protected checkMatchingAnswer(): void {
+    this.matchingComponent?.submit();
+  }
+
+  protected submitMatchingAnswer(answer: Record<string, string>): void {
+    if (this.state !== 'playing' || !this.activity) {
+      return;
+    }
+
+    this.selectedAnswer = answer;
+    this.state = 'answering';
+    this.gameService
+      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
+      .subscribe({
+        next: (response) => this.handleAnswer(response),
+        error: () => {
+          this.state = 'error';
+          this.errorMessage = this.text('activityError');
+        },
+      });
+  }
+
+  protected checkOrderingAnswer(): void {
+    this.orderingComponent?.submit();
+  }
+
+  protected submitOrderingAnswer(answer: string[]): void {
+    if (this.state !== 'playing' || !this.activity) {
+      return;
+    }
+
+    this.selectedAnswer = answer;
+    this.state = 'answering';
+    this.gameService
+      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
+      .subscribe({
+        next: (response) => this.handleAnswer(response),
+        error: () => {
+          this.state = 'error';
+          this.errorMessage = this.text('activityError');
+        },
+      });
+  }
+
   protected get isCheckDisabled(): boolean {
     if (this.state === 'answering') {
       return true;
     }
     if (this.classifyData) {
       return !this.classifyComplete;
+    }
+    if (this.matchingData) {
+      return !this.matchingComplete;
+    }
+    if (this.orderingData) {
+      return !this.orderingComplete;
     }
     return this.selectedAnswer === null;
   }
@@ -230,17 +317,31 @@ export class GameComponent implements OnInit {
   private loadInitialActivity(): void {
     this.state = 'loading';
     this.errorMessage = '';
-    this.completedActivities = 0;
     this.coins = 0;
     this.health = 100;
     this.characterSpeech = '';
-    this.gameService.startGame().subscribe({
-      next: (start) => this.loadActivity(start.activityId),
-      error: () => {
-        this.state = 'error';
-        this.errorMessage = this.text('backendError');
-      },
-    });
+
+    const activityParam = this.route.snapshot.paramMap.get('activityIndex');
+    if (activityParam) {
+      const parsed = parseInt(activityParam, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        this.completedActivities = parsed - 1;
+      } else {
+        this.completedActivities = 0;
+      }
+    } else {
+      this.completedActivities = 0;
+    }
+
+    this.gameService
+      .startGame('EASY', 'geography', activityParam ?? undefined)
+      .subscribe({
+        next: (start) => this.loadActivity(start.activityId),
+        error: () => {
+          this.state = 'error';
+          this.errorMessage = this.text('backendError');
+        },
+      });
   }
 
   private loadActivity(activityId: string, preserveState = false): void {

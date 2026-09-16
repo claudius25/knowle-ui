@@ -129,9 +129,13 @@ export class ContentDatabaseService {
   }
 
   /**
-   * Starts a game session by returning the first available activity in the chapter.
+   * Starts a game session by returning the first or requested activity in the chapter.
    */
-  startGame(difficulty: Difficulty = 'EASY', domain = 'geography'): Observable<GameStartResponse> {
+  startGame(
+    difficulty: Difficulty = 'EASY',
+    domain = 'geography',
+    startIndexOrId?: number | string,
+  ): Observable<GameStartResponse> {
     return forkJoin({
       db: this.loadDatabase(difficulty, domain),
       dict: this.loadTranslations(difficulty, domain),
@@ -142,11 +146,30 @@ export class ContentDatabaseService {
           throw new Error('No activities available in this chapter');
         }
 
-        const first = chapter.activities[0];
+        let target = chapter.activities[0];
+        if (typeof startIndexOrId === 'number') {
+          const idx = startIndexOrId > 0 ? startIndexOrId - 1 : 0;
+          const clamped = Math.max(0, Math.min(idx, chapter.activities.length - 1));
+          target = chapter.activities[clamped];
+        } else if (typeof startIndexOrId === 'string' && startIndexOrId.trim()) {
+          const trimmed = startIndexOrId.trim();
+          const parsed = parseInt(trimmed, 10);
+          if (!isNaN(parsed)) {
+            const idx = parsed > 0 ? parsed - 1 : 0;
+            const clamped = Math.max(0, Math.min(idx, chapter.activities.length - 1));
+            target = chapter.activities[clamped];
+          } else {
+            const found = chapter.activities.find((a) => a.id === trimmed);
+            if (found) {
+              target = found;
+            }
+          }
+        }
+
         return {
-          activityId: first.id,
-          title: dict[first.title] ?? first.title,
-          type: first.type,
+          activityId: target.id,
+          title: dict[target.title] ?? target.title,
+          type: target.type,
           difficulty,
         };
       }),
@@ -288,6 +311,60 @@ export class ContentDatabaseService {
         return expectedKeys.every((key) => submitted[key] === expected[key]);
       }
 
+      case 'MATCHING': {
+        if (!act.pairs || act.pairs.length === 0) return false;
+        if (Array.isArray(userAnswer)) {
+          if (userAnswer.length !== act.pairs.length) return false;
+          return act.pairs.every((pair) => {
+            const leftText = dict[pair.left] ?? pair.left;
+            const rightText = dict[pair.right] ?? pair.right;
+            return (userAnswer as Array<{ left?: string; right?: string; id?: string; rightId?: string }>).some(
+              (u) =>
+                (u.id === pair.id && (u.rightId === pair.id || u.right === rightText || u.right === pair.right)) ||
+                ((u.left === leftText || u.left === pair.left || u.left === pair.id) &&
+                  (u.right === rightText || u.right === pair.right || u.right === pair.id)),
+            );
+          });
+        }
+        if (userAnswer && typeof userAnswer === 'object') {
+          const userObj = userAnswer as Record<string, string>;
+          return act.pairs.every((pair) => {
+            const leftText = dict[pair.left] ?? pair.left;
+            const rightText = dict[pair.right] ?? pair.right;
+            const userRight = userObj[pair.id] ?? userObj[pair.left] ?? userObj[leftText];
+            return (
+              userRight === pair.id ||
+              userRight === pair.right ||
+              userRight === rightText
+            );
+          });
+        }
+        return false;
+      }
+
+      case 'ORDERING': {
+        const expectedOrder = Array.isArray(act.answer) ? (act.answer as string[]) : [];
+        if (!Array.isArray(userAnswer)) return false;
+        if (userAnswer.length !== expectedOrder.length) return false;
+
+        return expectedOrder.every((expectedId, idx) => {
+          const userVal = userAnswer[idx];
+          if (typeof userVal === 'string') {
+            const matchingItem = act.items?.find((item) => item.id === expectedId);
+            const translatedText = matchingItem ? (dict[matchingItem.text ?? ''] ?? matchingItem.text) : '';
+            return (
+              userVal === expectedId ||
+              userVal === translatedText ||
+              (matchingItem?.text !== undefined && userVal === matchingItem.text)
+            );
+          }
+          if (typeof userVal === 'object' && userVal !== null && 'id' in userVal) {
+            return (userVal as { id: string }).id === expectedId;
+          }
+          return false;
+        });
+      }
+
       default:
         return JSON.stringify(userAnswer) === JSON.stringify(act.answer);
     }
@@ -344,6 +421,37 @@ export class ContentDatabaseService {
             items: (act.items ?? []).map((i) => ({
               id: i.id,
               label: dict[i.label ?? i.text ?? ''] ?? i.label ?? i.text ?? '',
+            })),
+          },
+        };
+
+      case 'MATCHING':
+        return {
+          activityId: act.id,
+          title,
+          type: 'MATCHING',
+          difficulty,
+          data: {
+            question,
+            pairs: (act.pairs ?? []).map((p) => ({
+              id: p.id,
+              left: dict[p.left] ?? p.left,
+              right: dict[p.right] ?? p.right,
+            })),
+          },
+        };
+
+      case 'ORDERING':
+        return {
+          activityId: act.id,
+          title,
+          type: 'ORDERING',
+          difficulty,
+          data: {
+            question,
+            items: (act.items ?? []).map((item) => ({
+              id: item.id,
+              text: dict[item.text ?? ''] ?? item.text ?? '',
             })),
           },
         };

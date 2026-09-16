@@ -20,7 +20,14 @@ import { TryAgainButtonComponent } from '../ui/try-again-button/try-again-button
   styleUrl: './game-footer.component.css',
 })
 export class GameFooterComponent {
-  @Input() mode: 'waiting' | 'checking' | 'correct' | 'incorrect' | 'classify' = 'waiting';
+  @Input() mode:
+    | 'waiting'
+    | 'checking'
+    | 'correct'
+    | 'incorrect'
+    | 'classify'
+    | 'matching'
+    | 'ordering' = 'waiting';
   @Input() sessionComplete = false;
   @Input() classifyComplete = false;
   @Input() disabled = false;

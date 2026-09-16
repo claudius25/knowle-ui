@@ -7,8 +7,12 @@ import { ContentDatabaseService } from './content-database.service';
 export class GameService {
   private readonly contentDb = inject(ContentDatabaseService);
 
-  startGame(difficulty: Difficulty = 'EASY', domain = 'geography'): Observable<GameStartResponse> {
-    return this.contentDb.startGame(difficulty, domain);
+  startGame(
+    difficulty: Difficulty = 'EASY',
+    domain = 'geography',
+    startIndexOrId?: number | string,
+  ): Observable<GameStartResponse> {
+    return this.contentDb.startGame(difficulty, domain, startIndexOrId);
   }
 
   getActivity(

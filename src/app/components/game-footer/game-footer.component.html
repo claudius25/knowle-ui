@@ -36,5 +36,15 @@
         {{ checkText }}
       </app-check-button>
     }
+    @case ('matching') {
+      <app-check-button [disabled]="disabled" (check)="check.emit()">
+        {{ checkText }}
+      </app-check-button>
+    }
+    @case ('ordering') {
+      <app-check-button [disabled]="disabled" (check)="check.emit()">
+        {{ checkText }}
+      </app-check-button>
+    }
   }
 </div>

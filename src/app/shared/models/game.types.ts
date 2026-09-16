@@ -43,10 +43,33 @@ export interface ClassifyActivityData {
   categories: ClassifyCategory[];
 }
 
+export interface MatchingPair {
+  id: string;
+  left: string;
+  right: string;
+}
+
+export interface MatchingActivityData {
+  question: string;
+  pairs: MatchingPair[];
+}
+
+export interface OrderingItem {
+  id: string;
+  text: string;
+}
+
+export interface OrderingActivityData {
+  question: string;
+  items: OrderingItem[];
+}
+
 export type ActivityData =
   | MultipleChoiceActivityData
   | TrueFalseActivityData
-  | ClassifyActivityData;
+  | ClassifyActivityData
+  | MatchingActivityData
+  | OrderingActivityData;
 
 export interface MultipleChoiceActivity {
   activityId: string;
@@ -72,7 +95,28 @@ export interface ClassifyActivity {
   data: ClassifyActivityData;
 }
 
-export type Activity = MultipleChoiceActivity | TrueFalseActivity | ClassifyActivity;
+export interface MatchingActivity {
+  activityId: string;
+  title: string;
+  type: 'MATCHING';
+  difficulty: Difficulty;
+  data: MatchingActivityData;
+}
+
+export interface OrderingActivity {
+  activityId: string;
+  title: string;
+  type: 'ORDERING';
+  difficulty: Difficulty;
+  data: OrderingActivityData;
+}
+
+export type Activity =
+  | MultipleChoiceActivity
+  | TrueFalseActivity
+  | ClassifyActivity
+  | MatchingActivity
+  | OrderingActivity;
 
 export interface NextActivity {
   activityId: string;
