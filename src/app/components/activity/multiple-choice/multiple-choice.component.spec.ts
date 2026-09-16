@@ -25,11 +25,7 @@ describe('MultipleChoiceComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [MultipleChoiceComponent],
-      providers: [
-        UiTextService,
-        LanguageService,
-        { provide: TtsService, useValue: ttsSpy },
-      ],
+      providers: [UiTextService, LanguageService, { provide: TtsService, useValue: ttsSpy }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MultipleChoiceComponent);

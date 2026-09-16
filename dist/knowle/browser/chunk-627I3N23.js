@@ -1,0 +1,1 @@
+import{V as t}from"./chunk-K4FC24YL.js";var o="knowle-intro-seen",r=class e{hasSeenIntro(){return localStorage.getItem(o)==="true"}markIntroSeen(){localStorage.setItem(o,"true")}static \u0275fac=function(n){return new(n||e)};static \u0275prov=t({token:e,factory:e.\u0275fac,providedIn:"root"})};export{r as a};
