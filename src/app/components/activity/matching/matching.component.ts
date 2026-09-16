@@ -7,9 +7,11 @@ import {
   SimpleChanges,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { MatchingActivityData } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
+import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
 interface MatchingColumnItem {
   id: string;
@@ -20,19 +22,41 @@ interface MatchingColumnItem {
 @Component({
   selector: 'app-matching',
   standalone: true,
-  imports: [CommonModule],
+  imports: [AsyncPipe, CommonModule, MatIconModule],
   templateUrl: './matching.component.html',
   styleUrl: './matching.component.css',
 })
 export class MatchingComponent implements OnChanges {
   protected readonly uiText = inject(UiTextService);
+  private readonly audioPlayer = inject(AudioPlayerService);
 
   @Input({ required: true }) data!: MatchingActivityData;
   @Input() disabled = false;
   @Output() answerSubmitted = new EventEmitter<Record<string, string>>();
 
+  protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
+
   protected leftItems: MatchingColumnItem[] = [];
   protected rightItems: MatchingColumnItem[] = [];
+
+  protected speak(): void {
+    if (this.audioPlayer.isPlaying) {
+      this.audioPlayer.stop();
+      return;
+    }
+
+    const keys: string[] = [];
+    if (this.data.descriptionKey) {
+      keys.push(this.data.descriptionKey);
+    }
+    if (this.data.questionKey) {
+      keys.push(this.data.questionKey);
+    }
+
+    if (keys.length > 0) {
+      void this.audioPlayer.playKeys(keys);
+    }
+  }
 
   protected selectedLeftId: string | null = null;
   protected selectedRightId: string | null = null;

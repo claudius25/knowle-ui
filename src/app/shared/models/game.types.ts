@@ -60,7 +60,10 @@ export interface MatchingPair {
 
 export interface MatchingActivityData {
   question: string;
+  description?: string;
   pairs: MatchingPair[];
+  descriptionKey?: string;
+  questionKey?: string;
 }
 
 export interface OrderingItem {
@@ -70,7 +73,10 @@ export interface OrderingItem {
 
 export interface OrderingActivityData {
   question: string;
+  description?: string;
   items: OrderingItem[];
+  descriptionKey?: string;
+  questionKey?: string;
 }
 
 export type ActivityData =

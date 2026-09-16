@@ -7,26 +7,50 @@ import {
   SimpleChanges,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatIconModule } from '@angular/material/icon';
 import { OrderingActivityData, OrderingItem } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
+import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
 @Component({
   selector: 'app-ordering',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag],
+  imports: [AsyncPipe, CommonModule, CdkDropList, CdkDrag, MatIconModule],
   templateUrl: './ordering.component.html',
   styleUrl: './ordering.component.css',
 })
 export class OrderingComponent implements OnChanges {
   protected readonly uiText = inject(UiTextService);
+  private readonly audioPlayer = inject(AudioPlayerService);
 
   @Input({ required: true }) data!: OrderingActivityData;
   @Input() disabled = false;
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
+  protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
+
   protected items: OrderingItem[] = [];
+
+  protected speak(): void {
+    if (this.audioPlayer.isPlaying) {
+      this.audioPlayer.stop();
+      return;
+    }
+
+    const keys: string[] = [];
+    if (this.data.descriptionKey) {
+      keys.push(this.data.descriptionKey);
+    }
+    if (this.data.questionKey) {
+      keys.push(this.data.questionKey);
+    }
+
+    if (keys.length > 0) {
+      void this.audioPlayer.playKeys(keys);
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && this.data) {

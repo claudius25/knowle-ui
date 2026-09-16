@@ -453,6 +453,9 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            description,
+            descriptionKey: act.description,
+            questionKey: act.question,
             pairs: (act.pairs ?? []).map((p) => ({
               id: p.id,
               left: dict[p.left] ?? p.left,
@@ -474,6 +477,9 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            description,
+            descriptionKey: act.description,
+            questionKey: act.question,
             items: (act.items ?? []).map((item) => ({
               id: item.id,
               text: dict[item.text ?? ''] ?? item.text ?? '',
