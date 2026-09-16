@@ -259,12 +259,42 @@
             {
               "id": "item_3",
               "text": "easy_geo_9_item_3"
+            },
+            {
+              "id": "item_4",
+              "text": "easy_geo_9_item_4"
+            },
+            {
+              "id": "item_5",
+              "text": "easy_geo_9_item_5"
+            },
+            {
+              "id": "item_6",
+              "text": "easy_geo_9_item_6"
+            },
+            {
+              "id": "item_7",
+              "text": "easy_geo_9_item_7"
+            },
+            {
+              "id": "item_8",
+              "text": "easy_geo_9_item_8"
+            },
+            {
+              "id": "item_9",
+              "text": "easy_geo_9_item_9"
             }
           ],
           "answer": [
             "item_1",
             "item_2",
-            "item_3"
+            "item_3",
+            "item_4",
+            "item_5",
+            "item_6",
+            "item_7",
+            "item_8",
+            "item_9"
           ],
           "hint": "easy_geo_9_hint",
           "reward": {

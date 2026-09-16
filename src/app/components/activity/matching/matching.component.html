@@ -36,9 +36,9 @@
           <img [src]="item.image" [alt]="item.text" class="card-image" />
         }
         <span class="card-text">{{ item.text }}</span>
-        @if (isMatched(item.id)) {
+        <!-- @if (isMatched(item.id)) {
           <span class="check-badge" aria-hidden="true">✓</span>
-        }
+        } -->
       </button>
     }
   </div>
@@ -56,9 +56,9 @@
         (click)="selectRight(item.id)"
       >
         <span class="card-text">{{ item.text }}</span>
-        @if (isMatched(item.id)) {
+        <!-- @if (isMatched(item.id)) {
           <span class="check-badge" aria-hidden="true">✓</span>
-        }
+        } -->
       </button>
     }
   </div>
