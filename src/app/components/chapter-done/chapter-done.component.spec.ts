@@ -13,11 +13,7 @@ describe('ChapterDoneComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [ChapterDoneComponent],
-      providers: [
-        UiTextService,
-        LanguageService,
-        { provide: Router, useValue: routerSpy },
-      ],
+      providers: [UiTextService, LanguageService, { provide: Router, useValue: routerSpy }],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(ChapterDoneComponent);

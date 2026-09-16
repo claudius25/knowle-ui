@@ -245,16 +245,14 @@ export class ContentDatabaseService {
   /**
    * Helper to validate a submitted answer against the expected answer.
    */
-  private checkAnswer(
-    act: DbActivity,
-    userAnswer: unknown,
-    dict: Record<string, string>,
-  ): boolean {
+  private checkAnswer(act: DbActivity, userAnswer: unknown, dict: Record<string, string>): boolean {
     switch (act.type) {
       case 'MULTIPLE_CHOICE': {
         const expectedOptionId = String(act.answer);
         const matchingOption = act.options?.find((o) => o.id === expectedOptionId);
-        const translatedOptionText = matchingOption ? (dict[matchingOption.text] ?? matchingOption.text) : '';
+        const translatedOptionText = matchingOption
+          ? (dict[matchingOption.text] ?? matchingOption.text)
+          : '';
         const rawOptionKey = matchingOption?.text;
 
         return (
@@ -276,10 +274,9 @@ export class ContentDatabaseService {
 
       case 'CLASSIFY': {
         const expected = act.answer as Record<string, string>;
-        const submitted = (userAnswer && typeof userAnswer === 'object' ? userAnswer : {}) as Record<
-          string,
-          string
-        >;
+        const submitted = (
+          userAnswer && typeof userAnswer === 'object' ? userAnswer : {}
+        ) as Record<string, string>;
 
         if (!expected || typeof expected !== 'object') {
           return false;

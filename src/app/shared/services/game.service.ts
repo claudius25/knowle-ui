@@ -11,7 +11,11 @@ export class GameService {
     return this.contentDb.startGame(difficulty, domain);
   }
 
-  getActivity(activityId: string, difficulty: Difficulty = 'EASY', domain = 'geography'): Observable<Activity> {
+  getActivity(
+    activityId: string,
+    difficulty: Difficulty = 'EASY',
+    domain = 'geography',
+  ): Observable<Activity> {
     return this.contentDb.getActivity(activityId, difficulty, domain);
   }
 

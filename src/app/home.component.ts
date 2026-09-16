@@ -116,6 +116,10 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.router.navigate(['/intro']);
   }
 
+  protected goToAdmin(): void {
+    this.router.navigate(['/admin']);
+  }
+
   protected async onTortiClick(character: TortiCharacter): Promise<void> {
     const pose = HAPPY_POSES[Math.floor(Math.random() * HAPPY_POSES.length)];
     character.setPose(pose);

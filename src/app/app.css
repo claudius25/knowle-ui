@@ -16,6 +16,27 @@
 	background: #064B3F;
 }
 
+.admin-link-btn {
+	position: absolute;
+	top: max(16px, env(safe-area-inset-top));
+	right: 16px;
+	z-index: 10;
+	background: rgba(255, 255, 255, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 8px;
+	color: rgba(255, 255, 255, 0.9);
+	font-family: 'Nunito', sans-serif;
+	font-weight: 800;
+	font-size: 0.85rem;
+	padding: 6px 12px;
+	cursor: pointer;
+	transition: background 0.15s ease;
+}
+
+.admin-link-btn:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
 .hero-panel {
 	display: flex;
 	flex-direction: column;

@@ -9,13 +9,14 @@ describe('GameService', () => {
   let contentDbSpy: jasmine.SpyObj<ContentDatabaseService>;
 
   beforeEach(() => {
-    const spy = jasmine.createSpyObj('ContentDatabaseService', ['startGame', 'getActivity', 'submitAnswer']);
+    const spy = jasmine.createSpyObj('ContentDatabaseService', [
+      'startGame',
+      'getActivity',
+      'submitAnswer',
+    ]);
 
     TestBed.configureTestingModule({
-      providers: [
-        GameService,
-        { provide: ContentDatabaseService, useValue: spy },
-      ],
+      providers: [GameService, { provide: ContentDatabaseService, useValue: spy }],
     });
 
     service = TestBed.inject(GameService);
@@ -79,7 +80,12 @@ describe('GameService', () => {
 
     service.submitAnswer('easy_geo_1', 'Pământ', 'EASY').subscribe((res) => {
       expect(res).toEqual(mockResponse);
-      expect(contentDbSpy.submitAnswer).toHaveBeenCalledWith('easy_geo_1', 'Pământ', 'EASY', 'geography');
+      expect(contentDbSpy.submitAnswer).toHaveBeenCalledWith(
+        'easy_geo_1',
+        'Pământ',
+        'EASY',
+        'geography',
+      );
       done();
     });
   });

@@ -1,13 +1,29 @@
 import { Routes } from '@angular/router';
-import { GameComponent } from './components/game/game.component';
-import { IntroComponent } from './components/intro/intro.component';
-import { ChapterDoneComponent } from './components/chapter-done/chapter-done.component';
-import { HomeComponent } from './home.component';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'intro', component: IntroComponent },
-  { path: 'game', component: GameComponent },
-  { path: 'chapter-done', component: ChapterDoneComponent },
+  {
+    path: '',
+    loadComponent: () => import('./home.component').then((m) => m.HomeComponent),
+  },
+  {
+    path: 'intro',
+    loadComponent: () =>
+      import('./components/intro/intro.component').then((m) => m.IntroComponent),
+  },
+  {
+    path: 'game',
+    loadComponent: () =>
+      import('./components/game/game.component').then((m) => m.GameComponent),
+  },
+  {
+    path: 'chapter-done',
+    loadComponent: () =>
+      import('./components/chapter-done/chapter-done.component').then((m) => m.ChapterDoneComponent),
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./components/admin/admin.component').then((m) => m.AdminComponent),
+  },
   { path: '**', redirectTo: '' },
 ];
