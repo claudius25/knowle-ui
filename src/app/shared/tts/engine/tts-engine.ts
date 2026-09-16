@@ -9,6 +9,12 @@ import {
   TtsProgress,
   VoiceStyleRaw,
 } from '../tts.types';
+import { OpfsStorageService } from '../storage/opfs-storage.service';
+import {
+  REQUIRED_MODEL_FILES,
+  TTS_MODEL_CACHE_VERSION,
+  TtsModelManifest,
+} from '../storage/tts-model-cache.service';
 
 export class Style {
   constructor(
@@ -59,19 +65,59 @@ export class SupertonicEngine {
 
     notify(2, 6, 'Loading model configurations and tokenizer...');
 
-    // 1. Fetch configs and indexer
-    const [cfgResponse, indexerResponse] = await Promise.all([
-      fetch(`${config.modelBasePath}/tts.json`),
-      fetch(`${config.modelBasePath}/unicode_indexer.json`),
-    ]);
+    // Check if OPFS cache is available
+    const opfsStorage = new OpfsStorageService();
+    let useOpfs = false;
 
-    if (!cfgResponse.ok || !indexerResponse.ok) {
-      throw new Error('Failed to load Supertonic configuration or unicode indexer.');
+    if (opfsStorage.isSupported()) {
+      try {
+        const manifestExists = await opfsStorage.fileExists('supertonic/manifest.json');
+        if (manifestExists) {
+          const manifestText = await opfsStorage.readText('supertonic/manifest.json');
+          const manifest = JSON.parse(manifestText) as TtsModelManifest;
+          if (manifest && manifest.version === TTS_MODEL_CACHE_VERSION) {
+            let allFilesPresent = true;
+            for (const file of REQUIRED_MODEL_FILES) {
+              const filePresent = await opfsStorage.fileExists(`supertonic/models/${file}`);
+              if (!filePresent) {
+                allFilesPresent = false;
+                break;
+              }
+            }
+            if (allFilesPresent) {
+              useOpfs = true;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[TTS] Could not verify OPFS cache in engine:', err);
+        useOpfs = false;
+      }
     }
 
-    this.cfgs = (await cfgResponse.json()) as SupertonicConfig;
-    const indexer = (await indexerResponse.json()) as number[];
-    this.textProcessor = new UnicodeProcessor(indexer);
+    if (useOpfs) {
+      console.log('[TTS] Loading models from OPFS');
+      const cfgText = await opfsStorage.readText('supertonic/models/tts.json');
+      this.cfgs = JSON.parse(cfgText) as SupertonicConfig;
+
+      const indexerText = await opfsStorage.readText('supertonic/models/unicode_indexer.json');
+      const indexer = JSON.parse(indexerText) as number[];
+      this.textProcessor = new UnicodeProcessor(indexer);
+    } else {
+      console.log('[TTS] OPFS unavailable, using fallback');
+      const [cfgResponse, indexerResponse] = await Promise.all([
+        fetch(`${config.modelBasePath}/tts.json`),
+        fetch(`${config.modelBasePath}/unicode_indexer.json`),
+      ]);
+
+      if (!cfgResponse.ok || !indexerResponse.ok) {
+        throw new Error('Failed to load Supertonic configuration or unicode indexer.');
+      }
+
+      this.cfgs = (await cfgResponse.json()) as SupertonicConfig;
+      const indexer = (await indexerResponse.json()) as number[];
+      this.textProcessor = new UnicodeProcessor(indexer);
+    }
 
     // 2. Load ONNX models with WebGPU preferred, WASM fallback
     const modelDefinitions = [
@@ -98,10 +144,17 @@ export class SupertonicEngine {
         for (let i = 0; i < modelDefinitions.length; i++) {
           const model = modelDefinitions[i];
           notify(3 + i, 6, `Loading ${model.name} (${ep.toUpperCase()})...`);
-          const session = await ort.InferenceSession.create(
-            `${config.modelBasePath}/${model.file}`,
-            sessionOptions,
-          );
+
+          let session: ort.InferenceSession;
+          if (useOpfs) {
+            const buffer = await opfsStorage.readFile(`supertonic/models/${model.file}`);
+            session = await ort.InferenceSession.create(new Uint8Array(buffer), sessionOptions);
+          } else {
+            session = await ort.InferenceSession.create(
+              `${config.modelBasePath}/${model.file}`,
+              sessionOptions,
+            );
+          }
           sessions.push(session);
         }
 

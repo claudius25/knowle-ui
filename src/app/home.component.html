@@ -24,7 +24,7 @@
         <button class="intro-button" type="button" (click)="goToIntro()">{{ uiText.text('introButton') }}</button>
       } @else {
         <button class="duo-button duo-button--green start-button" type="button" (click)="startGame()">
-          <span>Sa incepem</span>
+          <span>{{ text('introStart') }}</span>
         </button>
       }
     } @else {

@@ -11,6 +11,7 @@ import {
 } from './tts.types';
 import { LanguageService } from '../services/language.service';
 import { SupertonicEngine } from './engine/tts-engine';
+import { TtsModelCacheService } from './storage/tts-model-cache.service';
 
 function isMobileBrowser(): boolean {
   if (typeof navigator === 'undefined') return false;
@@ -31,6 +32,7 @@ const DEFAULT_TTS_CONFIG: TtsConfig = {
 @Injectable({ providedIn: 'root' })
 export class TtsService implements OnDestroy {
   private readonly languageService = inject(LanguageService);
+  private readonly modelCache = inject(TtsModelCacheService);
 
   private readonly statusSubject = new BehaviorSubject<TtsStatus>('uninitialized');
   private readonly progressSubject = new BehaviorSubject<TtsProgress | null>(null);
@@ -113,6 +115,21 @@ export class TtsService implements OnDestroy {
 
     this.initPromise = (async () => {
       try {
+        // Step 1: Ensure models are downloaded and cached in OPFS
+        if (this.modelCache.isOpfsSupported()) {
+          try {
+            await this.modelCache.ensureModelsCached(this.config.modelBasePath, (prog) => {
+              this.progressSubject.next(prog);
+            });
+          } catch (cacheErr) {
+            console.warn(
+              '[TTS] OPFS model caching encountered an error, falling back to direct loading:',
+              cacheErr,
+            );
+          }
+        }
+
+        // Step 2: Initialize Supertonic engine (worker or main thread)
         if (this.worker) {
           const response = await this.sendWorkerRequest<WorkerResponse>({
             id: this.generateRequestId(),
@@ -303,6 +320,13 @@ export class TtsService implements OnDestroy {
     } catch (e) {
       console.warn('Failed to clear IndexedDB cache:', e);
     }
+  }
+
+  /**
+   * Invalidates and clears the persistent OPFS model cache.
+   */
+  async clearModelCache(): Promise<void> {
+    await this.modelCache.invalidateCache();
   }
 
   private buildCacheKey(

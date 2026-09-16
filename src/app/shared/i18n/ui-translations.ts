@@ -136,5 +136,5 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
 };
 
 export function uiText(language: Language, key: UiTextKey): string {
-  return UI_TRANSLATIONS[language][key];
+  return UI_TRANSLATIONS[language]?.[key];
 }

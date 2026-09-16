@@ -73,6 +73,10 @@ export class HomeComponent implements OnDestroy, OnInit {
     void this.initializeTts();
   }
 
+  protected text(key: Parameters<UiTextService['text']>[0]): string {
+    return this.uiText.text(key);
+  }
+
   private async initializeTts(): Promise<void> {
     try {
       await this.tts.init();
