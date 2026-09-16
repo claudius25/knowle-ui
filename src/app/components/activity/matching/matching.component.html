@@ -10,7 +10,7 @@
   <div class="matching-column matching-column--left">
     @for (item of leftItems; track item.id) {
       <button
-        class="duo-button duo-button--neutral match-card"
+        class="duo-button duo-button--neutral match-card match-card-left"
         type="button"
         [class.selected]="isLeftSelected(item.id)"
         [class.matched]="isMatched(item.id)"
@@ -18,6 +18,9 @@
         [disabled]="disabled || isMatched(item.id)"
         (click)="selectLeft(item.id)"
       >
+        @if (item.image) {
+          <img [src]="item.image" [alt]="item.text" class="card-image" />
+        }
         <span class="card-text">{{ item.text }}</span>
         @if (isMatched(item.id)) {
           <span class="check-badge" aria-hidden="true">✓</span>

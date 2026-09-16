@@ -199,17 +199,26 @@
             {
               "id": "pair_1",
               "left": "easy_geo_8_left_1",
-              "right": "easy_geo_8_right_1"
+              "right": "easy_geo_8_right_1",
+              "image": "jupiter.png"
             },
             {
               "id": "pair_2",
               "left": "easy_geo_8_left_2",
-              "right": "easy_geo_8_right_2"
+              "right": "easy_geo_8_right_2",
+              "image": "saturn.png"
             },
             {
               "id": "pair_3",
               "left": "easy_geo_8_left_3",
-              "right": "easy_geo_8_right_3"
+              "right": "easy_geo_8_right_3",
+              "image": "uranus.png"
+            },
+            {
+              "id": "pair_4",
+              "left": "easy_geo_8_left_4",
+              "right": "easy_geo_8_right_4",
+              "image": "asteroid.png"
             }
           ],
           "answer": [

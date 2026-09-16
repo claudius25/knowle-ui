@@ -15,10 +15,7 @@ import { Language, LanguageService } from './shared/services/language.service';
 import { IntroService } from './shared/services/intro.service';
 import { UiTextService } from './shared/services/ui-text.service';
 import { AudioPlayerService } from './shared/services/audio-player.service';
-import {
-  TORTI_HAPPY_LINES,
-  pickRandomLine,
-} from './characters/torti/torti-speech.constants';
+import { TORTI_HAPPY_LINES, pickRandomLine } from './characters/torti/torti-speech.constants';
 
 const HAPPY_POSES: readonly TortiPose[] = [
   'happy',

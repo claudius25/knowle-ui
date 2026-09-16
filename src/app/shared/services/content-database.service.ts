@@ -31,6 +31,7 @@ export interface DbPair {
   id: string;
   left: string;
   right: string;
+  image?: string;
 }
 
 export interface DbReward {
@@ -456,6 +457,11 @@ export class ContentDatabaseService {
               id: p.id,
               left: dict[p.left] ?? p.left,
               right: dict[p.right] ?? p.right,
+              image: p.image
+                ? p.image.startsWith('/') || p.image.startsWith('http')
+                  ? p.image
+                  : `/db/${diff}/${dom}/pics/${p.image}`
+                : undefined,
             })),
           },
         };

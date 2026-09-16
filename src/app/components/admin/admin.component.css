@@ -1086,6 +1086,10 @@ textarea:focus {
   font-weight: 800;
 }
 
+.pair-image-input-row input {
+  flex: 1;
+}
+
 /* TAB 2: Translations Table */
 .translations-table-container {
   padding: 24px;

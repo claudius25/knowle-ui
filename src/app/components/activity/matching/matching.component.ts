@@ -8,12 +8,13 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatchingActivityData, MatchingPair } from '../../../shared/models/game.types';
+import { MatchingActivityData } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 
 interface MatchingColumnItem {
   id: string;
   text: string;
+  image?: string;
 }
 
 @Component({
@@ -73,6 +74,7 @@ export class MatchingComponent implements OnChanges {
     this.leftItems = this.data.pairs.map((p) => ({
       id: p.id,
       text: p.left,
+      image: p.image,
     }));
 
     const rightList = this.data.pairs.map((p) => ({
