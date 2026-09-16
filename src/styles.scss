@@ -20,6 +20,7 @@ $knowle-theme: mat.define-theme((
 ));
 
 html {
+  font-size: 75%;
   @include mat.all-component-themes($knowle-theme);
 }
 
@@ -41,7 +42,7 @@ body {
 
 .curved-title text {
   font-family: "Lilita One", sans-serif;
-  font-size: 82px;
+  font-size: 61.5px;
   fill: white;
 }
 
@@ -67,7 +68,7 @@ body {
   border: none;
   border-radius: 18px;
 
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 700;
 
   cursor: pointer;
@@ -84,7 +85,7 @@ body {
   position: absolute;
   right: 24px;
 
-  font-size: 32px;
+  font-size: 24px;
   line-height: 1;
 }
 

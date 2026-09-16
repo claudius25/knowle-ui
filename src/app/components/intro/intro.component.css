@@ -40,12 +40,12 @@
 .intro-slide h1 {
   margin: 0;
   font-family: 'Lilita One', sans-serif;
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
 }
 
 .intro-slide p {
   margin: 0;
-  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-size: clamp(1rem, 2.25vw, 1.2rem);
   color: rgba(255, 255, 255, 0.85);
 }
 
