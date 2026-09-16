@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { MultipleChoiceActivityData } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
@@ -7,7 +8,7 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 @Component({
   selector: 'app-multiple-choice',
   standalone: true,
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, MatIconModule],
   templateUrl: './multiple-choice.component.html',
   styleUrl: './multiple-choice.component.css',
 })

@@ -25,10 +25,7 @@ describe('MultipleChoiceComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [MultipleChoiceComponent],
-      providers: [
-        UiTextService,
-        { provide: AudioPlayerService, useValue: audioPlayerSpy },
-      ],
+      providers: [UiTextService, { provide: AudioPlayerService, useValue: audioPlayerSpy }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MultipleChoiceComponent);
@@ -50,7 +47,10 @@ describe('MultipleChoiceComponent', () => {
 
   it('should play description and question audio keys on speak()', () => {
     component['speak']();
-    expect(audioPlayerSpy.playKeys).toHaveBeenCalledWith(['easy_geo_1_desc', 'easy_geo_1_question']);
+    expect(audioPlayerSpy.playKeys).toHaveBeenCalledWith([
+      'easy_geo_1_desc',
+      'easy_geo_1_question',
+    ]);
   });
 
   it('should stop audio if already playing', () => {

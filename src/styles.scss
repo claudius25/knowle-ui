@@ -1,4 +1,6 @@
 @use '@angular/material' as mat;
+@use './styles/activity';
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Lilita+One&family=Nunito:wght@800&display=swap');
 
 @include mat.core();
@@ -139,4 +141,9 @@ body {
   --button-color: #a560e8;
   --button-depth: #7c3fbd;
   color: #ffffff;
+}
+
+mat-icon {
+  font-family: 'Material Icons' !important;
+  padding-top: 2px;
 }
