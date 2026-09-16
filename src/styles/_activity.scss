@@ -70,12 +70,13 @@
 }
 
 .speak-btn {
+    align-self: end;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
-  height: 40px;
+  height: 30px;
   color: #ffffff;
   background: none;
   border:0;
@@ -84,20 +85,16 @@
   padding: 0;
 }
 
-.speak-btn:hover {
-  color: #ffd23f;
-  transform: scale(1.08);
-}
+// .speak-btn:hover {
+//   transform: scale(1.08);
+// }
 
 .speak-btn:active {
   transform: scale(0.95);
 }
 
 .speak-btn.speaking {
-  background: #1cb0f6;
-  border-color: #1cb0f6;
-  color: #ffffff;
-  animation: pulse 1.2s infinite;
+  animation: pulse 1s infinite;
 }
 
 .speaker-icon {
@@ -108,13 +105,13 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(28, 176, 246, 0.6);
+    transform: scale(1);
   }
-  70% {
-    box-shadow: 0 0 0 8px rgba(28, 176, 246, 0);
+  50% {
+    transform: scale(1.1); /* Scales up to 110% */
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(28, 176, 246, 0);
+    transform: scale(1); /* Returns to original size */
   }
 }
 

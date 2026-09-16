@@ -7,7 +7,9 @@
   }
   <div class="question-row">
     <h2>{{ data.question }}
-    <button
+    
+      </h2>
+<button
         class="speak-btn"
         type="button"
         [class.speaking]="isSpeaking$ | async"
@@ -17,8 +19,6 @@
       >
         <mat-icon>record_voice_over</mat-icon>
       </button>
-      </h2>
-
       
   </div>
 </div>

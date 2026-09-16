@@ -124,16 +124,6 @@ h2 {
   font-weight: 700;
 }
 
-.game-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  padding: 16px 20px;
-  background: #123f35;
-}
-
 .incorrect-footer {
   display: flex;
   flex-direction: row;
