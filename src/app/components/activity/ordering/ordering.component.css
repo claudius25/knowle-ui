@@ -28,6 +28,10 @@
   touch-action: none;
 }
 
+.ordering-card-small {
+    min-height: 48px;
+}
+
 .ordering-card:active {
   cursor: grabbing;
 }

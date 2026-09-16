@@ -101,7 +101,10 @@
           "reward": {
             "coins": 10,
             "energy": 0
-          }
+          },
+          "pictures": [
+            "planet_year.png"
+          ]
         },
         {
           "id": "easy_geo_5",
@@ -320,14 +323,21 @@
             {
               "id": "c",
               "text": "easy_geo_10_op_3"
+            },
+            {
+              "id": "d",
+              "text": "easy_geo_10_op_4"
             }
           ],
-          "answer": "a",
+          "answer": "b",
           "hint": "easy_geo_10_hint",
           "reward": {
             "coins": 10,
             "energy": 0
-          }
+          },
+          "pictures": [
+            "moon_phases.png"
+          ]
         }
       ]
     }
