@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { OpfsStorageService } from './opfs-storage.service';
 import { TtsProgress } from '../tts.types';
 
-export const TTS_MODEL_CACHE_VERSION = '1.0.0';
+export const TTS_MODEL_CACHE_VERSION = '1.1.0';
 
 export const REQUIRED_MODEL_FILES = [
   'tts.json',
@@ -108,13 +108,26 @@ export class TtsModelCacheService {
         return false;
       }
 
-      // Verify every required file exists and is non-empty
+      // Verify every required file exists and is non-empty / valid
       for (const fileName of REQUIRED_MODEL_FILES) {
         const filePath = `${OPFS_MODELS_DIR}/${fileName}`;
         const exists = await this.opfsStorage.fileExists(filePath);
         if (!exists) {
           console.log(`[TTS] Model cache missing required file: ${fileName}`);
           return false;
+        }
+
+        // Check if an ONNX file in cache is a corrupted Git LFS text pointer file
+        if (fileName.endsWith('.onnx')) {
+          const fileSize = await this.opfsStorage.getFileSize(filePath);
+          if (fileSize < 1000) {
+            const sampleText = await this.opfsStorage.readText(filePath).catch(() => '');
+            if (sampleText.startsWith('version https://git-lfs')) {
+              console.warn(`[TTS] Corrupted Git LFS pointer found in OPFS cache for ${fileName}`);
+              await this.opfsStorage.deleteFile(OPFS_MANIFEST_PATH);
+              return false;
+            }
+          }
         }
       }
 

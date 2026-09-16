@@ -93,9 +93,23 @@ export class SupertonicEngine {
                 allFilesPresent = false;
                 break;
               }
+              if (file.endsWith('.onnx')) {
+                const fileSize = await opfsStorage.getFileSize(`supertonic/models/${file}`);
+                if (fileSize < 1000) {
+                  const sample = await opfsStorage
+                    .readText(`supertonic/models/${file}`)
+                    .catch(() => '');
+                  if (sample.startsWith('version https://git-lfs')) {
+                    allFilesPresent = false;
+                    break;
+                  }
+                }
+              }
             }
             if (allFilesPresent) {
               useOpfs = true;
+            } else {
+              await opfsStorage.deleteFile('supertonic/manifest.json').catch(() => {});
             }
           }
         }
@@ -157,8 +171,17 @@ export class SupertonicEngine {
 
           let session: ort.InferenceSession;
           if (useOpfs) {
-            const buffer = await opfsStorage.readFile(`supertonic/models/${model.file}`);
-            session = await ort.InferenceSession.create(new Uint8Array(buffer), sessionOptions);
+            try {
+              const buffer = await opfsStorage.readFile(`supertonic/models/${model.file}`);
+              session = await ort.InferenceSession.create(new Uint8Array(buffer), sessionOptions);
+            } catch (opfsErr) {
+              console.warn(
+                `[TTS] Failed to load ${model.file} from OPFS, clearing cache:`,
+                opfsErr,
+              );
+              await opfsStorage.deleteFile('supertonic/manifest.json').catch(() => {});
+              throw opfsErr;
+            }
           } else {
             session = await ort.InferenceSession.create(
               `${config.modelBasePath}/${model.file}`,
