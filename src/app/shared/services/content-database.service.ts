@@ -45,6 +45,7 @@ export interface DbActivity {
   description: string;
   question: string;
   hint?: string;
+  pictures?: string[];
   options?: DbOption[];
   categories?: DbCategory[];
   items?: DbItem[];
@@ -196,7 +197,7 @@ export class ContentDatabaseService {
           throw new Error(`Activity ${activityId} not found`);
         }
 
-        return this.mapToClientActivity(act, dict, difficulty);
+        return this.mapToClientActivity(act, dict, difficulty, domain);
       }),
     );
   }
@@ -318,9 +319,12 @@ export class ContentDatabaseService {
           return act.pairs.every((pair) => {
             const leftText = dict[pair.left] ?? pair.left;
             const rightText = dict[pair.right] ?? pair.right;
-            return (userAnswer as Array<{ left?: string; right?: string; id?: string; rightId?: string }>).some(
+            return (
+              userAnswer as Array<{ left?: string; right?: string; id?: string; rightId?: string }>
+            ).some(
               (u) =>
-                (u.id === pair.id && (u.rightId === pair.id || u.right === rightText || u.right === pair.right)) ||
+                (u.id === pair.id &&
+                  (u.rightId === pair.id || u.right === rightText || u.right === pair.right)) ||
                 ((u.left === leftText || u.left === pair.left || u.left === pair.id) &&
                   (u.right === rightText || u.right === pair.right || u.right === pair.id)),
             );
@@ -332,11 +336,7 @@ export class ContentDatabaseService {
             const leftText = dict[pair.left] ?? pair.left;
             const rightText = dict[pair.right] ?? pair.right;
             const userRight = userObj[pair.id] ?? userObj[pair.left] ?? userObj[leftText];
-            return (
-              userRight === pair.id ||
-              userRight === pair.right ||
-              userRight === rightText
-            );
+            return userRight === pair.id || userRight === pair.right || userRight === rightText;
           });
         }
         return false;
@@ -351,7 +351,9 @@ export class ContentDatabaseService {
           const userVal = userAnswer[idx];
           if (typeof userVal === 'string') {
             const matchingItem = act.items?.find((item) => item.id === expectedId);
-            const translatedText = matchingItem ? (dict[matchingItem.text ?? ''] ?? matchingItem.text) : '';
+            const translatedText = matchingItem
+              ? (dict[matchingItem.text ?? ''] ?? matchingItem.text)
+              : '';
             return (
               userVal === expectedId ||
               userVal === translatedText ||
@@ -377,9 +379,18 @@ export class ContentDatabaseService {
     act: DbActivity,
     dict: Record<string, string>,
     difficulty: Difficulty,
+    domain = 'geography',
   ): Activity {
     const title = dict[act.title] ?? act.title;
+    const description = dict[act.description] ?? act.description;
     const question = dict[act.question] ?? act.question;
+    const diff = difficulty.toLowerCase();
+    const dom = domain.toLowerCase();
+
+    // Resolve picture paths: if relative filename given, map to /db/{difficulty}/{domain}/pics/{filename}
+    const pictures = act.pictures?.map((pic) =>
+      pic.startsWith('/') || pic.startsWith('http') ? pic : `/db/${diff}/${dom}/pics/${pic}`,
+    );
 
     switch (act.type) {
       case 'MULTIPLE_CHOICE':
@@ -390,6 +401,8 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            description,
+            pictures,
             options: (act.options ?? []).map((o) => dict[o.text] ?? o.text),
           },
         };
@@ -402,6 +415,8 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            description,
+            pictures,
             options: [true, false],
           },
         };

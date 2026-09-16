@@ -302,6 +302,17 @@
                     </div>
                     <small class="preview-text">RO: "{{ translations.ro[act.hint || ''] || '-' }}"</small>
                   </div>
+
+                  <div class="form-group full-width">
+                    <label>Imagini (Pictures - ex: eclipse.png, map.jpg separate prin virgulă):</label>
+                    <input
+                      type="text"
+                      [ngModel]="getPicturesString(act)"
+                      (ngModelChange)="updatePicturesFromString(act, $event)"
+                      placeholder="ex: eclipse.png, relief.jpg"
+                    />
+                    <small class="preview-text">Imaginile se caută automat în /db/{{ difficulty.toLowerCase() }}/{{ domain.toLowerCase() }}/pics/</small>
+                  </div>
                 </div>
 
                 <!-- TYPE SPECIFIC EDITORS -->

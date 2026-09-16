@@ -24,6 +24,10 @@
             {
               "id": "c",
               "text": "easy_geo_1_op_3"
+            },
+            {
+              "id": "d",
+              "text": "easy_geo_1_op_4"
             }
           ],
           "answer": "b",
@@ -31,7 +35,10 @@
           "reward": {
             "coins": 10,
             "energy": 0
-          }
+          },
+          "pictures": [
+            "eclipse.png"
+          ]
         },
         {
           "id": "easy_geo_2",
@@ -39,12 +46,15 @@
           "title": "easy_geo_2_title",
           "description": "easy_geo_2_desc",
           "question": "easy_geo_2_question",
-          "answer": true,
+          "answer": false,
           "hint": "easy_geo_2_hint",
           "reward": {
             "coins": 10,
             "energy": 0
-          }
+          },
+          "pictures": [
+            "rotate_sun.png"
+          ]
         },
         {
           "id": "easy_geo_3",
@@ -70,12 +80,15 @@
               "text": "easy_geo_3_op_4"
             }
           ],
-          "answer": "a",
+          "answer": "b",
           "hint": "easy_geo_3_hint",
           "reward": {
             "coins": 10,
             "energy": 0
-          }
+          },
+          "pictures": [
+            "prism.png"
+          ]
         },
         {
           "id": "easy_geo_4",

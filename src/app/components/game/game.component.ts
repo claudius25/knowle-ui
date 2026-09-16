@@ -333,15 +333,13 @@ export class GameComponent implements OnInit {
       this.completedActivities = 0;
     }
 
-    this.gameService
-      .startGame('EASY', 'geography', activityParam ?? undefined)
-      .subscribe({
-        next: (start) => this.loadActivity(start.activityId),
-        error: () => {
-          this.state = 'error';
-          this.errorMessage = this.text('backendError');
-        },
-      });
+    this.gameService.startGame('EASY', 'geography', activityParam ?? undefined).subscribe({
+      next: (start) => this.loadActivity(start.activityId),
+      error: () => {
+        this.state = 'error';
+        this.errorMessage = this.text('backendError');
+      },
+    });
   }
 
   private loadActivity(activityId: string, preserveState = false): void {

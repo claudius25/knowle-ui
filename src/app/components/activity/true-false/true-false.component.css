@@ -2,6 +2,19 @@
   padding: 12px 0 30px;
 }
 
+.question-description {
+  margin-bottom: 12px;
+}
+
+.question-description p {
+  margin: 0;
+  color: orange;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(1rem, 2.8vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .question-row {
   display: flex;
   align-items: center;
@@ -36,13 +49,37 @@ h2 {
   line-height: 1.14;
 }
 
+.activity-image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.activity-image-wrapper {
+  flex: 1 1 240px;
+  max-width: 480px;
+  min-height: 180px;
+  max-height: 280px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .activity-image {
   width: 100%;
-  height: 200px;
-  margin-bottom: 24px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px dashed rgba(255, 255, 255, 0.3);
+  height: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  display: block;
 }
 
 .boolean-answers {

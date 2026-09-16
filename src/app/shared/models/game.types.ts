@@ -19,12 +19,16 @@ export interface GameStartResponse {
 
 export interface MultipleChoiceActivityData {
   question: string;
+  description?: string;
   options: string[];
+  pictures?: string[];
 }
 
 export interface TrueFalseActivityData {
   question: string;
+  description?: string;
   options: [boolean, boolean];
+  pictures?: string[];
 }
 
 export interface ClassifyItem {

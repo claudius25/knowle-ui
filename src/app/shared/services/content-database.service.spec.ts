@@ -17,6 +17,7 @@ const MOCK_DB: DbDatabase = {
           title: 'easy_geo_1_title',
           description: 'easy_geo_1_desc',
           question: 'easy_geo_1_question',
+          pictures: ['eclipse.png'],
           options: [
             { id: 'a', text: 'easy_geo_1_op_1' },
             { id: 'b', text: 'easy_geo_1_op_2' },
@@ -91,6 +92,7 @@ const MOCK_RO_DICT: Record<string, string> = {
   easy_geo_1_op_1: 'Marte',
   easy_geo_1_op_2: 'Pământ',
   easy_geo_2_title: 'Apa pe Pământ',
+  easy_geo_2_desc: 'Descriere apa pe Pământ',
   easy_geo_2_question: 'Este apa predominantă?',
   easy_geo_5_title: 'Forme de relief',
   easy_geo_5_question: 'Clasifică elementele:',
@@ -177,7 +179,7 @@ describe('ContentDatabaseService', () => {
     httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO_DICT);
   });
 
-  it('should load multiple choice activity with translated options', (done) => {
+  it('should load multiple choice activity with translated options and pictures', (done) => {
     service.getActivity('easy_geo_1').subscribe((act) => {
       expect(act.activityId).toBe('easy_geo_1');
       expect(act.type).toBe('MULTIPLE_CHOICE');
@@ -185,6 +187,7 @@ describe('ContentDatabaseService', () => {
       if (act.type === 'MULTIPLE_CHOICE') {
         expect(act.data.question).toBe('Pe ce planetă trăim?');
         expect(act.data.options).toEqual(['Marte', 'Pământ']);
+        expect(act.data.pictures).toEqual(['/db/easy/geography/pics/eclipse.png']);
       }
       done();
     });
@@ -218,10 +221,19 @@ describe('ContentDatabaseService', () => {
   });
 
   it('should validate true/false activity correctly', (done) => {
-    service.submitAnswer('easy_geo_2', true).subscribe((res) => {
-      expect(res.correct).toBeTrue();
-      expect(res.nextActivity?.activityId).toBe('easy_geo_5');
-      done();
+    service.getActivity('easy_geo_2').subscribe((act) => {
+      expect(act.activityId).toBe('easy_geo_2');
+      expect(act.type).toBe('TRUE_FALSE');
+      if (act.type === 'TRUE_FALSE') {
+        expect(act.data.description).toBe('Descriere apa pe Pământ');
+        expect(act.data.question).toBe('Este apa predominantă?');
+      }
+
+      service.submitAnswer('easy_geo_2', true).subscribe((res) => {
+        expect(res.correct).toBeTrue();
+        expect(res.nextActivity?.activityId).toBe('easy_geo_5');
+        done();
+      });
     });
 
     httpMock.expectOne('/db/easy/geography/db.json').flush(MOCK_DB);

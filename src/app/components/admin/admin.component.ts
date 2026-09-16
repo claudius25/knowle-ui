@@ -523,6 +523,22 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  // --- Picture operations ---
+  protected getPicturesString(activity: DbActivity): string {
+    return activity.pictures?.join(', ') ?? '';
+  }
+
+  protected updatePicturesFromString(activity: DbActivity, raw: string): void {
+    if (!raw || !raw.trim()) {
+      delete activity.pictures;
+      return;
+    }
+    activity.pictures = raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+  }
+
   // --- Translation Modal Popup ---
   protected openTranslationModal(key: string, title?: string): void {
     if (!key) return;

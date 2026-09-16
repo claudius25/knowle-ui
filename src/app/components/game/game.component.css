@@ -196,3 +196,7 @@ h2 {
     padding: 14px;
   }
 }
+
+app-game-footer {
+  z-index: 30;
+}
