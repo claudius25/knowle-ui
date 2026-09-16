@@ -22,6 +22,8 @@ export interface MultipleChoiceActivityData {
   description?: string;
   options: string[];
   pictures?: string[];
+  descriptionKey?: string;
+  questionKey?: string;
 }
 
 export interface TrueFalseActivityData {
@@ -29,6 +31,8 @@ export interface TrueFalseActivityData {
   description?: string;
   options: [boolean, boolean];
   pictures?: string[];
+  descriptionKey?: string;
+  questionKey?: string;
 }
 
 export interface ClassifyItem {

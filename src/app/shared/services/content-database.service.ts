@@ -403,6 +403,8 @@ export class ContentDatabaseService {
             question,
             description,
             pictures,
+            descriptionKey: act.description,
+            questionKey: act.question,
             options: (act.options ?? []).map((o) => dict[o.text] ?? o.text),
           },
         };
@@ -417,6 +419,8 @@ export class ContentDatabaseService {
             question,
             description,
             pictures,
+            descriptionKey: act.description,
+            questionKey: act.question,
             options: [true, false],
           },
         };

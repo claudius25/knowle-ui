@@ -2,8 +2,7 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { MultipleChoiceActivityData } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
-import { TtsService } from '../../../shared/tts/tts.service';
-import { LanguageService } from '../../../shared/services/language.service';
+import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
 @Component({
   selector: 'app-multiple-choice',
@@ -14,15 +13,14 @@ import { LanguageService } from '../../../shared/services/language.service';
 })
 export class MultipleChoiceComponent {
   protected readonly uiText = inject(UiTextService);
-  private readonly tts = inject(TtsService);
-  private readonly languageService = inject(LanguageService);
+  private readonly audioPlayer = inject(AudioPlayerService);
 
   @Input({ required: true }) data!: MultipleChoiceActivityData;
   @Input() disabled = false;
   @Input() selectedAnswer: string | null = null;
   @Output() answerSelected = new EventEmitter<string>();
 
-  protected readonly isSpeaking$ = this.tts.isSpeaking$;
+  protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
 
   protected select(answer: string): void {
     if (!this.disabled) {
@@ -31,23 +29,21 @@ export class MultipleChoiceComponent {
   }
 
   protected speak(): void {
-    if (this.tts.isSpeaking) {
-      this.tts.stop();
+    if (this.audioPlayer.isPlaying) {
+      this.audioPlayer.stop();
       return;
     }
 
-    const parts: string[] = [];
-    if (this.data.description) {
-      parts.push(this.data.description.trim());
+    const keys: string[] = [];
+    if (this.data.descriptionKey) {
+      keys.push(this.data.descriptionKey);
     }
-    if (this.data.question) {
-      parts.push(this.data.question.trim());
+    if (this.data.questionKey) {
+      keys.push(this.data.questionKey);
     }
 
-    const textToSpeak = parts.join('. ');
-    if (!textToSpeak) return;
-
-    const lang = this.languageService.getCurrentLanguage() || 'ro';
-    void this.tts.speak(textToSpeak, { lang });
+    if (keys.length > 0) {
+      void this.audioPlayer.playKeys(keys);
+    }
   }
 }
