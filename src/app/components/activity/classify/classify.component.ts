@@ -7,6 +7,8 @@ import {
   SimpleChanges,
   inject,
 } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -17,22 +19,46 @@ import {
 } from '@angular/cdk/drag-drop';
 import { ClassifyActivityData, ClassifyItem } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
+import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
 @Component({
   selector: 'app-classify',
   standalone: true,
-  imports: [CdkDropListGroup, CdkDropList, CdkDrag],
+  imports: [AsyncPipe, CdkDropListGroup, CdkDropList, CdkDrag, MatIconModule],
   templateUrl: './classify.component.html',
   styleUrl: './classify.component.css',
 })
 export class ClassifyComponent implements OnChanges {
   protected readonly uiText = inject(UiTextService);
+  private readonly audioPlayer = inject(AudioPlayerService);
+
   @Input({ required: true }) data!: ClassifyActivityData;
   @Input() disabled = false;
   @Output() answerSubmitted = new EventEmitter<Record<string, string>>();
 
+  protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
+
   protected pool: ClassifyItem[] = [];
   protected categoryItems: Record<string, ClassifyItem[]> = {};
+
+  protected speak(): void {
+    if (this.audioPlayer.isPlaying) {
+      this.audioPlayer.stop();
+      return;
+    }
+
+    const keys: string[] = [];
+    if (this.data.descriptionKey) {
+      keys.push(this.data.descriptionKey);
+    }
+    if (this.data.questionKey) {
+      keys.push(this.data.questionKey);
+    }
+
+    if (keys.length > 0) {
+      void this.audioPlayer.playKeys(keys);
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data']) {

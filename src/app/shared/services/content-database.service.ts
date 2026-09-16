@@ -434,6 +434,9 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            description,
+            descriptionKey: act.description,
+            questionKey: act.question,
             categories: (act.categories ?? []).map((c) => ({
               id: c.id,
               label: dict[c.label] ?? c.label,

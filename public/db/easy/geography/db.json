@@ -114,11 +114,11 @@
           "question": "easy_geo_5_question",
           "categories": [
             {
-              "id": "land",
+              "id": "with",
               "label": "easy_geo_5_cat_1"
             },
             {
-              "id": "water",
+              "id": "without",
               "label": "easy_geo_5_cat_2"
             }
           ],
@@ -138,13 +138,23 @@
             {
               "id": "item_4",
               "label": "easy_geo_5_item_4"
+            },
+            {
+              "id": "item_5",
+              "label": "easy_geo_5_item_5"
+            },
+            {
+              "id": "item_6",
+              "label": "easy_geo_5_item_6"
             }
           ],
           "answer": {
-            "item_1": "land",
-            "item_2": "water",
-            "item_3": "land",
-            "item_4": "water"
+            "item_1": "with",
+            "item_2": "with",
+            "item_3": "with",
+            "item_4": "with",
+            "item_5": "without",
+            "item_6": "without"
           },
           "hint": "easy_geo_5_hint",
           "reward": {

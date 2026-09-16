@@ -47,8 +47,11 @@ export interface ClassifyCategory {
 
 export interface ClassifyActivityData {
   question: string;
+  description?: string;
   items: ClassifyItem[];
   categories: ClassifyCategory[];
+  descriptionKey?: string;
+  questionKey?: string;
 }
 
 export interface MatchingPair {
