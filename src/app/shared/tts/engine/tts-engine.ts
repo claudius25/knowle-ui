@@ -58,7 +58,17 @@ export class SupertonicEngine {
 
     // Configure WASM paths
     if (config.wasmBasePath) {
-      ort.env.wasm.wasmPaths = config.wasmBasePath;
+      const base = config.wasmBasePath;
+      const isAbsolute = base.startsWith('http://') || base.startsWith('https://');
+      const origin =
+        typeof self !== 'undefined' && self.location && self.location.origin
+          ? self.location.origin
+          : typeof window !== 'undefined' && window.location && window.location.origin
+            ? window.location.origin
+            : '';
+      const resolvedWasmPath =
+        isAbsolute || !origin ? base : `${origin}${base.startsWith('/') ? '' : '/'}${base}`;
+      ort.env.wasm.wasmPaths = resolvedWasmPath;
     }
     // Set 1 thread to avoid requiring COOP/COEP headers for SharedArrayBuffer
     ort.env.wasm.numThreads = 1;

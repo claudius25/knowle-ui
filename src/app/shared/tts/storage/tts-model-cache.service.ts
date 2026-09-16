@@ -189,6 +189,18 @@ export class TtsModelCacheService {
 
         const arrayBuffer = await response.arrayBuffer();
 
+        // Check if the downloaded ONNX file is a Git LFS pointer file instead of real binary weights
+        if (fileName.endsWith('.onnx') && arrayBuffer.byteLength < 2000) {
+          const headerText = new TextDecoder().decode(
+            new Uint8Array(arrayBuffer, 0, Math.min(64, arrayBuffer.byteLength)),
+          );
+          if (headerText.startsWith('version https://git-lfs')) {
+            throw new Error(
+              `Model file ${fileName} is a Git LFS pointer file (not the real binary model). Ensure Git LFS pulled real files on your hosting platform.`,
+            );
+          }
+        }
+
         console.log(`[TTS] Saving model to OPFS: ${fileName}`);
         progressCallback?.({
           step: stepNum,
