@@ -8,6 +8,8 @@
       tabindex="0"
       aria-label="Torti the Explorer"
     >
+      <div class="torti-shadow" [ngStyle]="getShadowStyle()" aria-hidden="true"></div>
+
       @for (layer of layers; track layer.id) {
         <img
           class="torti-sprite"

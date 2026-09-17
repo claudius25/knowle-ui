@@ -12,7 +12,7 @@
   align-items: start;
   padding: clamp(32px, 7vh, 72px) 20px;
   padding-bottom: calc(clamp(32px, 7vh, 72px) + 80px);
-  background: #123f35;
+  background: var(--home-background);
   font-family: 'Nunito', sans-serif;
 }
 
@@ -26,7 +26,6 @@
   align-items: center;
   gap: 16px;
   padding: 14px 20px;
-  background: #123f35;
 }
 
 .game-progress {
@@ -41,17 +40,13 @@
   width: 34px;
   height: 34px;
   border: none;
+  background: none;
   border-radius: 50%;
-  background: #0f5049;
-  color: #ffffff;
-  font-size: 1rem;
+  color: var(--home-button-text);
+  font-size: 32px;
   font-weight: 900;
   line-height: 1;
   cursor: pointer;
-}
-
-.exit-button:hover {
-  background: #0b3a35;
 }
 
 .exit-overlay {

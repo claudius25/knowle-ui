@@ -27,15 +27,20 @@
           <!-- @if (showIntroButton) {
             <button class="intro-button" type="button" (click)="goToIntro()">{{ uiText.text('introButton') }}</button>
           } @else { -->
-        <g-button class="w-100" labelKey="introStart" (clicked)="startGame()"></g-button>
+        <g-button
+          class="home-cta w-100"
+          labelKey="introStart"
+          [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button)']"
+          (clicked)="startGame()"
+        ></g-button>
     } @else {
       <div class="language-buttons" role="group" aria-label="Selecteaza limba">
         <g-button class="w-100" labelKey="EN" (clicked)="selectLanguage('en')"
-        [colors]="['#4B9E58','#327F45','#58cc02']" [selected]="selectedLanguage === 'en'">
+        [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']" [selected]="selectedLanguage === 'en'">
           <img  class="language-flag" src="assets/home/en.png" alt="English" />
         </g-button>
         <g-button class="w-100" labelKey="RO" (clicked)="selectLanguage('ro')"
-        [colors]="['#4B9E58','#327F45','#58cc02']" [selected]="selectedLanguage === 'ro'">
+        [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']" [selected]="selectedLanguage === 'ro'">
           <img  class="language-flag" src="assets/home/ro.png" alt="Română" />
         </g-button>
       </div>

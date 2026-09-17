@@ -184,6 +184,21 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     };
   }
 
+  getShadowStyle(): Record<string, string> {
+    const numericScale = typeof this.currentScale === 'number' ? this.currentScale : 0.28;
+    const heightPx = TORTI_POSE_BASE_HEIGHT * numericScale;
+    const shadowWidthPx = 410 * numericScale;
+    const shadowHeightPx = 72 * numericScale;
+    const topPx = this.centered ? heightPx / 2 - shadowHeightPx * 0.35 : -shadowHeightPx * 0.35;
+
+    return {
+      width: `${shadowWidthPx}px`,
+      height: `${shadowHeightPx}px`,
+      top: `${topPx}px`,
+      transform: 'translate(-50%, -50%)',
+    };
+  }
+
   getBubbleStyle(facing: FacingDirection): Record<string, string> {
     const numericScale = typeof this.currentScale === 'number' ? this.currentScale : 0.28;
     const heightPx = TORTI_POSE_BASE_HEIGHT * numericScale;

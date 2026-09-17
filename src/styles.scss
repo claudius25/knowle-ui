@@ -1,9 +1,19 @@
 @use '@angular/material' as mat;
 @use './styles/activity';
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
-@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Lilita+One&family=Nunito:wght@800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Lilita+One&family=Nunito:wght@800&family=Nunito+Sans:wght@800&family=Slackey&display=swap');
 
 @include mat.core();
+
+:root {
+  --home-background: #075548;
+  --home-decoration: #0b6858;
+  --home-text: #ffffff;
+  --home-button: #62d900;
+  --home-button-hover: #6ee80b;
+  --home-button-depth: #46ad00;
+  --home-button-text: #103f36;
+}
 
 $knowle-theme: mat.define-theme((
   color: (
@@ -154,4 +164,30 @@ mat-icon {
 
 .language-flag {
   width: 32px;
+}
+
+.home-page .home-cta .duo-button {
+  min-height: 58px;
+  height: 58px;
+  border-radius: 18px;
+  color: var(--home-button-text);
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow: 0 5px 0 var(--home-button-depth);
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.home-page .home-cta .duo-button:hover:not(:disabled) {
+  background: var(--home-button-hover);
+}
+
+.home-page .home-cta .duo-button:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--home-button-depth);
+}
+
+.home-page .duo-button:focus-visible {
+  outline: 3px solid var(--home-text);
+  outline-offset: 4px;
 }

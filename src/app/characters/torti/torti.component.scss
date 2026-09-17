@@ -15,10 +15,20 @@
   transition: opacity 0.2s ease;
 }
 
+.torti-shadow {
+  position: absolute;
+  left: 0;
+  z-index: 0;
+  border-radius: 50%;
+  background: rgba(0, 35, 29, 0.3);
+  pointer-events: none;
+}
+
 .torti-sprite {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
   display: block;
   object-fit: contain;
   opacity: 0;
@@ -36,6 +46,7 @@
 
 .torti-talk-indicator {
   position: absolute;
+  z-index: 2;
   bottom: 8%;
   left: 50%;
   width: 10px;
