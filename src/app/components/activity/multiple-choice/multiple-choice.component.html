@@ -24,8 +24,13 @@
 @if (data.pictures && data.pictures.length > 0) {
   <div class="activity-image-gallery">
     @for (pic of data.pictures; track pic) {
-      <div class="activity-image-wrapper">
-        <img [src]="pic" alt="Activity illustration" class="activity-image" />
+      <div #activityImageWrapper class="activity-image-wrapper">
+        <img
+          [src]="pic"
+          alt="Activity illustration"
+          class="activity-image"
+          (load)="handleImageLoad()"
+        />
       </div>
     }
   </div>

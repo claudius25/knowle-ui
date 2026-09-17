@@ -9,6 +9,8 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  ViewChildren,
+  QueryList,
   inject,
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
@@ -27,13 +29,15 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('questionDescription') private questionDescription?: ElementRef<HTMLElement>;
   @ViewChild('questionTitle') private questionTitle?: ElementRef<HTMLElement>;
+  @ViewChildren('activityImageWrapper')
+  private activityImageWrappers!: QueryList<ElementRef<HTMLElement>>;
 
   protected readonly uiText = inject(UiTextService);
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   private resizeObserver?: ResizeObserver;
-  private resizeFrame?: number;
+  private fitTimer?: number;
 
   @Input({ required: true }) data!: MultipleChoiceActivityData;
   @Input() disabled = false;
@@ -48,12 +52,17 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
 
     if (activityShell && gameFooter) {
       this.resizeObserver = new ResizeObserver(() => this.scheduleQuestionFit());
-      this.resizeObserver.observe(activityShell);
       this.resizeObserver.observe(gameFooter);
     }
 
     window.addEventListener('resize', this.scheduleQuestionFit);
     void document.fonts.ready.then(() => this.scheduleQuestionFit());
+    const images = Array.from(
+      this.elementRef.nativeElement.querySelectorAll('img'),
+    ) as HTMLImageElement[];
+    void Promise.all(images.map((image) => image.decode().catch(() => undefined))).then(() => {
+      this.scheduleQuestionFit();
+    });
     this.scheduleQuestionFit();
   }
 
@@ -66,13 +75,17 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     window.removeEventListener('resize', this.scheduleQuestionFit);
-    window.cancelAnimationFrame(this.resizeFrame ?? 0);
+    window.clearTimeout(this.fitTimer);
   }
 
   protected select(answer: string): void {
     if (!this.disabled) {
       this.answerSelected.emit(answer);
     }
+  }
+
+  protected handleImageLoad(): void {
+    this.scheduleQuestionFit();
   }
 
   protected speak(): void {
@@ -95,8 +108,8 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   }
 
   private readonly scheduleQuestionFit = (): void => {
-    window.cancelAnimationFrame(this.resizeFrame ?? 0);
-    this.resizeFrame = window.requestAnimationFrame(() => this.fitQuestionAboveFooter());
+    window.clearTimeout(this.fitTimer);
+    this.fitTimer = window.setTimeout(() => this.fitQuestionAboveFooter());
   };
 
   private fitQuestionAboveFooter(): void {
@@ -104,6 +117,9 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     const gameFooter = this.getGameFooter();
     const description = this.questionDescription?.nativeElement;
     const title = this.questionTitle?.nativeElement;
+    const imageWrappers = this.activityImageWrappers
+      .toArray()
+      .map(({ nativeElement }) => nativeElement);
 
     if (!activityShell || !gameFooter || !title) {
       return;
@@ -111,13 +127,34 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
 
     description?.style.removeProperty('font-size');
     title.style.removeProperty('font-size');
+    imageWrappers.forEach((wrapper) => {
+      wrapper.style.removeProperty('height');
+      wrapper.style.removeProperty('min-height');
+      wrapper.style.removeProperty('max-height');
+    });
     activityShell.style.removeProperty('max-height');
     activityShell.style.removeProperty('overflow-y');
 
     let descriptionSize = description ? parseFloat(getComputedStyle(description).fontSize) : 0;
     let titleSize = parseFloat(getComputedStyle(title).fontSize);
+    let imageHeights = imageWrappers.map((wrapper) => wrapper.getBoundingClientRect().height);
     const minimumDescriptionSize = 10;
     const minimumTitleSize = 14;
+    const minimumImageHeight = 100;
+
+    while (
+      this.elementsOverlap(activityShell, gameFooter) &&
+      imageHeights.some((height) => height > minimumImageHeight)
+    ) {
+      imageHeights = imageHeights.map((height, index) => {
+        const nextHeight = Math.max(minimumImageHeight, height - 20);
+        const wrapper = imageWrappers[index];
+        wrapper.style.height = `${nextHeight}px`;
+        wrapper.style.minHeight = `${nextHeight}px`;
+        wrapper.style.maxHeight = `${nextHeight}px`;
+        return nextHeight;
+      });
+    }
 
     while (
       this.elementsOverlap(activityShell, gameFooter) &&
