@@ -237,20 +237,17 @@ export class ContentDatabaseService {
         }
 
         const isCorrect = this.checkAnswer(act, userAnswer, dict);
+        const nextAct = targetChapter.activities[targetIndex + 1] ?? null;
+        const nextActivity: NextActivity | null = nextAct
+          ? {
+              activityId: nextAct.id,
+              title: dict[nextAct.title] ?? nextAct.title,
+              type: nextAct.type,
+              difficulty,
+            }
+          : null;
 
         if (isCorrect) {
-          const nextIndex = targetIndex + 1;
-          const nextAct = targetChapter.activities[nextIndex] ?? null;
-
-          const nextActivity: NextActivity | null = nextAct
-            ? {
-                activityId: nextAct.id,
-                title: dict[nextAct.title] ?? nextAct.title,
-                type: nextAct.type,
-                difficulty,
-              }
-            : null;
-
           return {
             correct: true,
             nextActivity,
@@ -259,7 +256,7 @@ export class ContentDatabaseService {
 
         return {
           correct: false,
-          nextActivity: null,
+          nextActivity,
           retry: true,
           message: dict['quiz_incorrect'] ?? 'Incorrect answer, try again!',
         };

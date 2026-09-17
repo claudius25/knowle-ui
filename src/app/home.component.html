@@ -3,6 +3,18 @@
     ⚙️ Admin
   </button> -->
 
+  @if (selectedLanguage) {
+    <button
+      class="settings-button"
+      type="button"
+      [attr.aria-label]="uiText.text('language')"
+      [title]="uiText.text('language')"
+      (click)="openLanguageDialog()"
+    >
+      <mat-icon>settings</mat-icon>
+    </button>
+  }
+
   <div class="hero-panel">
     <section class="character-area" aria-label="Personajul Gnosy">
       <div class="torti-home-stage">
@@ -49,4 +61,49 @@
     
 
   </footer>
+
+  @if (showLanguageDialog) {
+    <div class="language-dialog-backdrop" (click)="closeLanguageDialog()">
+      <section
+        class="language-dialog"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-label]="uiText.text('language')"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="language-dialog__header">
+          <h2>{{ uiText.text('language') }}</h2>
+          <button
+            class="language-dialog__close"
+            type="button"
+            aria-label="Close"
+            (click)="closeLanguageDialog()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </header>
+
+        <div class="language-buttons" role="group" [attr.aria-label]="uiText.text('language')">
+          <g-button
+            class="w-100"
+            labelKey="EN"
+            [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']"
+            [selected]="selectedLanguage === 'en'"
+            (clicked)="selectLanguage('en')"
+          >
+            <img class="language-flag" src="assets/home/en.png" alt="English" />
+          </g-button>
+          <g-button
+            class="w-100"
+            labelKey="RO"
+            [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']"
+            [selected]="selectedLanguage === 'ro'"
+            (clicked)="selectLanguage('ro')"
+          >
+            <img class="language-flag" src="assets/home/ro.png" alt="Română" />
+          </g-button>
+        </div>
+      </section>
+    </div>
+  }
 </main>

@@ -2,12 +2,14 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   OnDestroy,
   OnInit,
   ViewChild,
   inject,
 } from '@angular/core';
 import { GButtonComponent } from './shared/components/g-button/g-button.component';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { TortiComponent } from './characters/torti/torti.component';
 import { TortiCharacter } from './characters/torti/torti-character';
@@ -32,7 +34,7 @@ const HAPPY_POSES: readonly TortiPose[] = [
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [TortiComponent, GButtonComponent],
+  imports: [TortiComponent, GButtonComponent, MatIconModule],
   templateUrl: './home.component.html',
   styleUrl: './app.css',
 })
@@ -51,6 +53,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   protected selectedLanguage: Language | null = this.languageService.getStoredLanguage();
   protected tortiSpeech = '';
   protected tortiShowBubble = false;
+  protected showLanguageDialog = false;
 
   ngOnInit(): void {}
 
@@ -67,6 +70,20 @@ export class HomeComponent implements OnDestroy, OnInit {
   protected selectLanguage(language: Language): void {
     this.languageService.setLanguage(language);
     this.selectedLanguage = language;
+    this.showLanguageDialog = false;
+  }
+
+  protected openLanguageDialog(): void {
+    this.showLanguageDialog = true;
+  }
+
+  protected closeLanguageDialog(): void {
+    this.showLanguageDialog = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  protected closeLanguageDialogOnEscape(): void {
+    this.closeLanguageDialog();
   }
 
   protected startGame(): void {

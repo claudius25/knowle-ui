@@ -281,6 +281,8 @@ export class GameComponent implements OnInit, OnDestroy {
   protected continueGame(): void {
     this.audioPlayer.stop();
     this.characterSpeech = '';
+    console.log('Continuing game...', this.sessionComplete);
+    console.log('Continuing game... nextActivity', this.nextActivity);
 
     if (this.sessionComplete || !this.nextActivity) {
       this.router.navigate(['/chapter-done'], {
@@ -380,10 +382,11 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   private handleAnswer(response: AnswerResponse): void {
+    this.nextActivity = response.nextActivity;
+
     if (response.correct) {
       this.completedActivities += 1;
       this.coins += GameComponent.COINS_PER_CORRECT_ANSWER;
-      this.nextActivity = response.nextActivity;
       const speechKey = pickRandomLine(TORTI_HAPPY_LINES);
       this.characterSpeech = this.text(speechKey);
       void this.audioPlayer.playKey(speechKey, { global: true });

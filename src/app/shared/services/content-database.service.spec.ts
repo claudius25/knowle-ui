@@ -208,10 +208,10 @@ describe('ContentDatabaseService', () => {
     httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO_DICT);
   });
 
-  it('should validate incorrect multiple choice answer', (done) => {
+  it('should validate incorrect multiple choice answer and allow continuing', (done) => {
     service.submitAnswer('easy_geo_1', 'Marte').subscribe((res) => {
       expect(res.correct).toBeFalse();
-      expect(res.nextActivity).toBeNull();
+      expect(res.nextActivity?.activityId).toBe('easy_geo_2');
       expect(res.retry).toBeTrue();
       done();
     });
