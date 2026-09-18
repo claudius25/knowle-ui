@@ -24,16 +24,20 @@
   <div class="matching-column matching-column--left">
     @for (item of leftItems; track item.id) {
       <button
+        #leftCard
         class="duo-button duo-button--neutral match-card match-card-left"
         type="button"
+        [style.background-color]="'white'"
         [class.selected]="isLeftSelected(item.id)"
         [class.matched]="isMatched(item.id)"
         [class.mismatch]="isLeftWrong(item.id)"
+        [style.background-image]="'url(' + item.image + ')'"
         [disabled]="disabled || isMatched(item.id)"
         (click)="selectLeft(item.id)"
       >
         @if (item.image) {
-          <img [src]="item.image" [alt]="item.text" class="card-image" />
+          <img [src]="item.image" [alt]="item.text" class="card-image"
+          (load)="handleImageLoad()" />
         }
         <span class="card-text">{{ item.text }}</span>
         <!-- @if (isMatched(item.id)) {
@@ -47,7 +51,8 @@
   <div class="matching-column matching-column--right">
     @for (item of rightItems; track item.id) {
       <button
-        class="duo-button duo-button--neutral match-card"
+        #rightCard
+        class="duo-button duo-button--neutral match-card match-card-right"
         type="button"
         [class.selected]="isRightSelected(item.id)"
         [class.matched]="isMatched(item.id)"

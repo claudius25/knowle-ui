@@ -20,6 +20,10 @@
 }
 
 .match-card {
+  background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: black;
   position: relative;
   min-height: 64px;
   width: 100%;
@@ -42,18 +46,24 @@
 
 .match-card-left {
   flex-direction: column;
+  padding: 0 !important;
+}
+.match-card-right {
+  color: white;
 }
 
 .card-text {
-  flex: 1 1 auto;
+  width: 100%;
+  text-align: center;
 }
 
 .card-image {
   flex: 0 0 auto;
   width: 48px;
-  height: 48px;
+  height: 1px;
   object-fit: contain;
   border-radius: 8px;
+  opacity: 0;
 }
 
 .match-card.selected {

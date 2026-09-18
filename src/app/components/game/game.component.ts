@@ -6,7 +6,6 @@ import { MatchingComponent } from '../activity/matching/matching.component';
 import { OrderingComponent } from '../activity/ordering/ordering.component';
 import { MultipleChoiceComponent } from '../activity/multiple-choice/multiple-choice.component';
 import { TrueFalseComponent } from '../activity/true-false/true-false.component';
-import { ProgressBarComponent } from '../ui/progress-bar/progress-bar.component';
 import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
 import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
 import { GameService } from '../../shared/services/game.service';
@@ -42,7 +41,6 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     ClassifyComponent,
     MatchingComponent,
     OrderingComponent,
-    ProgressBarComponent,
     CoinDisplayComponent,
     HealthDisplayComponent,
     GameFooterComponent,

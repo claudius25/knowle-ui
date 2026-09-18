@@ -1,14 +1,14 @@
 :host {
   display: block;
-  min-height: 100vh;
+  min-height: 100svh;
   color: #ffffff;
 }
 
 .game-page {
-  min-height: 100vh;
+  min-height: 100svh;
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: 52px 1fr 130px;
+  grid-template-rows: 52px 1fr min-content;
   justify-items: center;
   align-items: start;
   background: var(--home-background);

@@ -1,10 +1,15 @@
 import {
+  AfterViewInit,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
+  QueryList,
   SimpleChanges,
+  ViewChildren,
   inject,
 } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -26,9 +31,18 @@ interface MatchingColumnItem {
   templateUrl: './matching.component.html',
   styleUrl: './matching.component.css',
 })
-export class MatchingComponent implements OnChanges {
+export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
   protected readonly uiText = inject(UiTextService);
   private readonly audioPlayer = inject(AudioPlayerService);
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
+
+  @ViewChildren('leftCard') private leftCardRefs!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('rightCard') private rightCardRefs!: QueryList<ElementRef<HTMLElement>>;
+
+  private static readonly CARD_HEIGHT_STEP = 4;
+  private static readonly MAX_CARD_HEIGHT = 220;
+  private resizeObserver?: ResizeObserver;
+  private growTimer?: number;
 
   @Input({ required: true }) data!: MatchingActivityData;
   @Input() disabled = false;
@@ -76,6 +90,26 @@ export class MatchingComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && this.data) {
       this.resetState();
+      this.scheduleGrow();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    const gameFooter = this.getGameFooter();
+    if (gameFooter) {
+      this.resizeObserver = new ResizeObserver(() => this.scheduleGrow());
+      this.resizeObserver.observe(gameFooter);
+    }
+    window.addEventListener('resize', this.scheduleGrow);
+    this.scheduleGrow();
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    window.removeEventListener('resize', this.scheduleGrow);
+    window.clearTimeout(this.growTimer);
+    if (this.mismatchTimeout) {
+      clearTimeout(this.mismatchTimeout);
     }
   }
 
@@ -107,6 +141,126 @@ export class MatchingComponent implements OnChanges {
     }));
 
     this.rightItems = this.shuffle(rightList);
+    this.resetCardHeights();
+  }
+
+  protected handleImageLoad(): void {
+    this.scheduleGrow();
+  }
+
+  private resetCardHeights(): void {
+    const cards = [
+      ...(this.leftCardRefs?.toArray().map((r) => r.nativeElement) ?? []),
+      ...(this.rightCardRefs?.toArray().map((r) => r.nativeElement) ?? []),
+    ];
+    cards.forEach((card) => {
+      card.style.removeProperty('height');
+      card.style.removeProperty('min-height');
+      const image = card.querySelector('.card-image') as HTMLImageElement | null;
+      image?.style.removeProperty('width');
+      image?.style.removeProperty('height');
+    });
+  }
+
+  private readonly scheduleGrow = (): void => {
+    window.clearTimeout(this.growTimer);
+    this.growTimer = window.setTimeout(() => this.growLeftCardsUntilCollision());
+  };
+
+  /** Grows the left cards' height a step at a time until they'd overlap the footer, then mirrors the final height onto the right cards. */
+  private growLeftCardsUntilCollision(): void {
+    const activityShell = this.getActivityShell();
+    const gameFooter = this.getGameFooter();
+    const leftCards = this.leftCardRefs?.toArray().map((r) => r.nativeElement) ?? [];
+    const rightCards = this.rightCardRefs?.toArray().map((r) => r.nativeElement) ?? [];
+
+    if (!activityShell || !gameFooter || leftCards.length === 0) {
+      return;
+    }
+
+    if (this.elementsOverlap(activityShell, gameFooter)) {
+      return;
+    }
+
+    const currentHeight = leftCards[0].getBoundingClientRect().height;
+    const nextHeight = Math.min(
+      MatchingComponent.MAX_CARD_HEIGHT,
+      currentHeight + MatchingComponent.CARD_HEIGHT_STEP,
+    );
+
+    leftCards.forEach((card) => {
+      card.style.height = `${nextHeight}px`;
+      card.style.minHeight = `${nextHeight}px`;
+    });
+
+    if (this.elementsOverlap(activityShell, gameFooter)) {
+      // Grew one step too far: back off and stabilize, then apply the same height to the right column.
+      const stableHeight = nextHeight - MatchingComponent.CARD_HEIGHT_STEP;
+      leftCards.forEach((card) => {
+        card.style.height = `${stableHeight}px`;
+        card.style.minHeight = `${stableHeight}px`;
+      });
+      rightCards.forEach((card) => {
+        card.style.height = `${stableHeight}px`;
+        card.style.minHeight = `${stableHeight}px`;
+      });
+      this.growLeftCardImages(leftCards, stableHeight);
+      return;
+    }
+
+    if (nextHeight >= MatchingComponent.MAX_CARD_HEIGHT) {
+      rightCards.forEach((card) => {
+        card.style.height = `${nextHeight}px`;
+        card.style.minHeight = `${nextHeight}px`;
+      });
+      this.growLeftCardImages(leftCards, nextHeight);
+      return;
+    }
+
+    this.scheduleGrow();
+  }
+
+  /** Enlarges each left card's image to fill the space left over after its text, without exceeding the card's stabilized height. */
+  private growLeftCardImages(leftCards: HTMLElement[], cardHeight: number): void {
+    const verticalPadding = 28; // .match-card padding: 14px top + 14px bottom
+    const horizontalPadding = 32; // 16px left + 16px right
+    const gap = 12; // .match-card gap between children
+
+    leftCards.forEach((card) => {
+      const image = card.querySelector('.card-image') as HTMLImageElement | null;
+      const text = card.querySelector('.card-text') as HTMLElement | null;
+      if (!image || !text) {
+        return;
+      }
+
+      const textHeight = text.getBoundingClientRect().height;
+      const cardWidth = card.getBoundingClientRect().width;
+      const availableHeight = cardHeight - verticalPadding - gap - textHeight;
+      const availableWidth = cardWidth - horizontalPadding;
+      const size = Math.max(32, Math.min(availableHeight, availableWidth));
+
+      image.style.width = `${size}px`;
+      image.style.height = `${size}px`;
+    });
+  }
+
+  private elementsOverlap(activityShell: HTMLElement, gameFooter: HTMLElement): boolean {
+    const activityRect = activityShell.getBoundingClientRect();
+    const footerRect = gameFooter.getBoundingClientRect();
+    console.log('Activity Shell Rect:', activityRect);
+    return activityRect.bottom > footerRect.top && activityRect.top < footerRect.bottom;
+  }
+
+  private getActivityShell(): HTMLElement | null {
+    const host = this.elementRef.nativeElement as HTMLElement;
+    const activityShell = host.closest('.activity-shell') as HTMLElement | null;
+    return activityShell ? (activityShell.children[0] as HTMLElement) : null;
+  }
+
+  private getGameFooter(): HTMLElement | null {
+    const host = this.elementRef.nativeElement as HTMLElement;
+    const gamePage = host.closest('.game-page');
+    return gamePage?.querySelector('app-game-footer .game-footer') as HTMLElement | null;
   }
 
   private shuffle(array: MatchingColumnItem[]): MatchingColumnItem[] {

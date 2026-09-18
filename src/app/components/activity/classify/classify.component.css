@@ -5,7 +5,7 @@
 }
 .drop-list {
   display: grid;
-    grid-template-rows: 120px 1fr;
+    grid-template-rows: max-content 1fr;
     gap: 10px;
 }
 .classify-pool {
