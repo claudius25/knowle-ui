@@ -175,8 +175,8 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
 
     if (this.elementsOverlap(activityShell, gameFooter)) {
       console.log('Adjusting activity shell max height due to overlap with footer');
-      // const activityTop = activityShell.getBoundingClientRect().top;
-      // const footerTop = gameFooter.getBoundingClientRect().top;
+      const activityTop = activityShell.getBoundingClientRect().top;
+      const footerTop = gameFooter.getBoundingClientRect().top;
       // activityShell.style.maxHeight = `${Math.max(0, footerTop - activityTop - 8)}px`;
       // activityShell.style.overflowY = 'auto';
       this.scheduleQuestionFit();
