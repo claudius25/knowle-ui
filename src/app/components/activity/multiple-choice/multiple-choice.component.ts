@@ -149,9 +149,9 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
       imageHeights = imageHeights.map((height, index) => {
         const nextHeight = Math.max(minimumImageHeight, height - 20);
         const wrapper = imageWrappers[index];
-        wrapper.style.height = `${nextHeight}px`;
-        wrapper.style.minHeight = `${nextHeight}px`;
-        wrapper.style.maxHeight = `${nextHeight}px`;
+        // wrapper.style.height = `${nextHeight}px`;
+        // wrapper.style.minHeight = `${nextHeight}px`;
+        // wrapper.style.maxHeight = `${nextHeight}px`;
         return nextHeight;
       });
     }
