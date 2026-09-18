@@ -18,6 +18,9 @@ import { Subscription } from 'rxjs';
 import { FacingDirection, TortiPose, TortiPosition, WalkOptions } from './torti.types';
 import { TortiCharacter } from './torti-character';
 import { TORTI_POSE_BASE_HEIGHT, tortiPoseUrl } from './torti.poses';
+import { AudioPlayerService } from '../../shared/services/audio-player.service';
+import { HealthDisplayComponent } from '../../components/ui/health-display/health-display.component';
+import { CoinDisplayComponent } from '../../components/ui/coin-display/coin-display.component';
 
 /** How long the crossfade between two poses takes, in ms. Keep in sync with the CSS transition. */
 const POSE_TRANSITION_MS = 260;
@@ -31,7 +34,7 @@ interface PoseLayer {
 @Component({
   selector: 'app-torti',
   standalone: true,
-  imports: [CommonModule, AsyncPipe],
+  imports: [CommonModule, AsyncPipe, HealthDisplayComponent, CoinDisplayComponent],
   templateUrl: './torti.component.html',
   styleUrl: './torti.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +49,8 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   @Input() initialPose: TortiPose = 'idle';
   @Input() speechText = '';
   @Input() showBubble = false;
+  /** Set to false to hide the mute/unmute control on the character. */
+  @Input() showMuteButton = true;
 
   @Output() movementFinished = new EventEmitter<void>();
   @Output() poseChanged = new EventEmitter<TortiPose>();
@@ -56,11 +61,16 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
 
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly audioPlayer = inject(AudioPlayerService);
+  protected readonly isMuted$ = this.audioPlayer.muted$;
   private subs = new Subscription();
   private resizeObserver?: ResizeObserver;
   private fittedScale = 0.28;
   private nextLayerId = 0;
   private cleanupTimeout: number | null = null;
+
+  health = 100;
+  coins = 0;
 
   get currentScale(): number | string {
     return this.fitToContainer ? this.fittedScale : this.scale;
@@ -217,6 +227,12 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
     this.characterClick.emit(this.character);
   }
 
+  /** Toggles whether the character's spoken audio is muted; doesn't trigger a click reaction. */
+  toggleMute(event: Event): void {
+    event.stopPropagation();
+    this.audioPlayer.toggleMute();
+  }
+
   private pushPoseLayer(pose: TortiPose): void {
     const id = this.nextLayerId++;
     this.layers.forEach((layer) => (layer.visible = false));
@@ -239,4 +255,6 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       }, POSE_TRANSITION_MS);
     });
   }
+
+  confirmExit() {}
 }

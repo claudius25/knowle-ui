@@ -1,0 +1,82 @@
+:host {
+    width: 100%;
+}
+.game-header {
+  height: 62px;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 24px minmax(100px, 1fr) 50px 50px;
+  align-items: center;
+  gap: 12px;
+
+  padding: 0 16px;
+  color: #ffffff;
+
+  background: var(--home-background);
+}
+
+/* Butoane generale */
+.header-btn {
+  height: 40px;
+  border: 0;
+  background: transparent;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  font: inherit;
+}
+
+/* Close */
+.close-btn {
+  font-size: 24px;
+  font-weight: 600;
+  color: #777;
+  justify-content: start;
+}
+
+/* Progress */
+.progress {
+  width: 100%;
+}
+
+.progress__track {
+  height: 12px;
+  width: 100%;
+
+  background: #3a3a3a;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  background: #58cc02;
+  border-radius: inherit;
+
+  transition: width 0.3s ease;
+}
+
+/* Battery + coins */
+.stat-btn {
+  padding: 0 8px;
+}
+
+.stat-btn .icon {
+  font-size: 22px;
+}
+
+.stat-btn .value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.coin-btn, .battery-btn, .close-btn {
+    margin: 0;
+    padding: 0;
+}

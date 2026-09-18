@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import {
   DbActivity,
   DbCategory,
@@ -53,12 +55,15 @@ export class AdminComponent implements OnInit {
   // UI state
   protected activeTab: 'editor' | 'translations' | 'raw' = 'editor';
   protected selectedChapterIndex = 0;
+  protected selectedActivityIndex = -1;
   protected statusMessage = '';
   protected isError = false;
 
   // Translation popup modal state
   protected modalData: ActiveTranslationModal | null = null;
   protected modalSearchFilter = '';
+  protected modalTranslating = false;
+  protected readonly translatingKeys = new Set<string>();
 
   // Supported activity types
   protected readonly activityTypes: ActivityType[] = [
@@ -168,6 +173,16 @@ export class AdminComponent implements OnInit {
         this.selectedChapterIndex = Math.max(0, this.db.chapters.length - 1);
       }
     }
+  }
+
+  protected selectChapter(index: number): void {
+    this.selectedChapterIndex = index;
+    this.selectedActivityIndex = -1;
+  }
+
+  // --- Activity list selection ---
+  protected selectActivity(index: number): void {
+    this.selectedActivityIndex = this.selectedActivityIndex === index ? -1 : index;
   }
 
   // --- Activity Operations ---
@@ -361,11 +376,17 @@ export class AdminComponent implements OnInit {
     }
 
     chapter.activities.push(newActivity);
+    this.selectedActivityIndex = chapter.activities.length - 1;
   }
 
   protected removeActivity(chapter: DbChapter, index: number): void {
     if (confirm(`Ești sigur că vrei să ștergi activitatea "${chapter.activities[index].id}"?`)) {
       chapter.activities.splice(index, 1);
+      if (this.selectedActivityIndex === index) {
+        this.selectedActivityIndex = -1;
+      } else if (this.selectedActivityIndex > index) {
+        this.selectedActivityIndex--;
+      }
     }
   }
 
@@ -560,6 +581,58 @@ export class AdminComponent implements OnInit {
 
   protected closeTranslationModal(): void {
     this.modalData = null;
+  }
+
+  // --- Automatic RO -> EN translation ---
+  /** Calls the Google Cloud Translation API (v2) to translate Romanian text to English. */
+  private requestAutoTranslation(text: string): Promise<string> {
+    const url = `https://translation.googleapis.com/language/translate/v2?key=${environment.googleTranslateApiKey}`;
+    const body = { q: text, source: 'ro', target: 'en', format: 'text' };
+
+    return firstValueFrom(
+      this.http.post<{ data?: { translations?: { translatedText: string }[] } }>(url, body),
+    ).then((res) => res?.data?.translations?.[0]?.translatedText?.trim() ?? '');
+  }
+
+  protected autoTranslateModal(): void {
+    if (!this.modalData || !this.modalData.ro.trim() || this.modalTranslating) return;
+    this.modalTranslating = true;
+    this.requestAutoTranslation(this.modalData.ro)
+      .then((translated) => {
+        if (this.modalData && translated) {
+          this.modalData.en = translated;
+        }
+      })
+      .catch(() => {
+        this.statusMessage = 'Traducerea automată a eșuat. Încearcă din nou.';
+        this.isError = true;
+      })
+      .finally(() => {
+        this.modalTranslating = false;
+      });
+  }
+
+  protected autoTranslateKey(key: string): void {
+    const roText = this.translations.ro[key];
+    if (!roText || !roText.trim() || this.translatingKeys.has(key)) return;
+    this.translatingKeys.add(key);
+    this.requestAutoTranslation(roText)
+      .then((translated) => {
+        if (translated) {
+          this.translations.en[key] = translated;
+        }
+      })
+      .catch(() => {
+        this.statusMessage = 'Traducerea automată a eșuat. Încearcă din nou.';
+        this.isError = true;
+      })
+      .finally(() => {
+        this.translatingKeys.delete(key);
+      });
+  }
+
+  protected isTranslatingKey(key: string): boolean {
+    return this.translatingKeys.has(key);
   }
 
   // --- Translation Dictionary Table View ---

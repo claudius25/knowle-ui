@@ -99,24 +99,54 @@
 
         <ul class="chapter-list">
           @for (ch of db.chapters; track ch.id; let i = $index) {
-            <li
-              class="chapter-item"
-              [class.active]="selectedChapterIndex === i"
-              (click)="selectedChapterIndex = i"
-            >
-              <div class="chapter-item-info">
-                <strong>{{ ch.id }}</strong>
-                <span class="chapter-subtitle">{{ translations.ro[ch.title] || ch.title }}</span>
-                <span class="activity-badge">{{ ch.activities.length }} activități</span>
-              </div>
-              <button
-                class="icon-btn icon-btn--danger"
-                type="button"
-                title="Șterge capitolul"
-                (click)="$event.stopPropagation(); removeChapter(i)"
+            <li class="chapter-list-entry">
+              <div
+                class="chapter-item"
+                [class.active]="selectedChapterIndex === i"
+                (click)="selectChapter(i)"
               >
-                🗑️
-              </button>
+                <div class="chapter-item-info">
+                  <strong>{{ ch.id }}</strong>
+                  <span class="chapter-subtitle">{{ translations.ro[ch.title] || ch.title }}</span>
+                  <span class="activity-badge">{{ ch.activities.length }} activități</span>
+                </div>
+                <button
+                  class="icon-btn icon-btn--danger"
+                  type="button"
+                  title="Șterge capitolul"
+                  (click)="$event.stopPropagation(); removeChapter(i)"
+                >
+                  🗑️
+                </button>
+              </div>
+
+              <!-- Activities nested under the currently selected chapter -->
+              @if (selectedChapterIndex === i) {
+                <ul class="activity-sublist">
+                  @for (act of ch.activities; track act.id; let actIdx = $index) {
+                    <li
+                      class="activity-sub-item"
+                      [class.active]="selectedActivityIndex === actIdx"
+                      (click)="selectActivity(actIdx)"
+                    >
+                      <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{ act.type }}</span>
+                      <span class="activity-sub-title">{{ translations.ro[act.title] || act.title }}</span>
+                      <div class="activity-sub-actions" (click)="$event.stopPropagation()">
+                        <button
+                          class="icon-btn icon-btn--danger icon-btn--tiny"
+                          type="button"
+                          (click)="removeActivity(ch, actIdx)"
+                          title="Șterge activitatea"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </li>
+                } @empty {
+                  <li class="activity-sublist-empty">Nicio activitate încă.</li>
+                }
+              </ul>
+            }
             </li>
           }
         </ul>
@@ -125,6 +155,7 @@
       <!-- Main Editor Content -->
       <section class="chapter-details">
         @if (db.chapters[selectedChapterIndex]; as currentChapter) {
+          @if (selectedActivityIndex === -1) {
           <!-- Chapter Metadata Card -->
           <div class="card chapter-meta-card">
             <div class="card-header">
@@ -189,46 +220,18 @@
               </button>
             </div>
           </div>
+          }
 
-          <!-- Activities List -->
+          <!-- Selected Activity Detail -->
           <div class="activities-list">
-            @for (act of currentChapter.activities; track act.id; let actIdx = $index) {
+            @if (currentChapter.activities[selectedActivityIndex]; as act) {
               <div class="card activity-card">
                 <!-- Activity Header -->
                 <div class="activity-card-header">
                   <div class="activity-title-row">
-                    <span class="activity-index">#{{ actIdx + 1 }}</span>
+                    <span class="activity-index">#{{ selectedActivityIndex + 1 }}</span>
                     <input class="act-id-input" type="text" [(ngModel)]="act.id" />
                     <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{ act.type }}</span>
-                  </div>
-
-                  <div class="activity-actions">
-                    <button
-                      class="icon-btn"
-                      type="button"
-                      [disabled]="actIdx === 0"
-                      (click)="moveActivity(currentChapter, actIdx, 'up')"
-                      title="Mută mai sus"
-                    >
-                      ▲
-                    </button>
-                    <button
-                      class="icon-btn"
-                      type="button"
-                      [disabled]="actIdx === currentChapter.activities.length - 1"
-                      (click)="moveActivity(currentChapter, actIdx, 'down')"
-                      title="Mută mai jos"
-                    >
-                      ▼
-                    </button>
-                    <button
-                      class="icon-btn icon-btn--danger"
-                      type="button"
-                      (click)="removeActivity(currentChapter, actIdx)"
-                      title="Șterge activitatea"
-                    >
-                      🗑️
-                    </button>
                   </div>
                 </div>
 
@@ -526,6 +529,10 @@
                   }
                 </div>
               </div>
+            } @else {
+              <div class="empty-state">
+                <p>Selectează o activitate din lista din stânga sau adaugă una nouă mai sus.</p>
+              </div>
             }
           </div>
         } @else {
@@ -574,6 +581,15 @@
                 </td>
                 <td>
                   <div class="table-actions">
+                    <button
+                      class="btn btn--small btn--i18n"
+                      type="button"
+                      [disabled]="isTranslatingKey(k) || !translations.ro[k]"
+                      (click)="autoTranslateKey(k)"
+                      title="Traduce automat RO→EN"
+                    >
+                      {{ isTranslatingKey(k) ? '⏳' : '🤖' }}
+                    </button>
                     <button class="btn btn--small btn--i18n" type="button" (click)="openTranslationModal(k)" title="Popup extins">
                       🌐
                     </button>
@@ -610,7 +626,7 @@
 
   <!-- TRANSLATION POPUP MODAL -->
   @if (modalData) {
-    <div class="modal-backdrop" (click)="closeTranslationModal()">
+    <div class="modal-backdrop">
       <div class="modal-dialog" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3>{{ modalData.title || 'Editare Traducere' }}</h3>
@@ -629,7 +645,18 @@
           </div>
 
           <div class="modal-field">
-            <label>🇬🇧 English (en.json):</label>
+            <div class="modal-field-label-row">
+              <label>🇬🇧 English (en.json):</label>
+              <button
+                class="btn btn--small btn--i18n"
+                type="button"
+                [disabled]="modalTranslating || !modalData.ro.trim()"
+                (click)="autoTranslateModal()"
+                title="Traduce automat din română în engleză"
+              >
+                {{ modalTranslating ? '⏳ Se traduce...' : '🤖 Traducere automată (RO→EN)' }}
+              </button>
+            </div>
             <textarea rows="3" [(ngModel)]="modalData.en" placeholder="Text in English..."></textarea>
           </div>
         </div>

@@ -13,12 +13,15 @@ export interface PlayAudioKeyOptions {
 @Injectable({ providedIn: 'root' })
 export class AudioPlayerService implements OnDestroy {
   private readonly languageService = inject(LanguageService);
+  private static readonly MUTE_STORAGE_KEY = 'gnosy_audio_muted';
 
   private readonly isPlayingSubject = new BehaviorSubject<boolean>(false);
   private readonly currentKeySubject = new BehaviorSubject<string | null>(null);
+  private readonly mutedSubject = new BehaviorSubject<boolean>(this.readStoredMute());
 
   readonly isPlaying$: Observable<boolean> = this.isPlayingSubject.asObservable();
   readonly currentKey$: Observable<string | null> = this.currentKeySubject.asObservable();
+  readonly muted$: Observable<boolean> = this.mutedSubject.asObservable();
 
   private currentAudio: HTMLAudioElement | null = null;
   private queue: string[] = [];
@@ -30,6 +33,34 @@ export class AudioPlayerService implements OnDestroy {
 
   get currentKey(): string | null {
     return this.currentKeySubject.value;
+  }
+
+  get muted(): boolean {
+    return this.mutedSubject.value;
+  }
+
+  setMuted(muted: boolean): void {
+    this.mutedSubject.next(muted);
+    try {
+      localStorage.setItem(AudioPlayerService.MUTE_STORAGE_KEY, muted ? '1' : '0');
+    } catch {
+      // localStorage unavailable (e.g. private mode) - mute preference just won't persist.
+    }
+    if (muted) {
+      this.stop();
+    }
+  }
+
+  toggleMute(): void {
+    this.setMuted(!this.muted);
+  }
+
+  private readStoredMute(): boolean {
+    try {
+      return localStorage.getItem(AudioPlayerService.MUTE_STORAGE_KEY) === '1';
+    } catch {
+      return false;
+    }
   }
 
   ngOnDestroy(): void {
@@ -56,6 +87,7 @@ export class AudioPlayerService implements OnDestroy {
    * Plays a single pre-generated audio file by its translation key.
    */
   async playKey(key: string, options?: PlayAudioKeyOptions): Promise<void> {
+    if (this.muted) return;
     const url = this.getAudioUrl(key, options);
     return this.playUrl(url, key);
   }
@@ -65,7 +97,7 @@ export class AudioPlayerService implements OnDestroy {
    */
   async playKeys(keys: string[], options?: PlayAudioKeyOptions): Promise<void> {
     this.stop();
-    if (!keys || keys.length === 0) return;
+    if (!keys || keys.length === 0 || this.muted) return;
 
     const urls = keys.map((k) => this.getAudioUrl(k, options));
     const combinedKey = keys.join('+');
@@ -93,6 +125,7 @@ export class AudioPlayerService implements OnDestroy {
    */
   async playUrl(url: string, keyIdentifier?: string): Promise<void> {
     this.stop();
+    if (this.muted) return;
 
     this.isPlayingSubject.next(true);
     this.currentKeySubject.next(keyIdentifier ?? url);

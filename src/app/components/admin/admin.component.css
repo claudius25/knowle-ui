@@ -219,6 +219,52 @@ textarea:focus {
   color: #ffd23f;
   font-weight: 800;
 }
+.activity-sublist {
+  list-style: none;
+  padding: 0 0 0 10px;
+  margin: 4px 0 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 2px solid #16564a;
+}
+.activity-sub-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #0a2f28;
+  border: 1px solid #16564a;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.activity-sub-item:hover {
+  border-color: #58cc02;
+}
+.activity-sub-item.active {
+  background: #1a6457;
+  border-color: #58cc02;
+}
+.activity-sub-title {
+  flex: 1;
+  font-size: 0.8rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.activity-sub-actions {
+  display: flex;
+  gap: 2px;
+}
+.icon-btn--tiny {
+  padding: 2px 5px;
+  font-size: 0.65rem;
+}
+.activity-sublist-empty {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 4px 8px;
+}
 .chapter-details {
   padding: 20px;
   overflow-y: auto;
@@ -540,6 +586,13 @@ textarea:focus {
 .modal-field label {
   font-size: 0.82rem;
   font-weight: 800;
+}
+.modal-field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .modal-footer {
   display: flex;

@@ -10,6 +10,20 @@
     >
       <div class="torti-shadow" [ngStyle]="getShadowStyle()" aria-hidden="true"></div>
 
+      
+      @if (showMuteButton) {
+        <button
+          type="button"
+          class="torti-mute-btn"
+          [class.torti-mute-btn--muted]="isMuted$ | async"
+          (click)="toggleMute($event)"
+          [attr.aria-label]="(isMuted$ | async) ? 'Unmute Torti' : 'Mute Torti'"
+          [attr.title]="(isMuted$ | async) ? 'Unmute Torti' : 'Mute Torti'"
+        >
+          {{ (isMuted$ | async) ? '🔇' : '🔊' }}
+        </button>
+      }
+
       @for (layer of layers; track layer.id) {
         <img
           class="torti-sprite"
@@ -32,4 +46,3 @@
     </div>
   }
 }
-

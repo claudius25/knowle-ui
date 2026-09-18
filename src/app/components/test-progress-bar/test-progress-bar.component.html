@@ -1,0 +1,21 @@
+<header class="game-header">
+  <button class="header-btn close-btn" aria-label="Close" (click)="onClose()">
+    ✕
+  </button>
+
+  <div class="progress">
+    <div class="progress__track">
+      <div class="progress__fill" [style.width.%]="progress"></div>
+    </div>
+  </div>
+
+  <button class="header-btn stat-btn battery-btn" aria-label="Energy">
+    <span class="icon">🔋</span>
+    <span class="value">{{ health }}</span>
+  </button>
+
+  <button class="header-btn stat-btn coin-btn" aria-label="Coins">
+    <span class="icon">🪙</span>
+    <span class="value">{{ coins }}</span>
+  </button>
+</header>

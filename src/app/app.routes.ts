@@ -28,5 +28,12 @@ export const routes: Routes = [
     path: 'admin',
     loadComponent: () => import('./components/admin/admin.component').then((m) => m.AdminComponent),
   },
+  {
+    path: 'test-progress-bar',
+    loadComponent: () =>
+      import('./components/test-progress-bar/test-progress-bar.component').then(
+        (m) => m.TestProgressBarComponent,
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];

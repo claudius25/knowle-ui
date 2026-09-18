@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { TestProgressBarComponent } from '../test-progress-bar/test-progress-bar.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClassifyComponent } from '../activity/classify/classify.component';
 import { MatchingComponent } from '../activity/matching/matching.component';
@@ -44,6 +45,7 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     CoinDisplayComponent,
     HealthDisplayComponent,
     GameFooterComponent,
+    TestProgressBarComponent,
   ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',

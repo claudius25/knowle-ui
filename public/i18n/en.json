@@ -55,7 +55,7 @@
   "domain_general_knowledge": "General knowledge",
 
   "intro_button": "Intro",
-  "intro_start": "Start the game",
+  "intro_start": "Start the quiz",
   "intro_page_1_title": "Welcome!",
   "intro_page_1_body": "Discover the world of GNOSIS together with Torti, your friendly guide.",
   "intro_page_2_title": "Learn by playing",
@@ -103,7 +103,7 @@
   "introButton": "Intro",
   "introSkip": "Skip",
   "introNext": "Next",
-  "introStart": "Start the game",
+  "introStart": "Start the quiz",
   "introPage1Title": "Welcome!",
   "introPage1Body": "Discover the world of GNOSIS together with Torti, your friendly guide.",
   "introPage2Title": "Learn by playing",

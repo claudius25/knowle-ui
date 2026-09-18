@@ -1,10 +1,10 @@
 <main class="game-page">
-  <div class="game-header">
-    <button class="exit-button" type="button" aria-label="Close" (click)="confirmExit()">✕</button>
-    <app-progress-bar class="game-progress" [value]="progress" />
-    <app-health-display [value]="health" />
-    <app-coin-display [amount]="coins" />
-  </div>
+    <app-test-progress-bar
+      [progress]="progress"
+      [health]="health"
+      [coins]="coins"
+      (close)="confirmExit()"
+    ></app-test-progress-bar>
   <section class="activity-shell" aria-live="polite">
     @if (state === 'loading') {
       <div class="status-panel">

@@ -8,10 +8,9 @@
   min-height: 100vh;
   box-sizing: border-box;
   display: grid;
+  grid-template-rows: auto 1fr auto;
   justify-items: center;
   align-items: start;
-  padding: clamp(32px, 7vh, 72px) 20px;
-  padding-bottom: calc(clamp(32px, 7vh, 72px) + 80px);
   background: var(--home-background);
   font-family: 'Nunito', sans-serif;
 }
@@ -88,7 +87,7 @@
 
 .activity-shell {
   width: min(100%, 760px);
-  margin-top: clamp(14px, 6vh, 60px);
+  padding: 0px 10px 10px 10px;
   z-index: 20;
 }
 
@@ -174,12 +173,6 @@ h2 {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-@media (max-width: 600px) {
-  .game-page {
-    padding: 14px;
-  }
 }
 
 app-game-footer {
