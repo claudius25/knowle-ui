@@ -191,7 +191,8 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
 
   private getActivityShell(): HTMLElement | null {
     const host = this.elementRef.nativeElement as HTMLElement;
-    return host.closest('.activity-shell') as HTMLElement | null;
+    const activityShell = host.closest('.activity-shell') as HTMLElement | null;
+    return activityShell ? (activityShell.children[0] as HTMLElement) : null;
   }
 
   private getGameFooter(): HTMLElement | null {

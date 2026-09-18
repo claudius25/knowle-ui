@@ -112,10 +112,12 @@ export class HomeComponent implements OnDestroy, OnInit {
 
     window.clearTimeout(this.speechTimeout);
 
-    void this.audioPlayer.playKey(lineKey, { global: true, lang: language }).then(() => {
-      character.stopTalking();
-      this.tortiShowBubble = false;
-    });
+    void this.audioPlayer
+      .playKey(lineKey, { global: true, lang: language, characterSpeech: true })
+      .then(() => {
+        character.stopTalking();
+        this.tortiShowBubble = false;
+      });
 
     this.speechTimeout = window.setTimeout(() => {
       character.stopTalking();

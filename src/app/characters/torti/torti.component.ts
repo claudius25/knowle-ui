@@ -62,15 +62,12 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly audioPlayer = inject(AudioPlayerService);
-  protected readonly isMuted$ = this.audioPlayer.muted$;
+  protected readonly isMuted$ = this.audioPlayer.characterMuted$;
   private subs = new Subscription();
   private resizeObserver?: ResizeObserver;
   private fittedScale = 0.28;
   private nextLayerId = 0;
   private cleanupTimeout: number | null = null;
-
-  health = 100;
-  coins = 0;
 
   get currentScale(): number | string {
     return this.fitToContainer ? this.fittedScale : this.scale;
@@ -230,7 +227,7 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   /** Toggles whether the character's spoken audio is muted; doesn't trigger a click reaction. */
   toggleMute(event: Event): void {
     event.stopPropagation();
-    this.audioPlayer.toggleMute();
+    this.audioPlayer.toggleCharacterMute();
   }
 
   private pushPoseLayer(pose: TortiPose): void {
@@ -255,6 +252,4 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
       }, POSE_TRANSITION_MS);
     });
   }
-
-  confirmExit() {}
 }

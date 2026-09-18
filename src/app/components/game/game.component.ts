@@ -390,7 +390,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.coins += GameComponent.COINS_PER_CORRECT_ANSWER;
       const speechKey = pickRandomLine(TORTI_HAPPY_LINES);
       this.characterSpeech = this.text(speechKey);
-      void this.audioPlayer.playKey(speechKey, { global: true });
+      void this.audioPlayer.playKey(speechKey, { global: true, characterSpeech: true });
       this.state = 'correct';
       return;
     }
@@ -398,7 +398,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.health = Math.max(0, this.health - GameComponent.HEALTH_LOSS_PER_MISTAKE);
     const speechKey = pickRandomLine(TORTI_SAD_LINES);
     this.characterSpeech = this.text(speechKey);
-    void this.audioPlayer.playKey(speechKey, { global: true });
+    void this.audioPlayer.playKey(speechKey, { global: true, characterSpeech: true });
     this.state = 'incorrect';
   }
 }
