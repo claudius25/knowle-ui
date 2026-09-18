@@ -14,22 +14,12 @@ import { Router } from '@angular/router';
 import { TortiComponent } from './characters/torti/torti.component';
 import { TortiCharacter } from './characters/torti/torti-character';
 import { TortiPose } from './characters/torti/torti.types';
+import { TORTI_HAPPY_POSES } from './characters/torti/torti.poses';
 import { Language, LanguageService } from './shared/services/language.service';
 import { IntroService } from './shared/services/intro.service';
 import { UiTextService } from './shared/services/ui-text.service';
 import { AudioPlayerService } from './shared/services/audio-player.service';
 import { TORTI_HAPPY_LINES, pickRandomLine } from './characters/torti/torti-speech.constants';
-
-const HAPPY_POSES: readonly TortiPose[] = [
-  'happy',
-  'wave',
-  'heart',
-  'thumbs-up',
-  'gotyou',
-  'elvis',
-  'tennis',
-  'jako',
-];
 
 @Component({
   selector: 'app-home',
@@ -101,7 +91,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   protected onTortiClick(character: TortiCharacter): void {
-    const pose = HAPPY_POSES[Math.floor(Math.random() * HAPPY_POSES.length)];
+    const pose = TORTI_HAPPY_POSES[Math.floor(Math.random() * TORTI_HAPPY_POSES.length)];
     character.setPose(pose);
 
     const language = this.selectedLanguage ?? this.languageService.getCurrentLanguage();

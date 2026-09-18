@@ -26,3 +26,16 @@ export const TORTI_POSES: readonly TortiPose[] = [
 export function tortiPoseUrl(pose: TortiPose): string {
   return `${TORTI_POSE_BASE_URL}/${pose}.png`;
 }
+
+/** Poses suitable for a "happy reaction" (e.g. correct answer, clicked happily). */
+export const TORTI_HAPPY_POSES: readonly TortiPose[] = [
+  'happy',
+  'wave',
+  'heart',
+  'photo',
+  'thumbs-up',
+  'gotyou',
+  'elvis',
+  'tennis',
+  'jako',
+];

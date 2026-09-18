@@ -13,6 +13,7 @@ import { GameFooterComponent } from '../game-footer/game-footer.component';
 import { UiTextService } from '../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../shared/services/audio-player.service';
 import { TortiPose } from '../../characters/torti/torti.types';
+import { TORTI_HAPPY_POSES } from '../../characters/torti/torti.poses';
 import {
   TORTI_HAPPY_LINES,
   TORTI_SAD_LINES,
@@ -87,13 +88,16 @@ export class GameComponent implements OnInit, OnDestroy {
 
   protected get characterPose(): TortiPose {
     if (this.state === 'correct') {
-      return 'happy';
+      return this.correctPose;
     }
     if (this.state === 'incorrect') {
       return 'sad';
     }
     return 'idle';
   }
+
+  /** Random happy pose picked once per correct answer, so it doesn't re-randomize every change detection cycle. */
+  private correctPose: TortiPose = 'happy';
 
   ngOnInit(): void {
     this.loadInitialActivity();
@@ -388,6 +392,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
     if (response.correct) {
       this.coins += GameComponent.COINS_PER_CORRECT_ANSWER;
+      this.correctPose = TORTI_HAPPY_POSES[Math.floor(Math.random() * TORTI_HAPPY_POSES.length)];
       const speechKey = pickRandomLine(TORTI_HAPPY_LINES);
       this.characterSpeech = this.text(speechKey);
       void this.audioPlayer.playKey(speechKey, { global: true, characterSpeech: true });

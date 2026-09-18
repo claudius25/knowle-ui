@@ -1,12 +1,13 @@
 <main class="chapter-done-page">
-  <div class="stats-bar">
+  <!-- <div class="stats-bar">
     <app-health-display [value]="health" />
     <app-coin-display [amount]="coins" />
-  </div>
+  </div> -->
 
   <section class="celebration-card" aria-live="polite">
     <div class="character-container">
       <app-torti
+        [showMuteButton]="false"
         [centered]="true"
         [initialPose]="'happy'"
         [speechText]="speechBubble"
@@ -34,10 +35,7 @@
 
     <div class="action-buttons">
       <button class="duo-button duo-button--green action-btn" type="button" (click)="goHome()">
-        {{ uiText.text('navigation_home', 'Acasă') }}
-      </button>
-      <button class="duo-button duo-button--neutral action-btn" type="button" (click)="playAgain()">
-        {{ uiText.text('playAgain', 'Joacă din nou') }}
+        {{ uiText.text('chapterNext', 'Acasă') }}
       </button>
     </div>
   </section>

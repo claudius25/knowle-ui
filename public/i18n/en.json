@@ -115,6 +115,7 @@
   "exitConfirmYes": "Yes, leave",
   "exitConfirmNo": "No, stay",
   "chapterComplete": "Chapter complete!",
+  "chapterNext": "Next chapter",
   "chapterDoneSubtitle": "You demonstrated great knowledge and learned new things!",
   "playAgain": "Play again",
 
@@ -122,11 +123,11 @@
   "happyLine2": "You did a great job!",
   "happyLine3": "Keep exploring and learning!",
   "happyLine4": "Enjoy every moment of your adventure!",
-  "happyLine5": "You little animal",
+  "happyLine5": "Brilliant!",
 
   "sadLine1": "Oops, not quite.",
   "sadLine2": "Don't worry, try again!",
   "sadLine3": "So close! Give it another shot.",
   "sadLine4": "Hmm, that is not it.",
-  "sadLine5": "You are pathetic!"
+  "sadLine5": "Let's retry!"
 }

@@ -115,6 +115,7 @@
   "exitConfirmYes": "Da, ieși",
   "exitConfirmNo": "Nu, rămân",
   "chapterComplete": "Capitol finalizat!",
+  "chapterNext": "Următorul capitol",
   "chapterDoneSubtitle": "Ai demonstrat cunoștințe excelente și ai învățat lucruri noi!",
   "playAgain": "Joacă din nou",
 
@@ -122,11 +123,11 @@
   "happyLine2": "Ai făcut o treabă grozavă!",
   "happyLine3": "Continuă să explorezi și să înveți!",
   "happyLine4": "Bucură-te de fiecare moment al aventurii tale!",
-  "happyLine5": "Animalule",
+  "happyLine5": "Briliant!",
 
   "sadLine1": "Ups, nu chiar.",
   "sadLine2": "Nu-ți face griji, încearcă din nou!",
   "sadLine3": "A fost aproape! Mai încearcă o dată.",
   "sadLine4": "Hmm, nu este corect.",
-  "sadLine5": "Esti patetic!"
+  "sadLine5": "Să reîncercăm!"
 }

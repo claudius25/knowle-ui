@@ -29,6 +29,7 @@
 >
   @for (item of items; track item.id; let i = $index) {
     <div
+      #orderingCard
       class="duo-button duo-button--neutral ordering-card"
       [class.ordering-card-small]="items.length > 4"
       cdkDrag
