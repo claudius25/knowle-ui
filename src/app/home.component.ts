@@ -124,4 +124,8 @@ export class HomeComponent implements OnDestroy, OnInit {
       this.tortiShowBubble = false;
     }, 4000);
   }
+
+  clearLocalStorage() {
+    localStorage.clear();
+  }
 }

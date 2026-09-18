@@ -340,3 +340,6 @@
 		height: clamp(260px, 50vh, 390px);
 	}
 }
+.clear-local-storage {
+	margin-top: 26px;
+}
