@@ -1,3 +1,13 @@
+:host {
+  height: 100%;
+      display: grid;
+    grid-template-rows: max-content 1fr;
+}
+.drop-list {
+  display: grid;
+    grid-template-rows: 120px 1fr;
+    gap: 10px;
+}
 .classify-pool {
   display: flex;
   flex-wrap: wrap;
@@ -15,12 +25,15 @@
 .classify-categories {
   display: grid;
   gap: 14px;
-  margin-top: 20px;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
 }
 
 .classify-category {
   display: grid;
   gap: 10px;
+  height: 100%;
+    grid-template-rows: 1fr auto;
   padding: 16px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);

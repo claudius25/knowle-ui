@@ -19,7 +19,7 @@
   </div>
 </div>
 
-<div cdkDropListGroup>
+<div class="drop-list" cdkDropListGroup>
   <div
     class="classify-pool"
     cdkDropList
@@ -35,7 +35,6 @@
   <div class="classify-categories">
     @for (category of data.categories; track category.id) {
       <div class="classify-category">
-        <strong class="category-title">{{ category.label }}</strong>
         <div
           class="classify-category-list"
           cdkDropList
@@ -47,6 +46,8 @@
             <div class="classify-chip classify-chip--placed" cdkDrag [cdkDragDisabled]="disabled">{{ item.label }}</div>
           }
         </div>
+        <strong class="category-title">{{ category.label }}</strong>
+        
       </div>
     }
   </div>

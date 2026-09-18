@@ -8,7 +8,7 @@
   min-height: 100vh;
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 52px 1fr 130px;
   justify-items: center;
   align-items: start;
   background: var(--home-background);
@@ -87,6 +87,7 @@
 
 .activity-shell {
   width: min(100%, 760px);
+  height: 100%;
   padding: 0px 10px 10px 10px;
   z-index: 20;
 }
