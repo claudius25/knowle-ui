@@ -125,15 +125,15 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
       return;
     }
 
-    description?.style.removeProperty('font-size');
-    title.style.removeProperty('font-size');
-    imageWrappers.forEach((wrapper) => {
-      wrapper.style.removeProperty('height');
-      wrapper.style.removeProperty('min-height');
-      wrapper.style.removeProperty('max-height');
-    });
-    activityShell.style.removeProperty('max-height');
-    activityShell.style.removeProperty('overflow-y');
+    // description?.style.removeProperty('font-size');
+    // title.style.removeProperty('font-size');
+    // imageWrappers.forEach((wrapper) => {
+    //   wrapper.style.removeProperty('height');
+    //   wrapper.style.removeProperty('min-height');
+    //   wrapper.style.removeProperty('max-height');
+    // });
+    // activityShell.style.removeProperty('max-height');
+    // activityShell.style.removeProperty('overflow-y');
 
     let descriptionSize = description ? parseFloat(getComputedStyle(description).fontSize) : 0;
     let titleSize = parseFloat(getComputedStyle(title).fontSize);
@@ -142,24 +142,26 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     const minimumTitleSize = 14;
     const minimumImageHeight = 100;
 
-    while (
+    if (
       this.elementsOverlap(activityShell, gameFooter) &&
       imageHeights.some((height) => height > minimumImageHeight)
     ) {
+      console.log('Adjusting image heights due to overlap with footer');
       imageHeights = imageHeights.map((height, index) => {
         const nextHeight = Math.max(minimumImageHeight, height - 20);
         const wrapper = imageWrappers[index];
-        // wrapper.style.height = `${nextHeight}px`;
-        // wrapper.style.minHeight = `${nextHeight}px`;
-        // wrapper.style.maxHeight = `${nextHeight}px`;
+        wrapper.style.height = `${nextHeight}px`;
+        wrapper.style.minHeight = `${nextHeight}px`;
+        wrapper.style.maxHeight = `${nextHeight}px`;
         return nextHeight;
       });
     }
 
-    while (
+    if (
       this.elementsOverlap(activityShell, gameFooter) &&
       (descriptionSize > minimumDescriptionSize || titleSize > minimumTitleSize)
     ) {
+      console.log('Adjusting text sizes due to overlap with footer');
       if (description && descriptionSize > minimumDescriptionSize) {
         descriptionSize = Math.max(minimumDescriptionSize, descriptionSize - 1);
         description.style.fontSize = `${descriptionSize}px`;
@@ -172,10 +174,12 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     }
 
     if (this.elementsOverlap(activityShell, gameFooter)) {
-      const activityTop = activityShell.getBoundingClientRect().top;
-      const footerTop = gameFooter.getBoundingClientRect().top;
-      activityShell.style.maxHeight = `${Math.max(0, footerTop - activityTop - 8)}px`;
-      activityShell.style.overflowY = 'auto';
+      console.log('Adjusting activity shell max height due to overlap with footer');
+      // const activityTop = activityShell.getBoundingClientRect().top;
+      // const footerTop = gameFooter.getBoundingClientRect().top;
+      // activityShell.style.maxHeight = `${Math.max(0, footerTop - activityTop - 8)}px`;
+      // activityShell.style.overflowY = 'auto';
+      this.scheduleQuestionFit();
     }
   }
 
