@@ -9,13 +9,8 @@
     </div>
   </div>
 
-  <button class="header-btn stat-btn battery-btn" aria-label="Energy">
-    <span class="icon">🔋</span>
-    <span class="value">{{ health }}</span>
-  </button>
+  <app-health-display class="header-btn stat-btn battery-btn" [value]="health"></app-health-display>
 
-  <button class="header-btn stat-btn coin-btn" aria-label="Coins">
-    <span class="icon">🪙</span>
-    <span class="value">{{ coins }}</span>
-  </button>
+  <app-coin-display class="header-btn stat-btn coin-btn" [amount]="coins"></app-coin-display>
+
 </header>
