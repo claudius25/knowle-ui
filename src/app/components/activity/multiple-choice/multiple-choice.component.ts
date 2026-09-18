@@ -138,9 +138,9 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     let descriptionSize = description ? parseFloat(getComputedStyle(description).fontSize) : 0;
     let titleSize = parseFloat(getComputedStyle(title).fontSize);
     let imageHeights = imageWrappers.map((wrapper) => wrapper.getBoundingClientRect().height);
-    const minimumDescriptionSize = 10;
-    const minimumTitleSize = 14;
-    const minimumImageHeight = 100;
+    const minimumDescriptionSize = 8;
+    const minimumTitleSize = 12;
+    const minimumImageHeight = 50;
 
     if (
       this.elementsOverlap(activityShell, gameFooter) &&
@@ -148,7 +148,7 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     ) {
       console.log('Adjusting image heights due to overlap with footer');
       imageHeights = imageHeights.map((height, index) => {
-        const nextHeight = Math.max(minimumImageHeight, height - 20);
+        const nextHeight = Math.max(minimumImageHeight, height - 5);
         const wrapper = imageWrappers[index];
         wrapper.style.height = `${nextHeight}px`;
         wrapper.style.minHeight = `${nextHeight}px`;
