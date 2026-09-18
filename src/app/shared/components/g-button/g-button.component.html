@@ -3,9 +3,10 @@
   type="button"
   [disabled]="disabled"
   [class.g-button--selected]="selected"
-  [style.--button-color]="defaultColor"
-  [style.--button-depth]="depthColor"
-  [style.--button-selected-color]="selectedColor"
+  [class]="colorsStyleClass"
+  [style.--button-color]="colorsStyleClass ? null : defaultColor"
+  [style.--button-depth]="colorsStyleClass ? null : depthColor"
+  [style.--button-selected-color]="colorsStyleClass ? null : selectedColor"
   (mousedown)="handleMouseDown()"
   (click)="handleClick()"
 >

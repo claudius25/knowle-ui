@@ -19,6 +19,7 @@
     <section class="character-area" aria-label="Personajul Gnosy">
       <div class="torti-home-stage">
         <app-torti
+          [showMuteButton]="false"
           [centered]="true"
           [fitToContainer]="true"
           initialPose="idle"
@@ -57,9 +58,6 @@
         </g-button>
       </div>
     }
-
-    
-
   </footer>
 
   @if (showLanguageDialog) {

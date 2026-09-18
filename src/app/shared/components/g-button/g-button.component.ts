@@ -14,6 +14,8 @@ export class GButtonComponent {
   @Input() disabled = false;
   @Input() selected = false;
   @Input() colors: [string, string, string] = ['#58cc02', '#46a302', '#1e90ff'];
+  /** Alternative to `colors`: a single CSS class defining --button-color, --button-depth and --button-selected-color. Takes precedence over `colors` when set. */
+  @Input() colorsStyleClass: string | null = null;
   @Output() clicked = new EventEmitter<void>();
 
   protected get defaultColor(): string {

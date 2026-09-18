@@ -88,9 +88,17 @@
         <h2>{{ text('exitConfirmTitle') }}</h2>
         <p>{{ text('exitConfirmMessage') }}</p>
         <div class="exit-dialog-actions">
-          <button class="duo-button duo-button--orange" type="button" (click)="exitToHome()">{{ text('exitConfirmYes') }}</button>
-          <button class="duo-button duo-button--neutral" type="button" (click)="cancelExit()">{{ text('exitConfirmNo') }}</button>
-        </div>
+          <g-button 
+            labelKey="exitConfirmYes"
+            colorsStyleClass="duo-button duo-button--orange"
+            (clicked)="exitToHome()"
+          ></g-button>
+          <g-button 
+            labelKey="exitConfirmNo"
+            colorsStyleClass="duo-button duo-button--neutral"
+            (clicked)="cancelExit()"
+          ></g-button>
+          </div>
       </div>
     </div>
   }

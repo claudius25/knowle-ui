@@ -29,6 +29,7 @@ import {
   OrderingActivityData,
   TrueFalseActivityData,
 } from '../../shared/models/game.types';
+import { GButtonComponent } from '../../shared/components/g-button/g-button.component';
 
 type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'incorrect';
 
@@ -46,6 +47,7 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     HealthDisplayComponent,
     GameFooterComponent,
     TestProgressBarComponent,
+    GButtonComponent,
   ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',
