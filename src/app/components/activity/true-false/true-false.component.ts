@@ -1,50 +1,56 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { TrueFalseActivityData } from '../../../shared/models/game.types';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  inject,
+} from '@angular/core';
+import {
+  MultipleChoiceActivityData,
+  TrueFalseActivityData,
+} from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
-import { AudioPlayerService } from '../../../shared/services/audio-player.service';
+import { MultipleChoiceComponent } from '../multiple-choice/multiple-choice.component';
 
 @Component({
   selector: 'app-true-false',
   standalone: true,
-  imports: [AsyncPipe, MatIconModule],
+  imports: [MultipleChoiceComponent],
   templateUrl: './true-false.component.html',
-  styleUrl: './true-false.component.css',
 })
-export class TrueFalseComponent {
-  protected readonly uiText = inject(UiTextService);
-  private readonly audioPlayer = inject(AudioPlayerService);
+export class TrueFalseComponent implements OnChanges {
+  private readonly uiText = inject(UiTextService);
 
   @Input({ required: true }) data!: TrueFalseActivityData;
   @Input() disabled = false;
   @Input() selectedAnswer: boolean | null = null;
   @Output() answerSelected = new EventEmitter<boolean>();
 
-  protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
+  protected choiceData!: MultipleChoiceActivityData;
+  private trueLabel = '';
 
-  protected select(answer: boolean): void {
-    if (!this.disabled) {
-      this.answerSelected.emit(answer);
-    }
-  }
-
-  protected speak(): void {
-    if (this.audioPlayer.isPlaying) {
-      this.audioPlayer.stop();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['data']) {
       return;
     }
 
-    const keys: string[] = [];
-    if (this.data.descriptionKey) {
-      keys.push(this.data.descriptionKey);
-    }
-    if (this.data.questionKey) {
-      keys.push(this.data.questionKey);
-    }
+    this.trueLabel = this.uiText.text('trueLabel');
+    this.choiceData = {
+      ...this.data,
+      options: [this.trueLabel, this.uiText.text('falseLabel')],
+    };
+  }
 
-    if (keys.length > 0) {
-      void this.audioPlayer.playKeys(keys);
+  protected get selectedOption(): string | null {
+    if (this.selectedAnswer === null) {
+      return null;
     }
+    return this.choiceData.options[this.selectedAnswer ? 0 : 1];
+  }
+
+  protected handleSelection(option: string): void {
+    this.answerSelected.emit(option === this.trueLabel);
   }
 }

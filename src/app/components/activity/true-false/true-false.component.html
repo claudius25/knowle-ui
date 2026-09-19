@@ -1,53 +1,6 @@
-<div class="question-block">
-  @if (data.description) {
-    <div class="question-description-row">
-      <p class="question-description">{{ data.description }}</p>
-    </div>
-  }
-  <div class="question-row">
-    <h2>{{ data.question }}
-      
-    </h2>
-    <button
-        class="speak-btn"
-        type="button"
-        [class.speaking]="isSpeaking$ | async"
-        (click)="speak()"
-        [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
-        title="Ascultă descrierea și întrebarea"
-      >
-        <mat-icon>record_voice_over</mat-icon>
-      </button>
-  </div>
-</div>
-
-@if (data.pictures && data.pictures.length > 0) {
-  <div class="activity-image-gallery">
-    @for (pic of data.pictures; track pic) {
-      <div class="activity-image-wrapper">
-        <img [src]="pic" alt="Activity illustration" class="activity-image" />
-      </div>
-    }
-  </div>
-}
-
-<div class="boolean-answers" [attr.aria-label]="uiText.text('trueFalse')">
-  <button
-    class="duo-button duo-button--neutral answer-card"
-    type="button"
-    [class.selected]="selectedAnswer === true"
-    [disabled]="disabled"
-    (click)="select(true)"
-  >
-    {{ uiText.text('trueLabel') }}
-  </button>
-  <button
-    class="duo-button duo-button--neutral answer-card"
-    type="button"
-    [class.selected]="selectedAnswer === false"
-    [disabled]="disabled"
-    (click)="select(false)"
-  >
-    {{ uiText.text('falseLabel') }}
-  </button>
-</div>
+<app-multiple-choice
+  [data]="choiceData"
+  [disabled]="disabled"
+  [selectedAnswer]="selectedOption"
+  (answerSelected)="handleSelection($event)"
+/>

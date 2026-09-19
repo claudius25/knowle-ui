@@ -39,23 +39,34 @@ describe('TrueFalseComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should emit answerSelected on select()', () => {
-    spyOn(component.answerSelected, 'emit');
-    component['select'](true);
-    expect(component.answerSelected.emit).toHaveBeenCalledWith(true);
-  });
-
-  it('should play description and question audio keys on speak()', () => {
-    component['speak']();
-    expect(audioPlayerSpy.playKeys).toHaveBeenCalledWith([
-      'easy_geo_4_desc',
-      'easy_geo_4_question',
+  it('should map the boolean options to the localized labels', () => {
+    const uiText = TestBed.inject(UiTextService);
+    expect(component['choiceData'].options).toEqual([
+      uiText.text('trueLabel'),
+      uiText.text('falseLabel'),
     ]);
   });
 
-  it('should stop audio if already playing', () => {
-    Object.defineProperty(audioPlayerSpy, 'isPlaying', { value: true, configurable: true });
-    component['speak']();
-    expect(audioPlayerSpy.stop).toHaveBeenCalled();
+  it('should emit answerSelected as a boolean', () => {
+    spyOn(component.answerSelected, 'emit');
+    const [trueLabel, falseLabel] = component['choiceData'].options;
+
+    component['handleSelection'](trueLabel);
+    expect(component.answerSelected.emit).toHaveBeenCalledWith(true);
+
+    component['handleSelection'](falseLabel);
+    expect(component.answerSelected.emit).toHaveBeenCalledWith(false);
+  });
+
+  it('should map the selected boolean back to the matching option', () => {
+    const [trueLabel, falseLabel] = component['choiceData'].options;
+
+    expect(component['selectedOption']).toBeNull();
+
+    component.selectedAnswer = true;
+    expect(component['selectedOption']).toBe(trueLabel);
+
+    component.selectedAnswer = false;
+    expect(component['selectedOption']).toBe(falseLabel);
   });
 });
