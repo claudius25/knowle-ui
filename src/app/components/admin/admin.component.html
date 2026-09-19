@@ -227,6 +227,9 @@
               <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'ORDERING')">
                 + Ordering
               </button>
+              <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'PUZZLE')">
+                + Puzzle
+              </button>
             </div>
           </div>
           }
@@ -330,7 +333,7 @@
                 <!-- TYPE SPECIFIC EDITORS -->
                 <div class="type-specific-section">
                   <!-- MULTIPLE_CHOICE -->
-                  @if (act.type === 'MULTIPLE_CHOICE') {
+                  @if (act.type === 'MULTIPLE_CHOICE' || act.type === 'PUZZLE') {
                     <div class="sub-section">
                       <div class="sub-section-header">
                         <h4>Variante de Răspuns (Options)</h4>
@@ -533,6 +536,26 @@
                             🗑️
                           </button>
                         </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- PUZZLE -->
+                  @if (act.type === 'PUZZLE') {
+                    <div class="sub-section">
+                      <h4>Imagine Puzzle (3x3)</h4>
+                      <small class="hint-label">
+                        Se folosește prima imagine din câmpul "Imagini" de mai sus. Va fi tăiată în 9 piese
+                        amestecate, iar întrebarea cu variante de mai sus apare abia după ce puzzle-ul este
+                        reconstituit.
+                      </small>
+
+                      @if (getPuzzleImageUrl(act); as puzzleUrl) {
+                        <div class="puzzle-preview">
+                          <img [src]="puzzleUrl" alt="Previzualizare puzzle" />
+                        </div>
+                      } @else {
+                        <p class="preview-text">Adaugă o imagine în câmpul "Imagini" pentru a vedea previzualizarea.</p>
                       }
                     </div>
                   }

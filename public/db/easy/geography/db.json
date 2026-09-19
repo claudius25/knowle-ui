@@ -354,6 +354,36 @@
           "pictures": [
             "moon_phases.png"
           ]
+        },
+        {
+          "id": "easy_geography_11",
+          "type": "PUZZLE",
+          "title": "easy_geography_11_title",
+          "description": "easy_geography_11_desc",
+          "question": "easy_geography_11_question",
+          "hint": "easy_geography_11_hint",
+          "answer": "b",
+          "reward": {
+            "coins": 15,
+            "energy": 0
+          },
+          "pictures": [
+            "galilei.png"
+          ],
+          "options": [
+            {
+              "id": "a",
+              "text": "easy_geography_11_op_1"
+            },
+            {
+              "id": "b",
+              "text": "easy_geography_11_op_2"
+            },
+            {
+              "id": "c",
+              "text": "easy_geography_11_op_3"
+            }
+          ]
         }
       ]
     }

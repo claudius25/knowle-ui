@@ -4,6 +4,7 @@ export type ActivityType =
   | 'MATCHING'
   | 'ORDERING'
   | 'CLASSIFY'
+  | 'PUZZLE'
   | 'DRAG_DROP'
   | 'FILL_BLANK'
   | 'MAP';
@@ -82,12 +83,24 @@ export interface OrderingActivityData {
   questionKey?: string;
 }
 
+export interface PuzzleActivityData {
+  /** Image to be split into pieces and reassembled by the player. */
+  image: string;
+  /** Question unlocked once the puzzle is solved. */
+  question: string;
+  options: string[];
+  description?: string;
+  descriptionKey?: string;
+  questionKey?: string;
+}
+
 export type ActivityData =
   | MultipleChoiceActivityData
   | TrueFalseActivityData
   | ClassifyActivityData
   | MatchingActivityData
-  | OrderingActivityData;
+  | OrderingActivityData
+  | PuzzleActivityData;
 
 export interface MultipleChoiceActivity {
   activityId: string;
@@ -129,12 +142,21 @@ export interface OrderingActivity {
   data: OrderingActivityData;
 }
 
+export interface PuzzleActivity {
+  activityId: string;
+  title: string;
+  type: 'PUZZLE';
+  difficulty: Difficulty;
+  data: PuzzleActivityData;
+}
+
 export type Activity =
   | MultipleChoiceActivity
   | TrueFalseActivity
   | ClassifyActivity
   | MatchingActivity
-  | OrderingActivity;
+  | OrderingActivity
+  | PuzzleActivity;
 
 export interface NextActivity {
   activityId: string;

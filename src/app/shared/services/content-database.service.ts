@@ -269,7 +269,8 @@ export class ContentDatabaseService {
    */
   private checkAnswer(act: DbActivity, userAnswer: unknown, dict: Record<string, string>): boolean {
     switch (act.type) {
-      case 'MULTIPLE_CHOICE': {
+      case 'MULTIPLE_CHOICE':
+      case 'PUZZLE': {
         const expectedOptionId = String(act.answer);
         const matchingOption = act.options?.find((o) => o.id === expectedOptionId);
         const translatedOptionText = matchingOption
@@ -484,6 +485,22 @@ export class ContentDatabaseService {
               id: item.id,
               text: dict[item.text ?? ''] ?? item.text ?? '',
             })),
+          },
+        };
+
+      case 'PUZZLE':
+        return {
+          activityId: act.id,
+          title,
+          type: 'PUZZLE',
+          difficulty,
+          data: {
+            image: pictures?.[0] ?? '',
+            question,
+            description,
+            descriptionKey: act.description,
+            questionKey: act.question,
+            options: (act.options ?? []).map((o) => dict[o.text] ?? o.text),
           },
         };
 

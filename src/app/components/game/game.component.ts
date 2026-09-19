@@ -6,6 +6,7 @@ import { MatchingComponent } from '../activity/matching/matching.component';
 import { OrderingComponent } from '../activity/ordering/ordering.component';
 import { MultipleChoiceComponent } from '../activity/multiple-choice/multiple-choice.component';
 import { TrueFalseComponent } from '../activity/true-false/true-false.component';
+import { PuzzleComponent } from '../activity/puzzle/puzzle.component';
 import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
 import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
 import { GameService } from '../../shared/services/game.service';
@@ -27,6 +28,7 @@ import {
   MultipleChoiceActivityData,
   NextActivity,
   OrderingActivityData,
+  PuzzleActivityData,
   TrueFalseActivityData,
 } from '../../shared/models/game.types';
 import { GButtonComponent } from '../../shared/components/g-button/g-button.component';
@@ -42,6 +44,7 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     ClassifyComponent,
     MatchingComponent,
     OrderingComponent,
+    PuzzleComponent,
     CoinDisplayComponent,
     HealthDisplayComponent,
     GameFooterComponent,
@@ -167,6 +170,10 @@ export class GameComponent implements OnInit, OnDestroy {
 
   protected get orderingComplete(): boolean {
     return this.orderingComponent?.isComplete ?? false;
+  }
+
+  protected get puzzleData(): PuzzleActivityData | null {
+    return this.activity?.type === 'PUZZLE' ? this.activity.data : null;
   }
 
   protected get footerMode():

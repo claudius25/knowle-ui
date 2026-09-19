@@ -80,5 +80,12 @@
   "easy_geo_9_item_9": "Pluto",
   "easy_geo_10_op_4": "The Earth's shadow covers it every night",
   "easy_geo_5_item_5": "Mercury",
-  "easy_geo_5_item_6": "Venus"
+  "easy_geo_5_item_6": "Venus",
+  "easy_geography_11_title": "Activity 11",
+  "easy_geography_11_desc": "An Italian astronomer who studied the sky with a telescope. He discovered mountains on the Moon, sunspots, and four moons of Jupiter. His discoveries have helped us better understand the universe.",
+  "easy_geography_11_question": "Galileo is credited with the famous phrase “E pur si muove!” — “And yet it moves!” What do you think Galileo was referring to?",
+  "easy_geography_11_hint": "Helpful hint.",
+  "easy_geography_11_op_1": "The Moon",
+  "easy_geography_11_op_2": "The Earth",
+  "easy_geography_11_op_3": "Jupiter"
 }

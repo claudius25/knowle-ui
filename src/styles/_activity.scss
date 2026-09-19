@@ -147,6 +147,16 @@
 }
 
 /* 4. Common Choice / Answer Card Base */
+.answers {
+  display: grid;
+  gap: 12px;
+  padding: 10px;
+}
+
+.answers--two-columns {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .answer-card {
   min-height: 68px;
   width: 100%;
@@ -156,6 +166,13 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   transition: transform 160ms ease;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 16px 20px !important;
+  border-radius: 14px;
+  text-align: left;
 }
 
 .answer-card.duo-button {
@@ -176,4 +193,8 @@
 .answer-card:disabled {
   cursor: default;
   opacity: 0.6;
+}
+
+.question-description--on-light {
+  color: #000000;
 }

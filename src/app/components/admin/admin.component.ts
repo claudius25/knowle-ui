@@ -72,6 +72,7 @@ export class AdminComponent implements OnInit {
     'CLASSIFY',
     'MATCHING',
     'ORDERING',
+    'PUZZLE',
   ];
 
   ngOnInit(): void {
@@ -363,6 +364,38 @@ export class AdminComponent implements OnInit {
         break;
       }
 
+      case 'PUZZLE': {
+        const op1Key = `${actId}_op_1`;
+        const op2Key = `${actId}_op_2`;
+        const op3Key = `${actId}_op_3`;
+
+        this.translations.ro[op1Key] = 'Opțiunea 1';
+        this.translations.ro[op2Key] = 'Opțiunea 2 (Corectă)';
+        this.translations.ro[op3Key] = 'Opțiunea 3';
+
+        this.translations.en[op1Key] = 'Option 1';
+        this.translations.en[op2Key] = 'Option 2 (Correct)';
+        this.translations.en[op3Key] = 'Option 3';
+
+        newActivity = {
+          id: actId,
+          type: 'PUZZLE',
+          title: titleKey,
+          description: descKey,
+          question: questionKey,
+          hint: hintKey,
+          pictures: [],
+          options: [
+            { id: 'a', text: op1Key },
+            { id: 'b', text: op2Key },
+            { id: 'c', text: op3Key },
+          ],
+          answer: 'b',
+          reward: { coins: 15, energy: 0 },
+        };
+        break;
+      }
+
       default:
         newActivity = {
           id: actId,
@@ -400,7 +433,7 @@ export class AdminComponent implements OnInit {
 
   protected changeActivityType(activity: DbActivity, newType: ActivityType): void {
     activity.type = newType;
-    if (newType === 'MULTIPLE_CHOICE' && !activity.options) {
+    if ((newType === 'MULTIPLE_CHOICE' || newType === 'PUZZLE') && !activity.options) {
       activity.options = [
         { id: 'a', text: `${activity.id}_op_1` },
         { id: 'b', text: `${activity.id}_op_2` },
@@ -558,6 +591,17 @@ export class AdminComponent implements OnInit {
       .split(',')
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
+  }
+
+  protected getPuzzleImageUrl(activity: DbActivity): string {
+    const picture = activity.pictures?.[0];
+    if (!picture) {
+      return '';
+    }
+    if (picture.startsWith('/') || picture.startsWith('http')) {
+      return picture;
+    }
+    return `/db/${this.difficulty.toLowerCase()}/${this.domain.toLowerCase().trim()}/pics/${picture}`;
   }
 
   // --- Translation Modal Popup ---

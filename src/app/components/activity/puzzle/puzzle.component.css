@@ -1,0 +1,66 @@
+.puzzle-board {
+  display: grid;
+  gap: 4px;
+  width: min(100%, 420px);
+  margin: 10px auto 0;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.puzzle-board--solved {
+  gap: 0;
+  padding: 0;
+  box-shadow: 0 0 0 3px #58cc02;
+}
+
+.puzzle-cell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.puzzle-piece {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background-repeat: no-repeat;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.puzzle-piece:active {
+  cursor: grabbing;
+}
+
+.puzzle-piece.cdk-drag-disabled {
+  cursor: default;
+}
+
+.puzzle-piece.cdk-drag-preview {
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+.puzzle-piece.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.puzzle-piece.cdk-drag-animating {
+  transition: transform 220ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.puzzle-question {
+  margin-top: 12px;
+}
+
+.puzzle-question h2 {
+  max-width: 620px;
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+  line-height: 1.15;
+}

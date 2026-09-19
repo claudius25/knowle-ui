@@ -45,7 +45,7 @@
 
 
 
-<div class="answers" [class.answers--two-columns]="data.options.length % 2 === 0" [attr.aria-label]="uiText.text('answers')">
+<div class="answers" [class.answers--two-columns]="data.options.length === 4" [attr.aria-label]="uiText.text('answers')">
   @for (option of data.options; track option) {
     <button
       class="duo-button duo-button--neutral answer-card"
