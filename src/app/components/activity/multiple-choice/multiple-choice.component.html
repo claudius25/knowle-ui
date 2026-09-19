@@ -1,7 +1,29 @@
 <div class="question-block">
+
+  @if (data.pictures && data.pictures.length > 0) {
+  <div class="activity-image-gallery" [style.background-color]="imageBackgroundColor">
+    @for (pic of data.pictures; track pic) {
+      <div #activityImageWrapper class="activity-image-wrapper">
+        <img
+          [src]="pic"
+          alt="Activity illustration"
+          class="activity-image"
+          (load)="handleImageLoad($event)"
+        />
+      </div>
+    }
+  </div>
+}
+
+
   @if (data.description) {
     <div class="question-description-row">
-      <p #questionDescription class="question-description">{{ data.description }}</p>
+      <p
+        #questionDescription
+        class="question-description"
+        [class.question-description--on-light]="hasLightImage"
+        [style.background-color]="imageBackgroundColor"
+      >{{ data.description }}</p>
     </div>
   }
   <div class="question-row">
@@ -21,20 +43,7 @@
 
 
 
-@if (data.pictures && data.pictures.length > 0) {
-  <div class="activity-image-gallery">
-    @for (pic of data.pictures; track pic) {
-      <div #activityImageWrapper class="activity-image-wrapper">
-        <img
-          [src]="pic"
-          alt="Activity illustration"
-          class="activity-image"
-          (load)="handleImageLoad()"
-        />
-      </div>
-    }
-  </div>
-}
+
 
 <div class="answers" [class.answers--two-columns]="data.options.length === 4" [attr.aria-label]="uiText.text('answers')">
   @for (option of data.options; track option) {

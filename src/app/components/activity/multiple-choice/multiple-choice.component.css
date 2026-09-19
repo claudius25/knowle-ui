@@ -1,6 +1,7 @@
 .answers {
   display: grid;
   gap: 12px;
+  padding: 10px;
 }
 
 .answers--two-columns {
@@ -20,5 +21,9 @@
 .answer-card:disabled {
   cursor: wait;
   opacity: 0.72;
+}
+
+.question-description--on-light {
+  color: #000000;
 }
 

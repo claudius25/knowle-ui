@@ -584,14 +584,14 @@ export class AdminComponent implements OnInit {
   }
 
   // --- Automatic RO -> EN translation ---
-  /** Calls the Google Cloud Translation API (v2) to translate Romanian text to English. */
+  /** Calls the gnosy-deepl proxy service (which forwards to DeepL) to translate Romanian text to English. */
   private requestAutoTranslation(text: string): Promise<string> {
-    const url = `https://translation.googleapis.com/language/translate/v2?key=${environment.googleTranslateApiKey}`;
-    const body = { q: text, source: 'ro', target: 'en', format: 'text' };
+    const url = `${environment.translateApiUrl}/translate`;
+    const body = { textContent: text, language: 'ro' };
 
     return firstValueFrom(
-      this.http.post<{ data?: { translations?: { translatedText: string }[] } }>(url, body),
-    ).then((res) => res?.data?.translations?.[0]?.translatedText?.trim() ?? '');
+      this.http.post<{ translatedText?: string }>(url, body),
+    ).then((res) => res?.translatedText?.trim() ?? '');
   }
 
   protected autoTranslateModal(): void {
@@ -690,6 +690,42 @@ export class AdminComponent implements OnInit {
     this.downloadDbJson();
     setTimeout(() => this.downloadRoJson(), 200);
     setTimeout(() => this.downloadEnJson(), 400);
+  }
+
+  // --- Copy directly to the local gnosy-ui files via gnosy-deepl's /writeassets ---
+  protected copyingAll = false;
+
+  protected copyAllToServer(): void {
+    if (this.copyingAll) return;
+    this.copyingAll = true;
+    this.isError = false;
+    this.statusMessage = 'Se copiază fișierele...';
+
+    const body = {
+      difficulty: this.difficulty.toLowerCase(),
+      domain: this.domain.toLowerCase(),
+      db: this.db,
+      en: this.translations.en,
+      ro: this.translations.ro,
+    };
+
+    this.http
+      .post<{ message: string; targetDir: string; backupDir: string }>(
+        `${environment.translateApiUrl}/writeassets`,
+        body,
+      )
+      .subscribe({
+        next: (res) => {
+          this.statusMessage = `Fișierele au fost copiate în ${res.targetDir} (backup în ${res.backupDir}).`;
+          this.isError = false;
+          this.copyingAll = false;
+        },
+        error: (err) => {
+          this.statusMessage = `Copierea a eșuat: ${err?.error?.message || err.message}`;
+          this.isError = true;
+          this.copyingAll = false;
+        },
+      });
   }
 
   private triggerDownload(content: string, fileName: string, mimeType: string): void {

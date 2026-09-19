@@ -47,6 +47,15 @@
       <button class="btn btn--accent" type="button" (click)="downloadAllFiles()" title="Descarcă toate cele 3 fișiere">
         📦 Descarcă Toate
       </button>
+      <button
+        class="btn btn--accent"
+        type="button"
+        [disabled]="copyingAll"
+        (click)="copyAllToServer()"
+        title="Trimite db.json, en.json și ro.json direct în gnosy-ui prin gnosy-deepl"
+      >
+        {{ copyingAll ? '⏳ Se copiază...' : '🗂️ Copiază Toate' }}
+      </button>
     </div>
   </header>
 

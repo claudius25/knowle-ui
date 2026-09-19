@@ -1,8 +1,11 @@
 :host {
     width: 100%;
+    /* position: fixed; */
+    /* z-index: 40; */
 }
 .game-header {
-  height: 52px;
+  height: var(--header-height);
+  background: white;
   box-sizing: border-box;
 
   display: grid;
@@ -13,14 +16,13 @@
   padding: 0 16px;
   color: #ffffff;
 
-  background: var(--home-background);
+  /* background: var(--home-background); */
 }
 
 /* Butoane generale */
 .header-btn {
-  height: 40px;
+  height: calc(var(--header-height));;
   border: 0;
-  background: transparent;
   border-radius: 12px;
 
   display: flex;
@@ -33,7 +35,7 @@
 
 /* Close */
 .close-btn {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: #777;
   justify-content: start;

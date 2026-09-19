@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MultipleChoiceActivityData } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
+import { ImageUtils } from '../../../shared/utils/image-utils';
 
 @Component({
   selector: 'app-multiple-choice',
@@ -45,6 +46,8 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   @Output() answerSelected = new EventEmitter<string>();
 
   protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
+  protected hasLightImage = false;
+  protected imageBackgroundColor: string | null = null;
 
   ngAfterViewInit(): void {
     const activityShell = this.getActivityShell();
@@ -68,6 +71,8 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && !changes['data'].firstChange) {
+      this.hasLightImage = false;
+      this.imageBackgroundColor = null;
       this.scheduleQuestionFit();
     }
   }
@@ -84,8 +89,19 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     }
   }
 
-  protected handleImageLoad(): void {
+  protected handleImageLoad(event: Event): void {
     this.scheduleQuestionFit();
+
+    const image = event.target as HTMLImageElement;
+    Promise.all([ImageUtils.getBackgroundColor(image), ImageUtils.getBackgroundBrightness(image)])
+      .then(([color, brightness]) => {
+        // The first loaded picture defines the shared background color.
+        this.imageBackgroundColor ??= color;
+        if (brightness === 'light') {
+          this.hasLightImage = true;
+        }
+      })
+      .catch(() => undefined);
   }
 
   protected speak(): void {
