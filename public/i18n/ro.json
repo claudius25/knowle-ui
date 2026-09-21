@@ -82,6 +82,8 @@
   "backendError": "Jocul nu poate fi încărcat. Verifică dacă backend-ul rulează.",
   "activityError": "Activitatea nu poate fi încărcată.",
   "retry": "Încearcă din nou",
+  "fifty": "50:50",
+  "hint": "Indiciu",
   "checking": "Verificăm răspunsul...",
   "correct": "Răspuns corect!",
   "correctPrompt": "Foarte bine. Ești gata pentru următoarea întrebare?",

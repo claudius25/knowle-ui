@@ -134,6 +134,34 @@ body {
   color: #063f37;
 }
 
+.duo-button--lavander {
+  --button-color: #c5c6ee;
+  --button-depth: #9fa4d3;
+}
+
+.duo-button--pastel {
+  --button-color: #ffe28a;
+  --button-depth: #d9b95d;
+}
+
+.duo-button--bleo {
+  --button-color: #8fd1e8;
+  --button-depth: #62b5cf;
+}
+
+.duo-button--grey {
+  --button-color: #ebe6d2;
+  --button-depth: #aaa58f;
+}
+
+.duo-button--medium {
+  height: 40px;
+}
+
+.duo-button--smalltext {
+  font-size: 12px;
+}
+
 .duo-button--orange {
   --button-color: #e48459;
   --button-depth: #bb6640;
@@ -167,12 +195,6 @@ body {
 .duo-button.answer--correct:disabled,
 .duo-button.answer--incorrect:disabled {
   opacity: 1;
-}
-
-.duo-button--grey {
-  --button-color: #9aa0a6;
-  --button-depth: #757b82;
-  color: #ffffff;
 }
 
 .duo-button--purple {

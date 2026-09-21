@@ -204,7 +204,12 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   private elementsOverlap(activityShell: HTMLElement, gameFooter: HTMLElement): boolean {
     const activityRect = activityShell.getBoundingClientRect();
     const footerRect = gameFooter.getBoundingClientRect();
-    console.log('Activity Rect:', activityRect, 'Footer Rect:', footerRect);
+    console.log(
+      'Activity Rect:',
+      activityRect.bottom,
+      footerRect.top,
+      activityRect.bottom > footerRect.top,
+    );
     return activityRect.bottom > footerRect.top && activityRect.top < footerRect.bottom;
   }
 

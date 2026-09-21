@@ -39,8 +39,7 @@
         (click)="selectLeft(item.id)"
       >
         @if (item.image) {
-          <img [src]="item.image" [alt]="item.text" class="card-image"
-          (load)="handleImageLoad()" />
+          <img [src]="item.image" [alt]="item.text" class="card-image" (load)="handleImageLoad()" />
         }
         <span class="card-text">{{ item.text }}</span>
         <!-- @if (isMatched(item.id)) {

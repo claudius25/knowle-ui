@@ -1,37 +1,36 @@
 <div class="question-block question-block--puzzle">
-
   @if (data.title) {
     <h3 class="activity-title">{{ data.title }}</h3>
   }
 
-    <div
-  class="puzzle-board"
-  cdkDropListGroup
-  [class.puzzle-board--solved]="isSolved"
-  [style.grid-template-columns]="'repeat(' + gridSize + ', 1fr)'"
-  [style.aspect-ratio]="boardAspectRatio"
-  [style.width]="boardWidth"
-  [attr.aria-label]="uiText.text('puzzle', 'Puzzle')"
->
-  @for (piece of pieces; track $index; let position = $index) {
-    <div
-      class="puzzle-cell"
-      cdkDropList
-      [cdkDropListData]="position"
-      [cdkDropListDisabled]="disabled || isSolved"
-      (cdkDropListDropped)="drop($event)"
-    >
+  <div
+    class="puzzle-board"
+    cdkDropListGroup
+    [class.puzzle-board--solved]="isSolved"
+    [style.grid-template-columns]="'repeat(' + gridSize + ', 1fr)'"
+    [style.aspect-ratio]="boardAspectRatio"
+    [style.width]="boardWidth"
+    [attr.aria-label]="uiText.text('puzzle', 'Puzzle')"
+  >
+    @for (piece of pieces; track $index; let position = $index) {
       <div
-        class="puzzle-piece"
-        cdkDrag
-        [cdkDragDisabled]="disabled || isSolved"
-        [style.background-image]="'url(' + data.image + ')'"
-        [style.background-size]="gridSize * 100 + '% ' + gridSize * 100 + '%'"
-        [style.background-position]="pieceBackgroundPosition(piece)"
-      ></div>
-    </div>
-  }
-</div>
+        class="puzzle-cell"
+        cdkDropList
+        [cdkDropListData]="position"
+        [cdkDropListDisabled]="disabled || isSolved"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <div
+          class="puzzle-piece"
+          cdkDrag
+          [cdkDragDisabled]="disabled || isSolved"
+          [style.background-image]="'url(' + data.image + ')'"
+          [style.background-size]="gridSize * 100 + '% ' + gridSize * 100 + '%'"
+          [style.background-position]="pieceBackgroundPosition(piece)"
+        ></div>
+      </div>
+    }
+  </div>
 
   @if (data.description) {
     <div class="question-description-row">
@@ -49,8 +48,6 @@
     </div>
   }
 </div>
-
-
 
 @if (isSolved) {
   <div class="puzzle-question">

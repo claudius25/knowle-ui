@@ -82,6 +82,8 @@
   "backendError": "The game cannot be loaded. Check that the backend is running.",
   "activityError": "The activity could not be loaded.",
   "retry": "Try again",
+  "fifty": "50:50",
+  "hint": "Hint",
   "checking": "Checking your answer...",
   "correct": "Correct answer!",
   "correctPrompt": "Great job. Ready for the next question?",

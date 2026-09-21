@@ -3,10 +3,9 @@ import { GButtonComponent } from '../../shared/components/g-button/g-button.comp
 import { TortiComponent } from '../../characters/torti/torti.component';
 import { TortiPose } from '../../characters/torti/torti.types';
 import { ChapterButtonComponent } from '../ui/chapter-button/chapter-button.component';
-import { CheckButtonComponent } from '../ui/check-button/check-button.component';
-import { ContinueButtonComponent } from '../ui/continue-button/continue-button.component';
 import { TryAgainButtonComponent } from '../ui/try-again-button/try-again-button.component';
 import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
+import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
 
 @Component({
   selector: 'app-game-footer',
@@ -14,11 +13,10 @@ import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component'
   imports: [
     TortiComponent,
     ChapterButtonComponent,
-    ContinueButtonComponent,
     TryAgainButtonComponent,
-    CheckButtonComponent,
     GButtonComponent,
     CoinDisplayComponent,
+    HealthDisplayComponent,
   ],
   templateUrl: './game-footer.component.html',
   styleUrl: './game-footer.component.css',
@@ -47,6 +45,8 @@ export class GameFooterComponent {
 
   @Output() continue = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
+  @Output() fifty = new EventEmitter<void>();
+  @Output() hint = new EventEmitter<void>();
   @Output() chapter = new EventEmitter<void>();
   @Output() check = new EventEmitter<void>();
 }

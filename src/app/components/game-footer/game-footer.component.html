@@ -6,75 +6,117 @@
       [initialPose]="characterPose"
       [speechText]="characterSpeech"
       [showBubble]="false"
+      [showMuteButton]="false"
     />
-
-    <div class="character-coin-health-group">
-      <div
-        class="character-health"
-        role="progressbar"
-        [attr.aria-valuenow]="health"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-label="Health"
-      >
-        <div
-          class="character-health__fill"
-          [class.character-health__fill--medium]="health <= 50 && health > 25"
-          [class.character-health__fill--low]="health <= 25"
-          [style.width.%]="health"
-        ></div>
-      </div>
-
-      <app-coin-display class="header-btn stat-btn coin-btn" [amount]="coins"></app-coin-display>
-    </div>
   </div>
 
-  @switch (mode) {
-    @case ('waiting') {
-      <app-check-button [disabled]="disabled" (check)="check.emit()">
-        {{ checkText }}
-      </app-check-button>
-    }
-    @case ('checking') {
-      <p class="feedback neutral">{{ checkingText }}</p>
-    }
-    @case ('correct') {
-      @if (sessionComplete) {
-        <app-chapter-button (chapter)="chapter.emit()">{{ chapterText }}</app-chapter-button>
-      } @else {
-        <app-continue-button (continue)="continue.emit()">{{ continueText }}</app-continue-button>
-      }
-    }
-    @case ('incorrect') {
-      <div class="incorrect-footer">
+  <div class="game-footer__actions">
+    <div class="game-footer__stats_and_helpers">
+      <div class="character-coin-health-group">
+        <app-health-display
+          class="header-btn stat-btn battery-btn"
+          [value]="health"
+        ></app-health-display>
+
+        <app-coin-display class="header-btn stat-btn coin-btn" [amount]="coins"></app-coin-display>
+      </div>
+      <div class="game-footer__helpers">
         <g-button
           labelKey="retry"
-          [colors]="['#e48459', '#bb6640', '#bb6640']"
+          colorsStyleClass="duo-button duo-button--grey duo-button--medium duo-button--smalltext"
           (clicked)="retry.emit()"
         >
         </g-button>
+
         <g-button
-          labelKey="continue"
-          [colors]="['#9aa0a6', '#757b82', '#757b82']"
-          (clicked)="continue.emit()"
+          labelKey="fifty"
+          colorsStyleClass="duo-button duo-button--pastel duo-button--medium duo-button--smalltext"
+          (clicked)="fifty.emit()"
+        >
+        </g-button>
+
+        <g-button
+          labelKey="hint"
+          colorsStyleClass="duo-button duo-button--lavander duo-button--medium duo-button--smalltext"
+          (clicked)="hint.emit()"
         >
         </g-button>
       </div>
+    </div>
+
+    @switch (mode) {
+      @case ('waiting') {
+        <g-button
+          class="check-button"
+          labelKey=""
+          [disabled]="disabled"
+          colorsStyleClass="duo-button duo-button--bleo duo-button--medium"
+          (clicked)="check.emit()"
+        >
+          {{ checkText }}
+        </g-button>
+      }
+      @case ('checking') {
+        <p class="feedback neutral">{{ checkingText }}</p>
+      }
+      @case ('correct') {
+        @if (sessionComplete) {
+          <app-chapter-button (chapter)="chapter.emit()">{{ chapterText }}</app-chapter-button>
+        } @else {
+          <g-button
+            class="check-button"
+            labelKey=""
+            [disabled]="disabled"
+            colorsStyleClass="duo-button duo-button--bleo duo-button--medium"
+            (clicked)="continue.emit()"
+          >
+            {{ continueText }}
+          </g-button>
+        }
+      }
+      @case ('incorrect') {
+        <div class="incorrect-footer">
+          <g-button
+            labelKey="continue"
+            [colors]="['#9aa0a6', '#757b82', '#757b82']"
+            (clicked)="continue.emit()"
+          >
+          </g-button>
+        </div>
+      }
+      @case ('classify') {
+        <g-button
+          class="check-button"
+          labelKey=""
+          [disabled]="disabled"
+          colorsStyleClass="duo-button duo-button--green duo-button--medium"
+          (clicked)="check.emit()"
+        >
+          {{ checkText }}
+        </g-button>
+      }
+      @case ('matching') {
+        <g-button
+          class="check-button"
+          labelKey=""
+          [disabled]="disabled"
+          colorsStyleClass="duo-button duo-button--green duo-button--medium"
+          (clicked)="check.emit()"
+        >
+          {{ checkText }}
+        </g-button>
+      }
+      @case ('ordering') {
+        <g-button
+          class="check-button"
+          labelKey=""
+          [disabled]="disabled"
+          colorsStyleClass="duo-button duo-button--green duo-button--medium"
+          (clicked)="check.emit()"
+        >
+          {{ checkText }}
+        </g-button>
+      }
     }
-    @case ('classify') {
-      <app-check-button [disabled]="disabled" (check)="check.emit()">
-        {{ checkText }}
-      </app-check-button>
-    }
-    @case ('matching') {
-      <app-check-button [disabled]="disabled" (check)="check.emit()">
-        {{ checkText }}
-      </app-check-button>
-    }
-    @case ('ordering') {
-      <app-check-button [disabled]="disabled" (check)="check.emit()">
-        {{ checkText }}
-      </app-check-button>
-    }
-  }
+  </div>
 </div>

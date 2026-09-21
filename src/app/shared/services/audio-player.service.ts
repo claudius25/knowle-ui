@@ -89,7 +89,7 @@ export class AudioPlayerService implements OnDestroy {
     try {
       return localStorage.getItem(key) === '1';
     } catch {
-      return false;
+      return true;
     }
   }
 

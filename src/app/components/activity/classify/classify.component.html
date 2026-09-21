@@ -46,11 +46,12 @@
           (cdkDropListDropped)="drop($event)"
         >
           @for (item of categoryItems[category.id]; track item.id) {
-            <div class="classify-chip classify-chip--placed" cdkDrag [cdkDragDisabled]="disabled">{{ item.label }}</div>
+            <div class="classify-chip classify-chip--placed" cdkDrag [cdkDragDisabled]="disabled">
+              {{ item.label }}
+            </div>
           }
         </div>
         <strong class="category-title">{{ category.label }}</strong>
-        
       </div>
     }
   </div>

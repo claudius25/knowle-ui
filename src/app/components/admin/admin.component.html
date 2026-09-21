@@ -2,7 +2,12 @@
   <!-- Top Navigation Bar -->
   <header class="admin-header">
     <div class="header-left">
-      <button class="back-home-btn" type="button" (click)="goHome()" title="Înapoi la pagina principală">
+      <button
+        class="back-home-btn"
+        type="button"
+        (click)="goHome()"
+        title="Înapoi la pagina principală"
+      >
         ← Acasă
       </button>
       <h1 class="header-title">🛠️ Gnosy Content Admin</h1>
@@ -21,7 +26,12 @@
 
       <div class="input-group">
         <label for="domainInput">Domeniu:</label>
-        <input id="domainInput" type="text" [(ngModel)]="domain" placeholder="ex: geography, science" />
+        <input
+          id="domainInput"
+          type="text"
+          [(ngModel)]="domain"
+          placeholder="ex: geography, science"
+        />
       </div>
 
       <button class="btn btn--primary" type="button" (click)="loadCurrentDatabase()">
@@ -35,16 +45,36 @@
 
     <!-- Download Export Actions -->
     <div class="export-bar">
-      <button class="btn btn--download" type="button" (click)="downloadDbJson()" title="Descarcă db.json">
+      <button
+        class="btn btn--download"
+        type="button"
+        (click)="downloadDbJson()"
+        title="Descarcă db.json"
+      >
         📥 db.json
       </button>
-      <button class="btn btn--download" type="button" (click)="downloadRoJson()" title="Descarcă ro.json">
+      <button
+        class="btn btn--download"
+        type="button"
+        (click)="downloadRoJson()"
+        title="Descarcă ro.json"
+      >
         📥 ro.json
       </button>
-      <button class="btn btn--download" type="button" (click)="downloadEnJson()" title="Descarcă en.json">
+      <button
+        class="btn btn--download"
+        type="button"
+        (click)="downloadEnJson()"
+        title="Descarcă en.json"
+      >
         📥 en.json
       </button>
-      <button class="btn btn--accent" type="button" (click)="downloadAllFiles()" title="Descarcă toate cele 3 fișiere">
+      <button
+        class="btn btn--accent"
+        type="button"
+        (click)="downloadAllFiles()"
+        title="Descarcă toate cele 3 fișiere"
+      >
         📦 Descarcă Toate
       </button>
       <button
@@ -138,8 +168,12 @@
                       [class.active]="selectedActivityIndex === actIdx"
                       (click)="selectActivity(actIdx)"
                     >
-                      <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{ act.type }}</span>
-                      <span class="activity-sub-title">{{ translations.ro[act.title] || act.title }}</span>
+                      <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{
+                        act.type
+                      }}</span>
+                      <span class="activity-sub-title">{{
+                        translations.ro[act.title] || act.title
+                      }}</span>
                       <div class="activity-sub-actions" (click)="$event.stopPropagation()">
                         <button
                           class="icon-btn icon-btn--danger icon-btn--tiny"
@@ -151,11 +185,11 @@
                         </button>
                       </div>
                     </li>
-                } @empty {
-                  <li class="activity-sublist-empty">Nicio activitate încă.</li>
-                }
-              </ul>
-            }
+                  } @empty {
+                    <li class="activity-sublist-empty">Nicio activitate încă.</li>
+                  }
+                </ul>
+              }
             </li>
           }
         </ul>
@@ -165,73 +199,103 @@
       <section class="chapter-details">
         @if (db.chapters[selectedChapterIndex]; as currentChapter) {
           @if (selectedActivityIndex === -1) {
-          <!-- Chapter Metadata Card -->
-          <div class="card chapter-meta-card">
-            <div class="card-header">
-              <h3>Setări Capitol: {{ currentChapter.id }}</h3>
-            </div>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>ID Capitol:</label>
-                <input type="text" [(ngModel)]="currentChapter.id" />
+            <!-- Chapter Metadata Card -->
+            <div class="card chapter-meta-card">
+              <div class="card-header">
+                <h3>Setări Capitol: {{ currentChapter.id }}</h3>
               </div>
-
-              <div class="form-group">
-                <label>Titlu (Cheie i18n):</label>
-                <div class="i18n-input-row">
-                  <input type="text" [(ngModel)]="currentChapter.title" />
-                  <button
-                    class="btn btn--i18n"
-                    type="button"
-                    (click)="openTranslationModal(currentChapter.title, 'Titlu Capitol')"
-                  >
-                    🌐 Traduceri
-                  </button>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>ID Capitol:</label>
+                  <input type="text" [(ngModel)]="currentChapter.id" />
                 </div>
-                <small class="preview-text">RO: "{{ translations.ro[currentChapter.title] || '-' }}"</small>
-              </div>
 
-              <div class="form-group full-width">
-                <label>Descriere (Cheie i18n):</label>
-                <div class="i18n-input-row">
-                  <input type="text" [(ngModel)]="currentChapter.description" />
-                  <button
-                    class="btn btn--i18n"
-                    type="button"
-                    (click)="openTranslationModal(currentChapter.description, 'Descriere Capitol')"
+                <div class="form-group">
+                  <label>Titlu (Cheie i18n):</label>
+                  <div class="i18n-input-row">
+                    <input type="text" [(ngModel)]="currentChapter.title" />
+                    <button
+                      class="btn btn--i18n"
+                      type="button"
+                      (click)="openTranslationModal(currentChapter.title, 'Titlu Capitol')"
+                    >
+                      🌐 Traduceri
+                    </button>
+                  </div>
+                  <small class="preview-text"
+                    >RO: "{{ translations.ro[currentChapter.title] || '-' }}"</small
                   >
-                    🌐 Traduceri
-                  </button>
                 </div>
-                <small class="preview-text">RO: "{{ translations.ro[currentChapter.description] || '-' }}"</small>
+
+                <div class="form-group full-width">
+                  <label>Descriere (Cheie i18n):</label>
+                  <div class="i18n-input-row">
+                    <input type="text" [(ngModel)]="currentChapter.description" />
+                    <button
+                      class="btn btn--i18n"
+                      type="button"
+                      (click)="
+                        openTranslationModal(currentChapter.description, 'Descriere Capitol')
+                      "
+                    >
+                      🌐 Traduceri
+                    </button>
+                  </div>
+                  <small class="preview-text"
+                    >RO: "{{ translations.ro[currentChapter.description] || '-' }}"</small
+                  >
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Activities Section -->
-          <div class="activities-header">
-            <h3>Activități în acest capitol ({{ currentChapter.activities.length }})</h3>
-            <div class="add-activity-dropdown">
-              <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'MULTIPLE_CHOICE')">
-                + Multiple Choice
-              </button>
-              <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'TRUE_FALSE')">
-                + True/False
-              </button>
-              <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'CLASSIFY')">
-                + Classify
-              </button>
-              <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'MATCHING')">
-                + Matching
-              </button>
-              <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'ORDERING')">
-                + Ordering
-              </button>
-              <button class="btn btn--primary" type="button" (click)="addActivity(currentChapter, 'PUZZLE')">
-                + Puzzle
-              </button>
+            <!-- Activities Section -->
+            <div class="activities-header">
+              <h3>Activități în acest capitol ({{ currentChapter.activities.length }})</h3>
+              <div class="add-activity-dropdown">
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="addActivity(currentChapter, 'MULTIPLE_CHOICE')"
+                >
+                  + Multiple Choice
+                </button>
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="addActivity(currentChapter, 'TRUE_FALSE')"
+                >
+                  + True/False
+                </button>
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="addActivity(currentChapter, 'CLASSIFY')"
+                >
+                  + Classify
+                </button>
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="addActivity(currentChapter, 'MATCHING')"
+                >
+                  + Matching
+                </button>
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="addActivity(currentChapter, 'ORDERING')"
+                >
+                  + Ordering
+                </button>
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="addActivity(currentChapter, 'PUZZLE')"
+                >
+                  + Puzzle
+                </button>
+              </div>
             </div>
-          </div>
           }
 
           <!-- Selected Activity Detail -->
@@ -243,7 +307,9 @@
                   <div class="activity-title-row">
                     <span class="activity-index">#{{ selectedActivityIndex + 1 }}</span>
                     <input class="act-id-input" type="text" [(ngModel)]="act.id" />
-                    <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{ act.type }}</span>
+                    <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{
+                      act.type
+                    }}</span>
                   </div>
                 </div>
 
@@ -270,7 +336,9 @@
                         🌐
                       </button>
                     </div>
-                    <small class="preview-text">RO: "{{ translations.ro[act.title] || '-' }}"</small>
+                    <small class="preview-text"
+                      >RO: "{{ translations.ro[act.title] || '-' }}"</small
+                    >
                   </div>
 
                   <div class="form-group full-width">
@@ -285,7 +353,9 @@
                         🌐
                       </button>
                     </div>
-                    <small class="preview-text">RO: "{{ translations.ro[act.description] || '-' }}"</small>
+                    <small class="preview-text"
+                      >RO: "{{ translations.ro[act.description] || '-' }}"</small
+                    >
                   </div>
 
                   <div class="form-group full-width">
@@ -300,7 +370,9 @@
                         🌐
                       </button>
                     </div>
-                    <small class="preview-text">RO: "{{ translations.ro[act.question] || '-' }}"</small>
+                    <small class="preview-text"
+                      >RO: "{{ translations.ro[act.question] || '-' }}"</small
+                    >
                   </div>
 
                   <div class="form-group full-width">
@@ -315,18 +387,26 @@
                         🌐
                       </button>
                     </div>
-                    <small class="preview-text">RO: "{{ translations.ro[act.hint || ''] || '-' }}"</small>
+                    <small class="preview-text"
+                      >RO: "{{ translations.ro[act.hint || ''] || '-' }}"</small
+                    >
                   </div>
 
                   <div class="form-group full-width">
-                    <label>Imagini (Pictures - ex: eclipse.png, map.jpg separate prin virgulă):</label>
+                    <label
+                      >Imagini (Pictures - ex: eclipse.png, map.jpg separate prin virgulă):</label
+                    >
                     <input
                       type="text"
                       [ngModel]="getPicturesString(act)"
                       (ngModelChange)="updatePicturesFromString(act, $event)"
                       placeholder="ex: eclipse.png, relief.jpg"
                     />
-                    <small class="preview-text">Imaginile se caută automat în /db/{{ difficulty.toLowerCase() }}/{{ domain.toLowerCase() }}/pics/</small>
+                    <small class="preview-text"
+                      >Imaginile se caută automat în /db/{{ difficulty.toLowerCase() }}/{{
+                        domain.toLowerCase()
+                      }}/pics/</small
+                    >
                   </div>
                 </div>
 
@@ -337,7 +417,11 @@
                     <div class="sub-section">
                       <div class="sub-section-header">
                         <h4>Variante de Răspuns (Options)</h4>
-                        <button class="btn btn--small btn--primary" type="button" (click)="addOption(act)">
+                        <button
+                          class="btn btn--small btn--primary"
+                          type="button"
+                          (click)="addOption(act)"
+                        >
                           + Opțiune
                         </button>
                       </div>
@@ -362,7 +446,9 @@
                             >
                               🌐
                             </button>
-                            <span class="preview-mini">"{{ translations.ro[opt.text] || '-' }}"</span>
+                            <span class="preview-mini"
+                              >"{{ translations.ro[opt.text] || '-' }}"</span
+                            >
                             <button
                               class="icon-btn icon-btn--danger"
                               type="button"
@@ -373,7 +459,9 @@
                           </div>
                         }
                       </div>
-                      <small class="hint-label">Selectează butonul radio din dreptul opțiunii corecte.</small>
+                      <small class="hint-label"
+                        >Selectează butonul radio din dreptul opțiunii corecte.</small
+                      >
                     </div>
                   }
 
@@ -383,11 +471,21 @@
                       <h4>Răspuns Corect (True / False):</h4>
                       <div class="tf-options">
                         <label class="radio-label">
-                          <input type="radio" [name]="'tf_' + act.id" [value]="true" [(ngModel)]="act.answer" />
+                          <input
+                            type="radio"
+                            [name]="'tf_' + act.id"
+                            [value]="true"
+                            [(ngModel)]="act.answer"
+                          />
                           <span>ADEVĂRAT (True)</span>
                         </label>
                         <label class="radio-label">
-                          <input type="radio" [name]="'tf_' + act.id" [value]="false" [(ngModel)]="act.answer" />
+                          <input
+                            type="radio"
+                            [name]="'tf_' + act.id"
+                            [value]="false"
+                            [(ngModel)]="act.answer"
+                          />
                           <span>FALS (False)</span>
                         </label>
                       </div>
@@ -402,13 +500,22 @@
                         <div class="classify-col">
                           <div class="sub-section-header">
                             <h4>Categorii</h4>
-                            <button class="btn btn--small btn--primary" type="button" (click)="addCategory(act)">
+                            <button
+                              class="btn btn--small btn--primary"
+                              type="button"
+                              (click)="addCategory(act)"
+                            >
                               + Categorie
                             </button>
                           </div>
                           @for (cat of act.categories; track cat.id; let catIdx = $index) {
                             <div class="option-row">
-                              <input style="width: 80px;" type="text" [(ngModel)]="cat.id" placeholder="id" />
+                              <input
+                                style="width: 80px"
+                                type="text"
+                                [(ngModel)]="cat.id"
+                                placeholder="id"
+                              />
                               <input class="flex-grow" type="text" [(ngModel)]="cat.label" />
                               <button
                                 class="btn btn--i18n"
@@ -432,18 +539,29 @@
                         <div class="classify-col">
                           <div class="sub-section-header">
                             <h4>Elemente & Categorie Țintă (Answer)</h4>
-                            <button class="btn btn--small btn--primary" type="button" (click)="addClassifyItem(act)">
+                            <button
+                              class="btn btn--small btn--primary"
+                              type="button"
+                              (click)="addClassifyItem(act)"
+                            >
                               + Element
                             </button>
                           </div>
                           @for (item of act.items; track item.id; let itemIdx = $index) {
                             <div class="option-row">
-                              <input style="width: 70px;" type="text" [(ngModel)]="item.id" placeholder="id" />
+                              <input
+                                style="width: 70px"
+                                type="text"
+                                [(ngModel)]="item.id"
+                                placeholder="id"
+                              />
                               <input class="flex-grow" type="text" [(ngModel)]="item.label" />
                               <button
                                 class="btn btn--i18n"
                                 type="button"
-                                (click)="openTranslationModal(item.label || '', 'Element: ' + item.id)"
+                                (click)="
+                                  openTranslationModal(item.label || '', 'Element: ' + item.id)
+                                "
                               >
                                 🌐
                               </button>
@@ -452,7 +570,9 @@
                                 (ngModelChange)="updateClassifyAnswer(act, item.id, $event)"
                               >
                                 @for (cat of act.categories; track cat.id) {
-                                  <option [value]="cat.id">{{ cat.id }} ({{ translations.ro[cat.label] || cat.label }})</option>
+                                  <option [value]="cat.id">
+                                    {{ cat.id }} ({{ translations.ro[cat.label] || cat.label }})
+                                  </option>
                                 }
                               </select>
                               <button
@@ -474,7 +594,11 @@
                     <div class="sub-section">
                       <div class="sub-section-header">
                         <h4>Perechi de Potrivire (Pairs)</h4>
-                        <button class="btn btn--small btn--primary" type="button" (click)="addPair(act)">
+                        <button
+                          class="btn btn--small btn--primary"
+                          type="button"
+                          (click)="addPair(act)"
+                        >
                           + Pereche
                         </button>
                       </div>
@@ -486,23 +610,39 @@
                             <div class="i18n-input-row">
                               <label>Stânga:</label>
                               <input type="text" [(ngModel)]="pair.left" />
-                              <button class="btn btn--i18n" type="button" (click)="openTranslationModal(pair.left, 'Stânga: ' + pair.id)">
+                              <button
+                                class="btn btn--i18n"
+                                type="button"
+                                (click)="openTranslationModal(pair.left, 'Stânga: ' + pair.id)"
+                              >
                                 🌐
                               </button>
                             </div>
                             <div class="i18n-input-row pair-image-input-row">
                               <label>Imagine:</label>
-                              <input type="text" [(ngModel)]="pair.image" placeholder="ex: compass.png" />
+                              <input
+                                type="text"
+                                [(ngModel)]="pair.image"
+                                placeholder="ex: compass.png"
+                              />
                             </div>
                             <div class="i18n-input-row">
                               <label>Dreapta:</label>
                               <input type="text" [(ngModel)]="pair.right" />
-                              <button class="btn btn--i18n" type="button" (click)="openTranslationModal(pair.right, 'Dreapta: ' + pair.id)">
+                              <button
+                                class="btn btn--i18n"
+                                type="button"
+                                (click)="openTranslationModal(pair.right, 'Dreapta: ' + pair.id)"
+                              >
                                 🌐
                               </button>
                             </div>
                           </div>
-                          <button class="icon-btn icon-btn--danger" type="button" (click)="removePair(act, pairIdx)">
+                          <button
+                            class="icon-btn icon-btn--danger"
+                            type="button"
+                            (click)="removePair(act, pairIdx)"
+                          >
                             🗑️
                           </button>
                         </div>
@@ -515,7 +655,11 @@
                     <div class="sub-section">
                       <div class="sub-section-header">
                         <h4>Elemente Ordonabile (În ordinea corectă de la 1 la N)</h4>
-                        <button class="btn btn--small btn--primary" type="button" (click)="addOrderingItem(act)">
+                        <button
+                          class="btn btn--small btn--primary"
+                          type="button"
+                          (click)="addOrderingItem(act)"
+                        >
                           + Element
                         </button>
                       </div>
@@ -527,12 +671,20 @@
                           <button
                             class="btn btn--i18n"
                             type="button"
-                            (click)="openTranslationModal(item.text || '', 'Element Ordine: ' + item.id)"
+                            (click)="
+                              openTranslationModal(item.text || '', 'Element Ordine: ' + item.id)
+                            "
                           >
                             🌐
                           </button>
-                          <span class="preview-mini">"{{ translations.ro[item.text || ''] || '-' }}"</span>
-                          <button class="icon-btn icon-btn--danger" type="button" (click)="removeOrderingItem(act, oIdx)">
+                          <span class="preview-mini"
+                            >"{{ translations.ro[item.text || ''] || '-' }}"</span
+                          >
+                          <button
+                            class="icon-btn icon-btn--danger"
+                            type="button"
+                            (click)="removeOrderingItem(act, oIdx)"
+                          >
                             🗑️
                           </button>
                         </div>
@@ -545,9 +697,9 @@
                     <div class="sub-section">
                       <h4>Imagine Puzzle (3x3)</h4>
                       <small class="hint-label">
-                        Se folosește prima imagine din câmpul "Imagini" de mai sus. Va fi tăiată în 9 piese
-                        amestecate, iar întrebarea cu variante de mai sus apare abia după ce puzzle-ul este
-                        reconstituit.
+                        Se folosește prima imagine din câmpul "Imagini" de mai sus. Va fi tăiată în
+                        9 piese amestecate, iar întrebarea cu variante de mai sus apare abia după ce
+                        puzzle-ul este reconstituit.
                       </small>
 
                       @if (getPuzzleImageUrl(act); as puzzleUrl) {
@@ -555,7 +707,9 @@
                           <img [src]="puzzleUrl" alt="Previzualizare puzzle" />
                         </div>
                       } @else {
-                        <p class="preview-text">Adaugă o imagine în câmpul "Imagini" pentru a vedea previzualizarea.</p>
+                        <p class="preview-text">
+                          Adaugă o imagine în câmpul "Imagini" pentru a vedea previzualizarea.
+                        </p>
                       }
                     </div>
                   }
@@ -595,16 +749,18 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th style="width: 25%;">Cheie (Key)</th>
-              <th style="width: 33%;">Română (ro.json)</th>
-              <th style="width: 33%;">English (en.json)</th>
-              <th style="width: 9%;">Acțiuni</th>
+              <th style="width: 25%">Cheie (Key)</th>
+              <th style="width: 33%">Română (ro.json)</th>
+              <th style="width: 33%">English (en.json)</th>
+              <th style="width: 9%">Acțiuni</th>
             </tr>
           </thead>
           <tbody>
             @for (k of allTranslationKeys; track k) {
               <tr>
-                <td><code>{{ k }}</code></td>
+                <td>
+                  <code>{{ k }}</code>
+                </td>
                 <td>
                   <input class="table-input" type="text" [(ngModel)]="translations.ro[k]" />
                 </td>
@@ -622,10 +778,20 @@
                     >
                       {{ isTranslatingKey(k) ? '⏳' : '🤖' }}
                     </button>
-                    <button class="btn btn--small btn--i18n" type="button" (click)="openTranslationModal(k)" title="Popup extins">
+                    <button
+                      class="btn btn--small btn--i18n"
+                      type="button"
+                      (click)="openTranslationModal(k)"
+                      title="Popup extins"
+                    >
                       🌐
                     </button>
-                    <button class="icon-btn icon-btn--danger" type="button" (click)="deleteTranslationKey(k)" title="Șterge">
+                    <button
+                      class="icon-btn icon-btn--danger"
+                      type="button"
+                      (click)="deleteTranslationKey(k)"
+                      title="Șterge"
+                    >
                       🗑️
                     </button>
                   </div>
@@ -673,7 +839,11 @@
 
           <div class="modal-field">
             <label>🇷🇴 Română (ro.json):</label>
-            <textarea rows="3" [(ngModel)]="modalData.ro" placeholder="Text în limba română..."></textarea>
+            <textarea
+              rows="3"
+              [(ngModel)]="modalData.ro"
+              placeholder="Text în limba română..."
+            ></textarea>
           </div>
 
           <div class="modal-field">
@@ -689,7 +859,11 @@
                 {{ modalTranslating ? '⏳ Se traduce...' : '🤖 Traducere automată (RO→EN)' }}
               </button>
             </div>
-            <textarea rows="3" [(ngModel)]="modalData.en" placeholder="Text in English..."></textarea>
+            <textarea
+              rows="3"
+              [(ngModel)]="modalData.en"
+              placeholder="Text in English..."
+            ></textarea>
           </div>
         </div>
 
