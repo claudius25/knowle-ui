@@ -1,5 +1,6 @@
 @if (character.position$ | async; as pos) {
   @if (character.facing$ | async; as facing) {
+    
     <div
       class="torti-container"
       [ngStyle]="getContainerStyle(pos)"

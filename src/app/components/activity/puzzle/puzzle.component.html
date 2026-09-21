@@ -1,22 +1,6 @@
-<div class="question-block">
-  @if (data.description) {
-    <div class="question-description-row">
-      <p class="question-description">{{ data.description }}</p>
-      <button
-        class="speak-btn"
-        type="button"
-        [class.speaking]="isSpeaking$ | async"
-        (click)="speak()"
-        [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
-        title="Ascultă descrierea"
-      >
-        <mat-icon>record_voice_over</mat-icon>
-      </button>
-    </div>
-  }
-</div>
+<div class="question-block question-block--puzzle">
 
-<div
+    <div
   class="puzzle-board"
   cdkDropListGroup
   [class.puzzle-board--solved]="isSolved"
@@ -44,6 +28,25 @@
     </div>
   }
 </div>
+
+  @if (data.description) {
+    <div class="question-description-row">
+      <p class="question-description">{{ data.description }}</p>
+      <button
+        class="speak-btn"
+        type="button"
+        [class.speaking]="isSpeaking$ | async"
+        (click)="speak()"
+        [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
+        title="Ascultă descrierea"
+      >
+        <mat-icon>record_voice_over</mat-icon>
+      </button>
+    </div>
+  }
+</div>
+
+
 
 @if (isSolved) {
   <div class="puzzle-question">

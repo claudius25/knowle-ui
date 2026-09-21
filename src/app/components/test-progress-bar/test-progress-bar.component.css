@@ -1,19 +1,17 @@
 :host {
-    width: 100%;
-    /* position: fixed; */
-    /* z-index: 40; */
+  width: 100%;
+  /* position: fixed; */
+  /* z-index: 40; */
 }
 .game-header {
   height: var(--header-height);
   background: white;
   box-sizing: border-box;
 
-  display: grid;
-  grid-template-columns: 24px minmax(100px, 1fr) 32px 32px;
+  display: flex;
   align-items: center;
-  gap: 12px;
 
-  padding: 0 16px;
+  padding: 0 0;
   color: #ffffff;
 
   /* background: var(--home-background); */
@@ -21,7 +19,7 @@
 
 /* Butoane generale */
 .header-btn {
-  height: calc(var(--header-height));;
+  height: calc(var(--header-height));
   border: 0;
   border-radius: 12px;
 
@@ -47,11 +45,11 @@
 }
 
 .progress__track {
-  height: 12px;
+  height: var(--header-height);
   width: 100%;
 
   background: #3a3a3a;
-  border-radius: 999px;
+  /* border-radius: 999px; */
   overflow: hidden;
 }
 
@@ -78,7 +76,9 @@
   color: #fff;
 }
 
-.coin-btn, .battery-btn, .close-btn {
-    margin: 0;
-    padding: 0;
+.coin-btn,
+.battery-btn,
+.close-btn {
+  margin: 0;
+  padding: 0;
 }

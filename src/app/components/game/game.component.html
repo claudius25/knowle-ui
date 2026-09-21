@@ -1,10 +1,4 @@
 <main class="game-page">
-    <app-test-progress-bar
-      [progress]="progress"
-      [health]="health"
-      [coins]="coins"
-      (close)="confirmExit()"
-    ></app-test-progress-bar>
   <section class="activity-shell" aria-live="polite">
     @if (state === 'loading') {
       <div class="status-panel">
@@ -16,7 +10,9 @@
         <span class="status-icon" aria-hidden="true">!</span>
         <h1>{{ text('errorTitle') }}</h1>
         <p>{{ errorMessage }}</p>
-        <button class="duo-button duo-button--green" type="button" (click)="reload()">{{ text('retry') }}</button>
+        <button class="duo-button duo-button--green" type="button" (click)="reload()">
+          {{ text('retry') }}
+        </button>
       </div>
     } @else if (activity) {
       @if (multipleChoiceData; as data) {
@@ -24,6 +20,7 @@
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
           [selectedAnswer]="selectedMultipleChoiceAnswer"
+          [answerState]="answerState"
           (answerSelected)="selectAnswer($event)"
         />
       } @else if (trueFalseData; as data) {
@@ -31,6 +28,7 @@
           [data]="data"
           [disabled]="state === 'answering' || state === 'correct'"
           [selectedAnswer]="selectedTrueFalseAnswer"
+          [answerState]="answerState"
           (answerSelected)="selectAnswer($event)"
         />
       } @else if (classifyData; as data) {
@@ -65,13 +63,19 @@
           <p>{{ text('unsupportedMessage') }}</p>
         </div>
       }
-
-     
     }
-
   </section>
 
+  <app-test-progress-bar
+    class="progress-bar-container"
+    [progress]="progress"
+    [health]="health"
+    [coins]="coins"
+    (close)="confirmExit()"
+  ></app-test-progress-bar>
+
   <app-game-footer
+    class="game-footer-container"
     [mode]="footerMode"
     [checkingText]="text('checking')"
     [sessionComplete]="sessionComplete"
@@ -83,10 +87,19 @@
     [checkText]="text('check')"
     [characterPose]="characterPose"
     [characterSpeech]="characterSpeech"
+    [health]="health"
     (chapter)="continueGame()"
     (continue)="continueGame()"
     (retry)="retry()"
-    (check)="classifyData ? checkClassifyAnswer() : (matchingData ? checkMatchingAnswer() : (orderingData ? checkOrderingAnswer() : checkSelectedAnswer()))"
+    (check)="
+      classifyData
+        ? checkClassifyAnswer()
+        : matchingData
+          ? checkMatchingAnswer()
+          : orderingData
+            ? checkOrderingAnswer()
+            : checkSelectedAnswer()
+    "
   />
 
   @if (showExitConfirm) {
@@ -95,17 +108,17 @@
         <h2>{{ text('exitConfirmTitle') }}</h2>
         <p>{{ text('exitConfirmMessage') }}</p>
         <div class="exit-dialog-actions">
-          <g-button 
+          <g-button
             labelKey="exitConfirmYes"
             colorsStyleClass="duo-button duo-button--orange"
             (clicked)="exitToHome()"
           ></g-button>
-          <g-button 
+          <g-button
             labelKey="exitConfirmNo"
             colorsStyleClass="duo-button duo-button--neutral"
             (clicked)="cancelExit()"
           ></g-button>
-          </div>
+        </div>
       </div>
     </div>
   }

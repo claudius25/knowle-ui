@@ -8,7 +8,7 @@
   min-height: 100svh;
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: var(--header-height) 1fr min-content;
+  grid-template-rows: 1fr var(--header-height) 140px;
   justify-items: center;
   align-items: start;
   background: var(--home-background);
@@ -71,7 +71,6 @@
   gap: 20px;
   margin-top: 8px;
 }
-
 
 .activity-shell {
   width: min(100%, 760px);
@@ -160,7 +159,9 @@ h2 {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 app-game-footer {

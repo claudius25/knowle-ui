@@ -633,9 +633,9 @@ export class AdminComponent implements OnInit {
     const url = `${environment.translateApiUrl}/translate`;
     const body = { textContent: text, language: 'ro' };
 
-    return firstValueFrom(
-      this.http.post<{ translatedText?: string }>(url, body),
-    ).then((res) => res?.translatedText?.trim() ?? '');
+    return firstValueFrom(this.http.post<{ translatedText?: string }>(url, body)).then(
+      (res) => res?.translatedText?.trim() ?? '',
+    );
   }
 
   protected autoTranslateModal(): void {
@@ -754,10 +754,11 @@ export class AdminComponent implements OnInit {
     };
 
     this.http
-      .post<{ message: string; targetDir: string; backupDir: string }>(
-        `${environment.translateApiUrl}/writeassets`,
-        body,
-      )
+      .post<{
+        message: string;
+        targetDir: string;
+        backupDir: string;
+      }>(`${environment.translateApiUrl}/writeassets`, body)
       .subscribe({
         next: (res) => {
           this.statusMessage = `Fișierele au fost copiate în ${res.targetDir} (backup în ${res.backupDir}).`;

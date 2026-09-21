@@ -13,24 +13,34 @@
   --home-button-hover: #b5ee82;
   --home-button-depth: #8fd35c;
   --home-button-text: #103f36;
-  --header-height: 22px;
+  --header-height: 5px;
+
+  /* Answer feedback (correct / incorrect choice) */
+  --answer-correct: #58cc02;
+  --answer-correct-depth: #46a302;
+  --answer-correct-text: #063f37;
+  --answer-incorrect: #ff4b4b;
+  --answer-incorrect-depth: #d33a3a;
+  --answer-incorrect-text: #ffffff;
 }
 
-$knowle-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$cyan-palette,
-    tertiary: mat.$orange-palette,
-  ),
-  typography: (
-    plain-family: 'Nunito, sans-serif',
-    brand-family: 'Nunito, sans-serif',
-    bold-weight: 700,
-  ),
-  density: (
-    scale: 0,
-  ),
-));
+$knowle-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$cyan-palette,
+      tertiary: mat.$orange-palette,
+    ),
+    typography: (
+      plain-family: 'Nunito, sans-serif',
+      brand-family: 'Nunito, sans-serif',
+      bold-weight: 700,
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
 
 html {
   font-size: 75%;
@@ -54,7 +64,7 @@ body {
 }
 
 .curved-title text {
-  font-family: "Lilita One", sans-serif;
+  font-family: 'Lilita One', sans-serif;
   font-size: 61.5px;
   fill: white;
 }
@@ -76,7 +86,7 @@ body {
   justify-content: center;
 
   background: var(--button-color);
-  color: #063f37;;
+  color: #063f37;
 
   border: none;
   border-radius: 18px;
@@ -131,7 +141,7 @@ body {
 }
 
 .duo-button--neutral {
-  --button-color: #0C4540;
+  --button-color: #0c4540;
   --button-depth: #0b3a35;
   color: #ffffff;
 }
@@ -140,6 +150,23 @@ body {
   --button-color: #b5ee82;
   --button-depth: #8fd35c;
   color: #063f37;
+}
+
+.duo-button.answer--correct {
+  --button-color: var(--answer-correct);
+  --button-depth: var(--answer-correct-depth);
+  color: var(--answer-correct-text);
+}
+
+.duo-button.answer--incorrect {
+  --button-color: var(--answer-incorrect);
+  --button-depth: var(--answer-incorrect-depth);
+  color: var(--answer-incorrect-text);
+}
+
+.duo-button.answer--correct:disabled,
+.duo-button.answer--incorrect:disabled {
+  opacity: 1;
 }
 
 .duo-button--grey {
@@ -176,7 +203,10 @@ mat-icon {
   font-size: 17px;
   font-weight: 800;
   box-shadow: 0 5px 0 var(--home-button-depth);
-  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease;
 }
 
 .home-page .home-cta .duo-button:hover:not(:disabled) {

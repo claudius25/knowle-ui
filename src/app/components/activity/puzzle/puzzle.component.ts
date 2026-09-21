@@ -64,9 +64,7 @@ export class PuzzleComponent implements OnChanges {
       () => {
         if (probe.naturalWidth > 0 && probe.naturalHeight > 0) {
           this.boardAspectRatio = `${probe.naturalWidth} / ${probe.naturalHeight}`;
-          this.boardWidth = PuzzleComponent.boardWidthFor(
-            probe.naturalWidth / probe.naturalHeight,
-          );
+          this.boardWidth = PuzzleComponent.boardWidthFor(probe.naturalWidth / probe.naturalHeight);
         }
       },
       { once: true },

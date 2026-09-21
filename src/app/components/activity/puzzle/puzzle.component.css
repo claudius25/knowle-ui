@@ -1,8 +1,12 @@
+.question-block--puzzle {
+    background: white;
+    color: black;
+    padding: 10px;
+}
 .puzzle-board {
   display: grid;
   gap: 4px;
   width: min(100%, 420px);
-  margin: 10px auto 0;
   padding: 6px;
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.2);

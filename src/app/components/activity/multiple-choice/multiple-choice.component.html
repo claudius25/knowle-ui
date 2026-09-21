@@ -50,7 +50,9 @@
     <button
       class="duo-button duo-button--neutral answer-card"
       type="button"
-      [class.selected]="selectedAnswer === option"
+      [class.selected]="selectedAnswer === option && answerState === null"
+      [class.answer--correct]="selectedAnswer === option && answerState === 'correct'"
+      [class.answer--incorrect]="selectedAnswer === option && answerState === 'incorrect'"
       [disabled]="disabled"
       (click)="select(option)"
     >

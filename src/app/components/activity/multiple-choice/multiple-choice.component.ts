@@ -43,6 +43,8 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   @Input({ required: true }) data!: MultipleChoiceActivityData;
   @Input() disabled = false;
   @Input() selectedAnswer: string | null = null;
+  /** Result of the checked answer, used to color the selected option. */
+  @Input() answerState: 'correct' | 'incorrect' | null = null;
   @Output() answerSelected = new EventEmitter<string>();
 
   protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
@@ -202,6 +204,7 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   private elementsOverlap(activityShell: HTMLElement, gameFooter: HTMLElement): boolean {
     const activityRect = activityShell.getBoundingClientRect();
     const footerRect = gameFooter.getBoundingClientRect();
+    console.log('Activity Rect:', activityRect, 'Footer Rect:', footerRect);
     return activityRect.bottom > footerRect.top && activityRect.top < footerRect.bottom;
   }
 
@@ -214,6 +217,7 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   private getGameFooter(): HTMLElement | null {
     const host = this.elementRef.nativeElement as HTMLElement;
     const gamePage = host.closest('.game-page');
-    return gamePage?.querySelector('app-game-footer .game-footer') as HTMLElement | null;
+    console.log('Game Page:', gamePage);
+    return gamePage?.querySelector('app-test-progress-bar .game-header') as HTMLElement | null;
   }
 }

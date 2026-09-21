@@ -5,7 +5,7 @@
 .coin-display {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
   border-radius: 999px;
   white-space: nowrap;
 }

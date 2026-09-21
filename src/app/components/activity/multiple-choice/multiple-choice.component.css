@@ -3,6 +3,11 @@
   opacity: 0.72;
 }
 
+.answer-card.answer--correct:disabled,
+.answer-card.answer--incorrect:disabled {
+  opacity: 1;
+}
+
 .question-description--on-light {
   color: #000000;
 }

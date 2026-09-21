@@ -51,6 +51,7 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   @Input() showBubble = false;
   /** Set to false to hide the mute/unmute control on the character. */
   @Input() showMuteButton = true;
+  @Input() coins = 0;
 
   @Output() movementFinished = new EventEmitter<void>();
   @Output() poseChanged = new EventEmitter<TortiPose>();

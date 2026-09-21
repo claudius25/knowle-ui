@@ -6,6 +6,7 @@ import { ChapterButtonComponent } from '../ui/chapter-button/chapter-button.comp
 import { CheckButtonComponent } from '../ui/check-button/check-button.component';
 import { ContinueButtonComponent } from '../ui/continue-button/continue-button.component';
 import { TryAgainButtonComponent } from '../ui/try-again-button/try-again-button.component';
+import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
 
 @Component({
   selector: 'app-game-footer',
@@ -17,6 +18,7 @@ import { TryAgainButtonComponent } from '../ui/try-again-button/try-again-button
     TryAgainButtonComponent,
     CheckButtonComponent,
     GButtonComponent,
+    CoinDisplayComponent,
   ],
   templateUrl: './game-footer.component.html',
   styleUrl: './game-footer.component.css',
@@ -40,6 +42,8 @@ export class GameFooterComponent {
   @Input() checkText = 'Check';
   @Input() characterPose: TortiPose = 'idle';
   @Input() characterSpeech = '';
+  @Input() health = 100;
+  @Input() coins = 0;
 
   @Output() continue = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();

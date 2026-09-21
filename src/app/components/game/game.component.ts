@@ -140,6 +140,10 @@ export class GameComponent implements OnInit, OnDestroy {
     return typeof this.selectedAnswer === 'string' ? this.selectedAnswer : null;
   }
 
+  protected get answerState(): 'correct' | 'incorrect' | null {
+    return this.state === 'correct' || this.state === 'incorrect' ? this.state : null;
+  }
+
   protected get trueFalseData(): TrueFalseActivityData | null {
     return this.activity?.type === 'TRUE_FALSE' ? this.activity.data : null;
   }

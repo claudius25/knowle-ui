@@ -384,6 +384,57 @@
               "text": "easy_geography_11_op_3"
             }
           ]
+        },
+        {
+          "id": "easy_geography_12",
+          "type": "MATCHING",
+          "title": "easy_geography_12_title",
+          "description": "easy_geography_12_desc",
+          "question": "easy_geography_12_question",
+          "hint": "easy_geography_12_hint",
+          "pairs": [
+            {
+              "id": "pair_1",
+              "left": "easy_geography_12_left_1",
+              "right": "easy_geography_12_right_1",
+              "image": "sun_vitD.png"
+            },
+            {
+              "id": "pair_2",
+              "left": "easy_geography_12_left_2",
+              "right": "easy_geography_12_right_2",
+              "image": "sun_microbes.png"
+            },
+            {
+              "id": "pair_3",
+              "left": "easy_geography_12_left_3",
+              "right": "easy_geography_12_right_3",
+              "image": "sun_circadian.png"
+            },
+            {
+              "id": "pair_4",
+              "left": "easy_geography_12_left_4",
+              "right": "easy_geography_12_right_4",
+              "image": "sun_disposition.png"
+            }
+          ],
+          "answer": [
+            {
+              "left": "easy_geography_12_left_1",
+              "right": "easy_geography_12_right_1"
+            },
+            {
+              "left": "easy_geography_12_left_2",
+              "right": "easy_geography_12_right_2"
+            }
+          ],
+          "reward": {
+            "coins": 15,
+            "energy": 0
+          },
+          "pictures": [
+            "sun_benefits.png"
+          ]
         }
       ]
     }

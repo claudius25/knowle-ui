@@ -26,6 +26,7 @@ export class TrueFalseComponent implements OnChanges {
   @Input({ required: true }) data!: TrueFalseActivityData;
   @Input() disabled = false;
   @Input() selectedAnswer: boolean | null = null;
+  @Input() answerState: 'correct' | 'incorrect' | null = null;
   @Output() answerSelected = new EventEmitter<boolean>();
 
   protected choiceData!: MultipleChoiceActivityData;
