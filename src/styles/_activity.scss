@@ -5,6 +5,21 @@
 
 /* 1. Question Block & Headings */
 
+.activity-title {
+  margin: 0;
+  padding: 6px 10px;
+  text-align: center;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.activity-title--on-light {
+  color: #000000;
+}
+
 
 .question-row {
   display: flex;

@@ -9,24 +9,24 @@
     />
 
     <div class="character-coin-health-group">
-    <div
-      class="character-health"
-      role="progressbar"
-      [attr.aria-valuenow]="health"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      aria-label="Health"
-    >
       <div
-        class="character-health__fill"
-        [class.character-health__fill--medium]="health <= 50 && health > 25"
-        [class.character-health__fill--low]="health <= 25"
-        [style.width.%]="health"
-      ></div>
-    </div>
+        class="character-health"
+        role="progressbar"
+        [attr.aria-valuenow]="health"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-label="Health"
+      >
+        <div
+          class="character-health__fill"
+          [class.character-health__fill--medium]="health <= 50 && health > 25"
+          [class.character-health__fill--low]="health <= 25"
+          [style.width.%]="health"
+        ></div>
+      </div>
 
-    <app-coin-display class="header-btn stat-btn coin-btn" [amount]="coins"></app-coin-display>
-  </div>
+      <app-coin-display class="header-btn stat-btn coin-btn" [amount]="coins"></app-coin-display>
+    </div>
   </div>
 
   @switch (mode) {

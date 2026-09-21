@@ -1,5 +1,9 @@
 <div class="question-block question-block--puzzle">
 
+  @if (data.title) {
+    <h3 class="activity-title">{{ data.title }}</h3>
+  }
+
     <div
   class="puzzle-board"
   cdkDropListGroup

@@ -20,18 +20,22 @@ export interface GameStartResponse {
 
 export interface MultipleChoiceActivityData {
   question: string;
+  title?: string;
   description?: string;
   options: string[];
   pictures?: string[];
+  titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
 }
 
 export interface TrueFalseActivityData {
   question: string;
+  title?: string;
   description?: string;
   options: [boolean, boolean];
   pictures?: string[];
+  titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
 }
@@ -48,9 +52,11 @@ export interface ClassifyCategory {
 
 export interface ClassifyActivityData {
   question: string;
+  title?: string;
   description?: string;
   items: ClassifyItem[];
   categories: ClassifyCategory[];
+  titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
 }
@@ -64,8 +70,10 @@ export interface MatchingPair {
 
 export interface MatchingActivityData {
   question: string;
+  title?: string;
   description?: string;
   pairs: MatchingPair[];
+  titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
 }
@@ -77,8 +85,10 @@ export interface OrderingItem {
 
 export interface OrderingActivityData {
   question: string;
+  title?: string;
   description?: string;
   items: OrderingItem[];
+  titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
 }
@@ -89,7 +99,9 @@ export interface PuzzleActivityData {
   /** Question unlocked once the puzzle is solved. */
   question: string;
   options: string[];
+  title?: string;
   description?: string;
+  titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
 }

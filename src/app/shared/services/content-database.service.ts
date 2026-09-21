@@ -400,8 +400,10 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            title,
             description,
             pictures,
+            titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
             options: (act.options ?? []).map((o) => dict[o.text] ?? o.text),
@@ -416,8 +418,10 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            title,
             description,
             pictures,
+            titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
             options: [true, false],
@@ -432,7 +436,9 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            title,
             description,
+            titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
             categories: (act.categories ?? []).map((c) => ({
@@ -454,7 +460,9 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            title,
             description,
+            titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
             pairs: (act.pairs ?? []).map((p) => ({
@@ -478,7 +486,9 @@ export class ContentDatabaseService {
           difficulty,
           data: {
             question,
+            title,
             description,
+            titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
             items: (act.items ?? []).map((item) => ({
@@ -497,7 +507,9 @@ export class ContentDatabaseService {
           data: {
             image: pictures?.[0] ?? '',
             question,
+            title,
             description,
+            titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
             options: (act.options ?? []).map((o) => dict[o.text] ?? o.text),

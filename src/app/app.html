@@ -1,1 +1,8 @@
 <router-outlet></router-outlet>
+
+@if (showDevNav) {
+  <div class="dev-nav">
+    <button type="button" title="Activitatea anterioară" (click)="goToActivity(-1)">‹</button>
+    <button type="button" title="Activitatea următoare" (click)="goToActivity(1)">›</button>
+  </div>
+}

@@ -1,4 +1,7 @@
 <div class="question-block">
+  @if (data.title) {
+    <h3 class="activity-title">{{ data.title }}</h3>
+  }
   @if (data.description) {
     <div class="question-description-row">
       <p class="question-description">{{ data.description }}</p>

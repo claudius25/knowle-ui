@@ -1,20 +1,27 @@
 <div class="question-block">
-
+  @if (data.title) {
+    <h3
+      class="activity-title"
+      [class.activity-title--on-light]="hasLightImage"
+      [style.background-color]="imageBackgroundColor"
+    >
+      {{ data.title }}
+    </h3>
+  }
   @if (data.pictures && data.pictures.length > 0) {
-  <div class="activity-image-gallery" [style.background-color]="imageBackgroundColor">
-    @for (pic of data.pictures; track pic) {
-      <div #activityImageWrapper class="activity-image-wrapper">
-        <img
-          [src]="pic"
-          alt="Activity illustration"
-          class="activity-image"
-          (load)="handleImageLoad($event)"
-        />
-      </div>
-    }
-  </div>
-}
-
+    <div class="activity-image-gallery" [style.background-color]="imageBackgroundColor">
+      @for (pic of data.pictures; track pic) {
+        <div #activityImageWrapper class="activity-image-wrapper">
+          <img
+            [src]="pic"
+            alt="Activity illustration"
+            class="activity-image"
+            (load)="handleImageLoad($event)"
+          />
+        </div>
+      }
+    </div>
+  }
 
   @if (data.description) {
     <div class="question-description-row">
@@ -23,29 +30,31 @@
         class="question-description"
         [class.question-description--on-light]="hasLightImage"
         [style.background-color]="imageBackgroundColor"
-      >{{ data.description }}</p>
+      >
+        {{ data.description }}
+      </p>
     </div>
   }
   <div class="question-row">
     <h2 #questionTitle>{{ data.question }}</h2>
     <button
-        class="speak-btn"
-        type="button"
-        [class.speaking]="isSpeaking$ | async"
-        (click)="speak()"
-        [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
-        title="Ascultă descrierea și întrebarea"
-      >
-        <mat-icon>record_voice_over</mat-icon>
-      </button>
+      class="speak-btn"
+      type="button"
+      [class.speaking]="isSpeaking$ | async"
+      (click)="speak()"
+      [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
+      title="Ascultă descrierea și întrebarea"
+    >
+      <mat-icon>record_voice_over</mat-icon>
+    </button>
   </div>
 </div>
 
-
-
-
-
-<div class="answers" [class.answers--two-columns]="data.options.length === 4" [attr.aria-label]="uiText.text('answers')">
+<div
+  class="answers"
+  [class.answers--two-columns]="data.options.length === 4"
+  [attr.aria-label]="uiText.text('answers')"
+>
   @for (option of data.options; track option) {
     <button
       class="duo-button duo-button--neutral answer-card"
