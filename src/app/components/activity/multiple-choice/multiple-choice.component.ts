@@ -204,13 +204,11 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   private elementsOverlap(activityShell: HTMLElement, gameFooter: HTMLElement): boolean {
     const activityRect = activityShell.getBoundingClientRect();
     const footerRect = gameFooter.getBoundingClientRect();
-    console.log(
-      'Activity Rect:',
-      activityRect.bottom,
-      footerRect.top,
-      activityRect.bottom > footerRect.top,
+    const progressBarHeight = 5; // Replace with actual progress bar height if needed
+    return (
+      activityRect.bottom > footerRect.top - progressBarHeight &&
+      activityRect.top < footerRect.bottom
     );
-    return activityRect.bottom > footerRect.top && activityRect.top < footerRect.bottom;
   }
 
   private getActivityShell(): HTMLElement | null {
@@ -222,7 +220,6 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   private getGameFooter(): HTMLElement | null {
     const host = this.elementRef.nativeElement as HTMLElement;
     const gamePage = host.closest('.game-page');
-    console.log('Game Page:', gamePage);
-    return gamePage?.querySelector('app-test-progress-bar .game-header') as HTMLElement | null;
+    return gamePage?.querySelector('app-game-footer .game-footer') as HTMLElement | null;
   }
 }

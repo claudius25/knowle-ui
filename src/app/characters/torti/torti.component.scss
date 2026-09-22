@@ -1,7 +1,9 @@
 :host {
-  display: block;
+  display: flex;
   position: relative;
   pointer-events: none;
+  width: 100%;
+  height: 100%;
 }
 
 .torti-container {
@@ -13,6 +15,10 @@
   pointer-events: auto;
   cursor: pointer;
   transition: opacity 0.2s ease;
+}
+
+.torti-container--centered {
+  top: 35% !important;
 }
 
 .torti-shadow {
@@ -59,19 +65,26 @@
 }
 
 .torti-mute-btn {
-  position: absolute;
-  z-index: 3;
-  top: 35px;
-  right: -14px;
-  width: 26px;
+  position: relative;
+  z-index: 4;
+  bottom: -5px;
+  width: 80px;
+  // width: 26px;
   height: 26px;
   display: grid;
+  margin-left: auto;
+  margin-top: auto;
+  margin-right: auto;
+  grid-template-columns: 1fr 1fr;
   place-items: center;
+  gap: 6px;
   border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  // background: linear-gradient(to top, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   font-size: 1rem;
+  padding-right: 10px;
+  padding-left: 10px;
   cursor: pointer;
   pointer-events: auto;
 
@@ -91,7 +104,6 @@
     opacity: 1;
   }
 }
-
 
 .torti-speech-bubble {
   position: absolute;

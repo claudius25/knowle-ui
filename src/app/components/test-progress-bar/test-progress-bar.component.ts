@@ -1,12 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
-import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
 
 @Component({
   selector: 'app-test-progress-bar',
   standalone: true,
-  imports: [CommonModule, HealthDisplayComponent, CoinDisplayComponent],
+  imports: [CommonModule],
   templateUrl: './test-progress-bar.component.html',
   styleUrl: './test-progress-bar.component.css',
 })

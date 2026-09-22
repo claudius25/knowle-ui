@@ -7,8 +7,6 @@ import { OrderingComponent } from '../activity/ordering/ordering.component';
 import { MultipleChoiceComponent } from '../activity/multiple-choice/multiple-choice.component';
 import { TrueFalseComponent } from '../activity/true-false/true-false.component';
 import { PuzzleComponent } from '../activity/puzzle/puzzle.component';
-import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
-import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
 import { GameService } from '../../shared/services/game.service';
 import { GameFooterComponent } from '../game-footer/game-footer.component';
 import { UiTextService } from '../../shared/services/ui-text.service';
@@ -45,8 +43,6 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
     MatchingComponent,
     OrderingComponent,
     PuzzleComponent,
-    CoinDisplayComponent,
-    HealthDisplayComponent,
     GameFooterComponent,
     TestProgressBarComponent,
     GButtonComponent,

@@ -81,7 +81,7 @@
   "errorTitle": "An error occurred.",
   "backendError": "The game cannot be loaded. Check that the backend is running.",
   "activityError": "The activity could not be loaded.",
-  "retry": "Try again",
+  "retry": "Retry",
   "fifty": "50:50",
   "hint": "Hint",
   "checking": "Checking your answer...",

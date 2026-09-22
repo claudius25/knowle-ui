@@ -81,7 +81,7 @@
   "errorTitle": "A apărut o eroare.",
   "backendError": "Jocul nu poate fi încărcat. Verifică dacă backend-ul rulează.",
   "activityError": "Activitatea nu poate fi încărcată.",
-  "retry": "Încearcă din nou",
+  "retry": "Reîncearcă",
   "fifty": "50:50",
   "hint": "Indiciu",
   "checking": "Verificăm răspunsul...",

@@ -7,26 +7,16 @@
     bottom: 0;
     left: 0;
     right: 0;
+    gap: 5px;
     z-index: 10;
     display: grid;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: 30% 70%;
     align-items: center;
     padding: 0 10px 2px;
+    padding-left: 0;
 
     .game-footer__character {
-      width: min(170px, 18vw);
       height: 120px;
-      display: grid;
-      grid-template-rows: 1fr min-content;
-      justify-items: center;
-      align-items: center;
-      margin-top: -8px;
-    }
-
-    .game-footer__character app-torti {
-      display: block;
-      width: 100%;
-      height: 100%;
     }
 
     .game-footer__actions {
@@ -40,23 +30,16 @@
         display: grid;
         grid-template-columns: min-content 1fr;
         gap: 10px;
-        .game-footer__helpers {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(5px, 1fr));
-          gap: 5px;
-          margin-top: 10px;
+      }
+      .game-footer__helpers {
+        display: flex;
+        gap: 5px;
+        justify-content: flex-end;
+        margin-top: 10px;
+        g-button {
+          flex: 0 0 calc((100% - 10px) / 3);
         }
       }
-    }
-  }
-
-  .incorrect-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    & g-button {
-      flex: 1;
     }
   }
 
@@ -74,13 +57,12 @@
     flex-direction: column;
     width: 100%;
     align-items: start;
+    align-self: start;
     gap: 4px;
-    z-index: 50;
-    justify-content: start;
-  }
 
-  .check-button {
-    padding-left: 30px;
+    justify-content: start;
+    justify-self: self-end;
+    margin-right: 10px;
   }
 
   .helper-button {

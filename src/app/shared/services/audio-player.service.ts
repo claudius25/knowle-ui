@@ -83,6 +83,10 @@ export class AudioPlayerService implements OnDestroy {
     this.setCharacterMuted(!this.characterMuted);
   }
 
+  makeCharacterMuted(): void {
+    this.setCharacterMuted(true);
+  }
+
   private currentIsCharacterSpeech = false;
 
   private readStoredMute(key: string = AudioPlayerService.MUTE_STORAGE_KEY): boolean {

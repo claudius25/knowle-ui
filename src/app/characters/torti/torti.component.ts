@@ -19,8 +19,8 @@ import { FacingDirection, TortiPose, TortiPosition, WalkOptions } from './torti.
 import { TortiCharacter } from './torti-character';
 import { TORTI_POSE_BASE_HEIGHT, tortiPoseUrl } from './torti.poses';
 import { AudioPlayerService } from '../../shared/services/audio-player.service';
-import { HealthDisplayComponent } from '../../components/ui/health-display/health-display.component';
 import { CoinDisplayComponent } from '../../components/ui/coin-display/coin-display.component';
+import { HealthDisplayComponent } from '../../components/ui/health-display/health-display.component';
 
 /** How long the crossfade between two poses takes, in ms. Keep in sync with the CSS transition. */
 const POSE_TRANSITION_MS = 260;
@@ -34,7 +34,7 @@ interface PoseLayer {
 @Component({
   selector: 'app-torti',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, HealthDisplayComponent, CoinDisplayComponent],
+  imports: [CommonModule, AsyncPipe, CoinDisplayComponent, HealthDisplayComponent],
   templateUrl: './torti.component.html',
   styleUrl: './torti.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,7 +51,10 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
   @Input() showBubble = false;
   /** Set to false to hide the mute/unmute control on the character. */
   @Input() showMuteButton = true;
+  @Input() showCoinButton = false;
+  @Input() showHealthDisplay = false;
   @Input() coins = 0;
+  @Input() health = 100;
 
   @Output() movementFinished = new EventEmitter<void>();
   @Output() poseChanged = new EventEmitter<TortiPose>();
@@ -96,6 +99,8 @@ export class TortiComponent implements OnInit, OnChanges, OnDestroy, AfterViewIn
         this.poseChanged.emit(pose);
       }),
     );
+
+    this.audioPlayer.makeCharacterMuted();
   }
 
   ngAfterViewInit(): void {

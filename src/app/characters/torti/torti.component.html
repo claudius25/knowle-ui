@@ -1,8 +1,8 @@
 @if (character.position$ | async; as pos) {
   @if (character.facing$ | async; as facing) {
-    
     <div
       class="torti-container"
+      [class.torti-container--centered]="showHealthDisplay"
       [ngStyle]="getContainerStyle(pos)"
       (click)="onClick()"
       role="button"
@@ -10,20 +10,6 @@
       aria-label="Torti the Explorer"
     >
       <div class="torti-shadow" [ngStyle]="getShadowStyle()" aria-hidden="true"></div>
-
-      
-      @if (showMuteButton) {
-        <button
-          type="button"
-          class="torti-mute-btn"
-          [class.torti-mute-btn--muted]="isMuted$ | async"
-          (click)="toggleMute($event)"
-          [attr.aria-label]="(isMuted$ | async) ? 'Unmute Torti' : 'Mute Torti'"
-          [attr.title]="(isMuted$ | async) ? 'Unmute Torti' : 'Mute Torti'"
-        >
-          {{ (isMuted$ | async) ? '🔇' : '🔊' }}
-        </button>
-      }
 
       @for (layer of layers; track layer.id) {
         <img
@@ -45,5 +31,23 @@
         </div>
       }
     </div>
+
+    @if (showHealthDisplay) {
+      <div
+        type="button"
+        class="torti-mute-btn"
+        [class.torti-mute-btn--muted]="isMuted$ | async"
+        (click)="toggleMute($event)"
+        [attr.aria-label]="(isMuted$ | async) ? 'Unmute Torti' : 'Mute Torti'"
+        [attr.title]="(isMuted$ | async) ? 'Unmute Torti' : 'Mute Torti'"
+      >
+        <!-- {{ (isMuted$ | async) ? '🔇' : '🔊' }} -->
+        <app-health-display
+          class="header-btn stat-btn battery-btn"
+          [value]="health"
+        ></app-health-display>
+        <app-coin-display class="header-btn stat-btn coin-btn" [amount]="coins"></app-coin-display>
+      </div>
+    }
   }
 }
