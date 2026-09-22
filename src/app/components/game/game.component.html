@@ -89,9 +89,11 @@
     [characterPose]="characterPose"
     [characterSpeech]="characterSpeech"
     [health]="health"
+    [hasHint]="!!hintText"
     (chapter)="continueGame()"
     (continue)="continueGame()"
     (retry)="retry()"
+    (hint)="openHint()"
     (check)="
       classifyData
         ? checkClassifyAnswer()

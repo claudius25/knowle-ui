@@ -47,6 +47,7 @@ export class GameFooterComponent {
   @Input() characterSpeech = '';
   @Input() health = 100;
   @Input() coins = 0;
+  @Input() hasHint = false;
 
   private _bottomSheet: MatBottomSheet = inject(MatBottomSheet);
 

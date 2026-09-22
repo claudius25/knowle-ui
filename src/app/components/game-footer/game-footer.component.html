@@ -44,7 +44,7 @@
         >
         </g-button>
       }
-      @if (activity?.type !== 'MATCHING' && activity?.type !== 'PUZZLE') {
+      @if (hasHint) {
         <g-button
           labelKey="hint"
           colorsStyleClass="duo-button duo-button--grey duo-button--medium duo-button--smalltext"

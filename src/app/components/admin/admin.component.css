@@ -308,6 +308,18 @@ textarea:focus {
   font-weight: 800;
   color: rgba(255, 255, 255, 0.85);
 }
+.form-group label.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.form-group label.checkbox-label input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #66bb6a;
+  cursor: pointer;
+}
 .i18n-input-row {
   display: flex;
   gap: 6px;

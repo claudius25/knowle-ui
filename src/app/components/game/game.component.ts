@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { TestProgressBarComponent } from '../test-progress-bar/test-progress-bar.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClassifyComponent } from '../activity/classify/classify.component';
@@ -30,6 +31,7 @@ import {
   TrueFalseActivityData,
 } from '../../shared/models/game.types';
 import { GButtonComponent } from '../../shared/components/g-button/g-button.component';
+import { HintDialogComponent } from '../../shared/components/hint-dialog/hint-dialog.component';
 
 type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'incorrect';
 
@@ -56,6 +58,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
 
   @ViewChild(ClassifyComponent) private classifyComponent?: ClassifyComponent;
   @ViewChild(MatchingComponent) private matchingComponent?: MatchingComponent;
@@ -174,6 +177,33 @@ export class GameComponent implements OnInit, OnDestroy {
 
   protected get puzzleData(): PuzzleActivityData | null {
     return this.activity?.type === 'PUZZLE' ? this.activity.data : null;
+  }
+
+  protected get hintText(): string {
+    switch (this.activity?.type) {
+      case 'MULTIPLE_CHOICE':
+      case 'TRUE_FALSE':
+      case 'CLASSIFY':
+      case 'ORDERING':
+        return this.activity.data.hint ?? '';
+      default:
+        return '';
+    }
+  }
+
+  protected openHint(): void {
+    const hint = this.hintText;
+    if (!hint) {
+      return;
+    }
+
+    this.dialog.open(HintDialogComponent, {
+      data: { hint },
+      panelClass: 'hint-dialog-panel',
+      autoFocus: false,
+      maxWidth: '90vw',
+      width: '420px',
+    });
   }
 
   protected get footerMode():
@@ -407,7 +437,9 @@ export class GameComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.health = Math.max(0, this.health - GameComponent.HEALTH_LOSS_PER_MISTAKE);
+    if (this.activity?.isPractical) {
+      this.health = Math.max(0, this.health - GameComponent.HEALTH_LOSS_PER_MISTAKE);
+    }
     const speechKey = pickRandomLine(TORTI_SAD_LINES);
     this.characterSpeech = this.text(speechKey);
     void this.audioPlayer.playKey(speechKey, { global: true, characterSpeech: true });

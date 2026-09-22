@@ -75,6 +75,18 @@ export class AdminComponent implements OnInit {
     'PUZZLE',
   ];
 
+  // Activity types that expose a hint to the player
+  private readonly hintActivityTypes: ActivityType[] = [
+    'MULTIPLE_CHOICE',
+    'TRUE_FALSE',
+    'CLASSIFY',
+    'ORDERING',
+  ];
+
+  protected supportsHint(type: ActivityType): boolean {
+    return this.hintActivityTypes.includes(type);
+  }
+
   ngOnInit(): void {
     this.loadCurrentDatabase();
   }
@@ -202,12 +214,15 @@ export class AdminComponent implements OnInit {
     this.translations.ro[titleKey] = `Activitatea ${actNum}`;
     this.translations.ro[descKey] = `Informație introductivă pentru activitatea ${actNum}.`;
     this.translations.ro[questionKey] = `Întrebarea activității ${actNum}?`;
-    this.translations.ro[hintKey] = `Indiciu util pentru răspuns.`;
 
     this.translations.en[titleKey] = `Activity ${actNum}`;
     this.translations.en[descKey] = `Introductory concept for activity ${actNum}.`;
     this.translations.en[questionKey] = `Question for activity ${actNum}?`;
-    this.translations.en[hintKey] = `Helpful hint.`;
+
+    if (this.supportsHint(type)) {
+      this.translations.ro[hintKey] = `Indiciu util pentru răspuns.`;
+      this.translations.en[hintKey] = `Helpful hint.`;
+    }
 
     let newActivity: DbActivity;
 
@@ -232,6 +247,7 @@ export class AdminComponent implements OnInit {
           description: descKey,
           question: questionKey,
           hint: hintKey,
+          isPractical: false,
           options: [
             { id: 'a', text: op1Key },
             { id: 'b', text: op2Key },
@@ -251,6 +267,7 @@ export class AdminComponent implements OnInit {
           description: descKey,
           question: questionKey,
           hint: hintKey,
+          isPractical: false,
           answer: true,
           reward: { coins: 10, energy: 0 },
         };
@@ -280,6 +297,7 @@ export class AdminComponent implements OnInit {
           description: descKey,
           question: questionKey,
           hint: hintKey,
+          isPractical: false,
           categories: [
             { id: 'cat_1', label: cat1Key },
             { id: 'cat_2', label: cat2Key },
@@ -319,7 +337,7 @@ export class AdminComponent implements OnInit {
           title: titleKey,
           description: descKey,
           question: questionKey,
-          hint: hintKey,
+          isPractical: false,
           pairs: [
             { id: 'pair_1', left: l1Key, right: r1Key },
             { id: 'pair_2', left: l2Key, right: r2Key },
@@ -353,6 +371,7 @@ export class AdminComponent implements OnInit {
           description: descKey,
           question: questionKey,
           hint: hintKey,
+          isPractical: false,
           items: [
             { id: 'item_1', text: item1Key },
             { id: 'item_2', text: item2Key },
@@ -383,7 +402,7 @@ export class AdminComponent implements OnInit {
           title: titleKey,
           description: descKey,
           question: questionKey,
-          hint: hintKey,
+          isPractical: false,
           pictures: [],
           options: [
             { id: 'a', text: op1Key },
@@ -403,6 +422,7 @@ export class AdminComponent implements OnInit {
           title: titleKey,
           description: descKey,
           question: questionKey,
+          isPractical: false,
           answer: '',
           reward: { coins: 10, energy: 0 },
         };
@@ -433,6 +453,9 @@ export class AdminComponent implements OnInit {
 
   protected changeActivityType(activity: DbActivity, newType: ActivityType): void {
     activity.type = newType;
+    if (!this.supportsHint(newType)) {
+      delete activity.hint;
+    }
     if ((newType === 'MULTIPLE_CHOICE' || newType === 'PUZZLE') && !activity.options) {
       activity.options = [
         { id: 'a', text: `${activity.id}_op_1` },

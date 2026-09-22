@@ -375,20 +375,32 @@
                     >
                   </div>
 
-                  <div class="form-group full-width">
-                    <label>Indiciu (Hint - Cheie i18n):</label>
-                    <div class="i18n-input-row">
-                      <input type="text" [(ngModel)]="act.hint" placeholder="opțional" />
-                      <button
-                        class="btn btn--i18n"
-                        type="button"
-                        (click)="openTranslationModal(act.hint || '', 'Indiciu: ' + act.id)"
+                  @if (supportsHint(act.type)) {
+                    <div class="form-group full-width">
+                      <label>Indiciu (Hint - Cheie i18n):</label>
+                      <div class="i18n-input-row">
+                        <input type="text" [(ngModel)]="act.hint" placeholder="opțional" />
+                        <button
+                          class="btn btn--i18n"
+                          type="button"
+                          (click)="openTranslationModal(act.hint || '', 'Indiciu: ' + act.id)"
+                        >
+                          🌐
+                        </button>
+                      </div>
+                      <small class="preview-text"
+                        >RO: "{{ translations.ro[act.hint || ''] || '-' }}"</small
                       >
-                        🌐
-                      </button>
                     </div>
+                  }
+
+                  <div class="form-group full-width">
+                    <label class="checkbox-label">
+                      <input type="checkbox" [(ngModel)]="act.isPractical" />
+                      Activitate practică (răspunsul greșit NU scade din viață)
+                    </label>
                     <small class="preview-text"
-                      >RO: "{{ translations.ro[act.hint || ''] || '-' }}"</small
+                      >Debifat: un răspuns greșit scade din bara de viață.</small
                     >
                   </div>
 

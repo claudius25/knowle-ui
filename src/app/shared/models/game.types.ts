@@ -24,9 +24,11 @@ export interface MultipleChoiceActivityData {
   description?: string;
   options: string[];
   pictures?: string[];
+  hint?: string;
   titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
+  hintKey?: string;
 }
 
 export interface TrueFalseActivityData {
@@ -35,9 +37,11 @@ export interface TrueFalseActivityData {
   description?: string;
   options: [boolean, boolean];
   pictures?: string[];
+  hint?: string;
   titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
+  hintKey?: string;
 }
 
 export interface ClassifyItem {
@@ -56,9 +60,11 @@ export interface ClassifyActivityData {
   description?: string;
   items: ClassifyItem[];
   categories: ClassifyCategory[];
+  hint?: string;
   titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
+  hintKey?: string;
 }
 
 export interface MatchingPair {
@@ -88,9 +94,11 @@ export interface OrderingActivityData {
   title?: string;
   description?: string;
   items: OrderingItem[];
+  hint?: string;
   titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
+  hintKey?: string;
 }
 
 export interface PuzzleActivityData {
@@ -114,51 +122,41 @@ export type ActivityData =
   | OrderingActivityData
   | PuzzleActivityData;
 
-export interface MultipleChoiceActivity {
+interface ActivityBase {
   activityId: string;
   title: string;
-  type: 'MULTIPLE_CHOICE';
   difficulty: Difficulty;
+  /** Practice activity: a wrong answer does not cost health. */
+  isPractical?: boolean;
+}
+
+export interface MultipleChoiceActivity extends ActivityBase {
+  type: 'MULTIPLE_CHOICE';
   data: MultipleChoiceActivityData;
 }
 
-export interface TrueFalseActivity {
-  activityId: string;
-  title: string;
+export interface TrueFalseActivity extends ActivityBase {
   type: 'TRUE_FALSE';
-  difficulty: Difficulty;
   data: TrueFalseActivityData;
 }
 
-export interface ClassifyActivity {
-  activityId: string;
-  title: string;
+export interface ClassifyActivity extends ActivityBase {
   type: 'CLASSIFY';
-  difficulty: Difficulty;
   data: ClassifyActivityData;
 }
 
-export interface MatchingActivity {
-  activityId: string;
-  title: string;
+export interface MatchingActivity extends ActivityBase {
   type: 'MATCHING';
-  difficulty: Difficulty;
   data: MatchingActivityData;
 }
 
-export interface OrderingActivity {
-  activityId: string;
-  title: string;
+export interface OrderingActivity extends ActivityBase {
   type: 'ORDERING';
-  difficulty: Difficulty;
   data: OrderingActivityData;
 }
 
-export interface PuzzleActivity {
-  activityId: string;
-  title: string;
+export interface PuzzleActivity extends ActivityBase {
   type: 'PUZZLE';
-  difficulty: Difficulty;
   data: PuzzleActivityData;
 }
 

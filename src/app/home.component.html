@@ -37,15 +37,15 @@
 
   <footer class="home-footer" aria-label="Incepe jocul">
     @if (selectedLanguage) {
-          <!-- @if (showIntroButton) {
+      <!-- @if (showIntroButton) {
             <button class="intro-button" type="button" (click)="goToIntro()">{{ uiText.text('introButton') }}</button>
           } @else { -->
-        <g-button
-          class="home-cta w-100"
-          labelKey="introStart"
-          [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button)']"
-          (clicked)="startGame()"
-        ></g-button>
+      <g-button
+        class="home-cta w-100"
+        labelKey="introStart"
+        [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button)']"
+        (clicked)="startGame()"
+      ></g-button>
     } @else {
       <mat-button-toggle-group
         class="language-toggle-group"
@@ -101,9 +101,7 @@
             <span class="language-label">RO</span>
           </mat-button-toggle>
         </mat-button-toggle-group>
-        <div class="clear-local-storage" (click)="clearLocalStorage()">
-          Clear local storage
-        </div>
+        <div class="clear-local-storage" (click)="clearLocalStorage()">Clear local storage</div>
       </section>
     </div>
   }

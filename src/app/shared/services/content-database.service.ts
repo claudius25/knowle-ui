@@ -46,6 +46,8 @@ export interface DbActivity {
   description: string;
   question: string;
   hint?: string;
+  /** Practice activity: a wrong answer does not cost health. */
+  isPractical?: boolean;
   pictures?: string[];
   options?: DbOption[];
   categories?: DbCategory[];
@@ -383,6 +385,8 @@ export class ContentDatabaseService {
     const title = dict[act.title] ?? act.title;
     const description = dict[act.description] ?? act.description;
     const question = dict[act.question] ?? act.question;
+    const hint = act.hint ? (dict[act.hint] ?? act.hint) : undefined;
+    const isPractical = act.isPractical ?? false;
     const diff = difficulty.toLowerCase();
     const dom = domain.toLowerCase();
 
@@ -398,14 +402,17 @@ export class ContentDatabaseService {
           title,
           type: 'MULTIPLE_CHOICE',
           difficulty,
+          isPractical,
           data: {
             question,
             title,
             description,
             pictures,
+            hint,
             titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
+            hintKey: act.hint,
             options: (act.options ?? []).map((o) => dict[o.text] ?? o.text),
           },
         };
@@ -416,14 +423,17 @@ export class ContentDatabaseService {
           title,
           type: 'TRUE_FALSE',
           difficulty,
+          isPractical,
           data: {
             question,
             title,
             description,
             pictures,
+            hint,
             titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
+            hintKey: act.hint,
             options: [true, false],
           },
         };
@@ -434,13 +444,16 @@ export class ContentDatabaseService {
           title,
           type: 'CLASSIFY',
           difficulty,
+          isPractical,
           data: {
             question,
             title,
             description,
+            hint,
             titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
+            hintKey: act.hint,
             categories: (act.categories ?? []).map((c) => ({
               id: c.id,
               label: dict[c.label] ?? c.label,
@@ -458,6 +471,7 @@ export class ContentDatabaseService {
           title,
           type: 'MATCHING',
           difficulty,
+          isPractical,
           data: {
             question,
             title,
@@ -484,13 +498,16 @@ export class ContentDatabaseService {
           title,
           type: 'ORDERING',
           difficulty,
+          isPractical,
           data: {
             question,
             title,
             description,
+            hint,
             titleKey: act.title,
             descriptionKey: act.description,
             questionKey: act.question,
+            hintKey: act.hint,
             items: (act.items ?? []).map((item) => ({
               id: item.id,
               text: dict[item.text ?? ''] ?? item.text ?? '',
@@ -504,6 +521,7 @@ export class ContentDatabaseService {
           title,
           type: 'PUZZLE',
           difficulty,
+          isPractical,
           data: {
             image: pictures?.[0] ?? '',
             question,
@@ -523,6 +541,7 @@ export class ContentDatabaseService {
           title,
           type: act.type as any,
           difficulty,
+          isPractical,
           data: {
             question,
             options: [],
