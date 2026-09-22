@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { GButtonComponent } from './shared/components/g-button/g-button.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { Router } from '@angular/router';
 import { TortiComponent } from './characters/torti/torti.component';
 import { TortiCharacter } from './characters/torti/torti-character';
@@ -24,7 +25,7 @@ import { TORTI_HAPPY_LINES, pickRandomLine } from './characters/torti/torti-spee
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [TortiComponent, GButtonComponent, MatIconModule],
+  imports: [TortiComponent, GButtonComponent, MatIconModule, MatButtonToggleModule],
   templateUrl: './home.component.html',
   styleUrl: './app.css',
 })
@@ -58,9 +59,11 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   protected selectLanguage(language: Language): void {
-    this.languageService.setLanguage(language);
-    this.selectedLanguage = language;
-    this.showLanguageDialog = false;
+    setTimeout(() => {
+      this.languageService.setLanguage(language);
+      this.selectedLanguage = language;
+      this.showLanguageDialog = false;
+    }, 1000);
   }
 
   protected openLanguageDialog(): void {

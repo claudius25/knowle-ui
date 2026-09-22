@@ -23,8 +23,8 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding-bottom: 20px;
+      justify-content: space-evenly;
+      padding-bottom: 10px;
 
       .game-footer__stats_and_helpers {
         display: grid;
@@ -35,7 +35,6 @@
         display: flex;
         gap: 5px;
         justify-content: flex-end;
-        margin-top: 10px;
         g-button {
           flex: 0 0 calc((100% - 10px) / 3);
         }

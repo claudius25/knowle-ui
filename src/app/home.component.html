@@ -47,16 +47,21 @@
           (clicked)="startGame()"
         ></g-button>
     } @else {
-      <div class="language-buttons" role="group" aria-label="Selecteaza limba">
-        <g-button class="w-100" labelKey="EN" (clicked)="selectLanguage('en')"
-        [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']" [selected]="selectedLanguage === 'en'">
-          <img  class="language-flag" src="assets/home/en.png" alt="English" />
-        </g-button>
-        <g-button class="w-100" labelKey="RO" (clicked)="selectLanguage('ro')"
-        [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']" [selected]="selectedLanguage === 'ro'">
-          <img  class="language-flag" src="assets/home/ro.png" alt="Română" />
-        </g-button>
-      </div>
+      <mat-button-toggle-group
+        class="language-toggle-group"
+        aria-label="Selecteaza limba"
+        [value]="selectedLanguage"
+        (change)="selectLanguage($event.value)"
+      >
+        <mat-button-toggle value="en">
+          <img class="language-flag" src="assets/home/en.png" alt="English" />
+          <span class="language-label">EN</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="ro">
+          <img class="language-flag" src="assets/home/ro.png" alt="Română" />
+          <span class="language-label">RO</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     }
   </footer>
 
@@ -81,26 +86,21 @@
           </button>
         </header>
 
-        <div class="language-buttons" role="group" [attr.aria-label]="uiText.text('language')">
-          <g-button
-            class="w-100"
-            labelKey="EN"
-            [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']"
-            [selected]="selectedLanguage === 'en'"
-            (clicked)="selectLanguage('en')"
-          >
+        <mat-button-toggle-group
+          class="language-toggle-group"
+          [attr.aria-label]="uiText.text('language')"
+          [value]="selectedLanguage"
+          (change)="selectLanguage($event.value)"
+        >
+          <mat-button-toggle value="en">
             <img class="language-flag" src="assets/home/en.png" alt="English" />
-          </g-button>
-          <g-button
-            class="w-100"
-            labelKey="RO"
-            [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button-hover)']"
-            [selected]="selectedLanguage === 'ro'"
-            (clicked)="selectLanguage('ro')"
-          >
+            <span class="language-label">EN</span>
+          </mat-button-toggle>
+          <mat-button-toggle value="ro">
             <img class="language-flag" src="assets/home/ro.png" alt="Română" />
-          </g-button>
-        </div>
+            <span class="language-label">RO</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
         <div class="clear-local-storage" (click)="clearLocalStorage()">
           Clear local storage
         </div>

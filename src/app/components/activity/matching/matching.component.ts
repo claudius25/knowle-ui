@@ -247,8 +247,11 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
   private elementsOverlap(activityShell: HTMLElement, gameFooter: HTMLElement): boolean {
     const activityRect = activityShell.getBoundingClientRect();
     const footerRect = gameFooter.getBoundingClientRect();
-    console.log('Activity Shell Rect:', activityRect);
-    return activityRect.bottom > footerRect.top && activityRect.top < footerRect.bottom;
+    const progressBarHeight = 15;
+    return (
+      activityRect.bottom > footerRect.top - progressBarHeight &&
+      activityRect.top < footerRect.bottom
+    );
   }
 
   private getActivityShell(): HTMLElement | null {

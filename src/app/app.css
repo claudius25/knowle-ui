@@ -265,6 +265,46 @@
   width: 100%;
 }
 
+.language-toggle-group {
+  width: 100%;
+  border-radius: 999px;
+  border-color: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  --mat-standard-button-toggle-background-color: var(--home-button);
+  --mat-standard-button-toggle-text-color: #ffffff;
+  --mat-standard-button-toggle-selected-state-background-color: var(--home-button-hover);
+  --mat-standard-button-toggle-selected-state-text-color: #ffffff;
+  --mat-standard-button-toggle-divider-color: rgba(255, 255, 255, 0.25);
+  --mat-standard-button-toggle-height: 64px;
+}
+
+.language-toggle-group mat-button-toggle {
+  flex: 1 1 0;
+}
+
+.language-toggle-group ::ng-deep .mat-button-toggle-label-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  line-height: 1;
+}
+
+.language-toggle-group .language-flag {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.language-toggle-group .language-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
 .language-button.duo-button,
 .start-button.duo-button {
   min-width: 88px;
