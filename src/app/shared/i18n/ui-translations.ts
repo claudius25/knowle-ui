@@ -58,7 +58,10 @@ export type UiTextKey =
   | 'sadLine2'
   | 'sadLine3'
   | 'sadLine4'
-  | 'sadLine5';
+  | 'sadLine5'
+  | 'mapTitle'
+  | 'mapSubtitle'
+  | 'mapLocked';
 
 const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
   ro: {
@@ -121,6 +124,9 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     sadLine3: 'A fost aproape! Mai încearcă o dată.',
     sadLine4: 'Hmm, nu este corect.',
     sadLine5: 'Esti patetic!',
+    mapTitle: 'Capitole',
+    mapSubtitle: 'Alege următoarea destinație',
+    mapLocked: 'Capitol blocat',
   },
   en: {
     gameName: 'Knowledge Adventure',
@@ -182,6 +188,9 @@ const UI_TRANSLATIONS: Record<Language, Record<UiTextKey, string>> = {
     sadLine3: 'So close! Give it another shot.',
     sadLine4: 'Hmm, that is not it.',
     sadLine5: 'You are pathetic!',
+    mapTitle: 'Chapters',
+    mapSubtitle: 'Choose your next destination',
+    mapLocked: 'Locked chapter',
   },
 };
 

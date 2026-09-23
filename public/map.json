@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "chapters": [
+    {
+      "id": "geo_basics",
+      "title": "mapChapter1Title",
+      "subtitle": "mapChapter1Subtitle",
+      "icon": "☀️",
+      "image": "assets/map/01_sistemul_solar.png",
+      "startActivityId": "easy_geo_1"
+    },
+    {
+      "id": "geo_mountains",
+      "title": "mapChapter2Title",
+      "subtitle": "mapChapter2Subtitle",
+      "icon": "🌋",
+      "image": "assets/map/02_munti_si_vulcani.png"
+    },
+    {
+      "id": "geo_waters",
+      "title": "mapChapter3Title",
+      "subtitle": "mapChapter3Subtitle",
+      "icon": "🌊",
+      "image": "assets/map/03_oceane_si_rauri.png"
+    },
+    {
+      "id": "geo_plants",
+      "title": "mapChapter4Title",
+      "subtitle": "mapChapter4Subtitle",
+      "icon": "🌳",
+      "image": "assets/map/04_plante_si_copaci.png"
+    },
+    {
+      "id": "geo_animals",
+      "title": "mapChapter5Title",
+      "subtitle": "mapChapter5Subtitle",
+      "icon": "🐘",
+      "image": "assets/map/05_animalele.png"
+    },
+    {
+      "id": "geo_people",
+      "title": "mapChapter6Title",
+      "subtitle": "mapChapter6Subtitle",
+      "icon": "🏘️",
+      "image": "assets/map/06_oamenii_si_tarile.png"
+    },
+    {
+      "id": "geo_climate",
+      "title": "mapChapter7Title",
+      "subtitle": "mapChapter7Subtitle",
+      "icon": "🐻‍❄️",
+      "image": "assets/map/07_zonele_climatice.png"
+    },
+    {
+      "id": "geo_islands",
+      "title": "mapChapter8Title",
+      "subtitle": "mapChapter8Subtitle",
+      "icon": "🏝️",
+      "image": "assets/map/08_insule_si_arhipelaguri.png"
+    },
+    {
+      "id": "geo_deserts",
+      "title": "mapChapter9Title",
+      "subtitle": "mapChapter9Subtitle",
+      "icon": "🌵",
+      "image": "assets/map/09_deserturi.png"
+    },
+    {
+      "id": "geo_maps",
+      "title": "mapChapter10Title",
+      "subtitle": "mapChapter10Subtitle",
+      "icon": "🧭",
+      "image": "assets/map/10_harti_si_orientare.png"
+    }
+  ]
+}

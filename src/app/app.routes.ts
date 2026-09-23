@@ -14,6 +14,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/game/game.component').then((m) => m.GameComponent),
   },
   {
+    path: 'map',
+    loadComponent: () => import('./components/map/map.component').then((m) => m.MapComponent),
+  },
+  {
     path: 'game/:activityIndex',
     loadComponent: () => import('./components/game/game.component').then((m) => m.GameComponent),
   },

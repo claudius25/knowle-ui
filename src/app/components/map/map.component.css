@@ -1,0 +1,216 @@
+.map-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: 12px 14px 20px;
+  background: #f6f1e4;
+  overflow: hidden;
+}
+
+.map-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 2px 14px;
+  flex: 0 0 auto;
+}
+
+.map-back {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #2f6b3d;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+}
+
+.map-heading {
+  flex: 1;
+  text-align: center;
+}
+
+.map-heading h1 {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f4f6b;
+}
+
+.map-heading p {
+  margin: 2px 0 0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  color: #6b7b7f;
+}
+
+.map-coins {
+  flex: 0 0 auto;
+}
+
+.map-status {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  padding: 40px 0;
+  font-family: 'Nunito', sans-serif;
+  color: #6b7b7f;
+}
+
+.map-trail {
+  position: relative;
+  flex: 1;
+  margin: 0;
+  padding: 4px 0 4px 56px;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Dashed trail running behind the numbered badges. */
+.map-trail::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 27px;
+  width: 0;
+  border-left: 3px dashed #9dc79a;
+}
+
+.map-node {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.map-node__badge {
+  position: absolute;
+  top: 50%;
+  left: -44px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: #2f8a4b;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  box-shadow: 0 0 0 4px #f6f1e4;
+}
+
+.map-node:nth-child(even) .map-node__badge {
+  background: #2f7fb8;
+}
+
+.map-node--locked .map-node__badge {
+  background: #9aa5a8;
+}
+
+.map-card {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+  transition: transform 120ms ease;
+}
+
+.map-card:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.map-card:disabled {
+  cursor: not-allowed;
+  background: #f1eee6;
+  color: #9aa5a8;
+}
+
+.map-card__art {
+  position: relative;
+  display: grid;
+  width: 84px;
+  height: 92px;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+/* The illustrations are tall with empty space on top, so they are anchored to the bottom. */
+.map-card__art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.map-card__icon {
+  grid-area: 1 / 1;
+}
+
+.map-card__text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  font-family: 'Nunito', sans-serif;
+}
+
+.map-card__text strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1f4f6b;
+}
+
+.map-card:disabled .map-card__text strong {
+  color: #8d979a;
+}
+
+.map-card__text small {
+  font-size: 0.82rem;
+  color: #7b8a8e;
+}
+
+.map-card__state {
+  flex: 0 0 auto;
+  color: #6f8f7a;
+}
+
+.map-card:disabled .map-card__state {
+  color: #a7b0b3;
+}
+
+.loader {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(47, 138, 75, 0.25);
+  border-top-color: #2f8a4b;
+  border-radius: 50%;
+  animation: map-spin 800ms linear infinite;
+}
+
+@keyframes map-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

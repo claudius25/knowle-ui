@@ -1,0 +1,62 @@
+<main class="map-page">
+  <header class="map-header">
+    <button
+      class="map-back"
+      type="button"
+      [attr.aria-label]="uiText.text('exitConfirmNo')"
+      (click)="goBack()"
+    >
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <div class="map-heading">
+      <h1>{{ uiText.text('mapTitle') }}</h1>
+      <p>{{ uiText.text('mapSubtitle') }}</p>
+    </div>
+
+    <app-coin-display class="map-coins" [amount]="game.coins"></app-coin-display>
+  </header>
+
+  @if (loading) {
+    <div class="map-status">
+      <span class="loader" aria-hidden="true"></span>
+      <p>{{ uiText.text('loading') }}</p>
+    </div>
+  } @else {
+    <ol class="map-trail">
+      @for (chapter of chapters; track chapter.id) {
+        <li class="map-node" [class.map-node--locked]="chapter.locked">
+          <span class="map-node__badge" aria-hidden="true">{{ chapter.order }}</span>
+
+          <button
+            class="map-card"
+            type="button"
+            [disabled]="chapter.locked"
+            [attr.aria-label]="
+              chapter.locked
+                ? uiText.text('mapLocked') + ': ' + uiText.text(chapter.title)
+                : uiText.text(chapter.title)
+            "
+            (click)="openChapter(chapter)"
+          >
+            <span class="map-card__art">
+              @if (chapter.image) {
+                <img [src]="chapter.image" alt="" (error)="hideBrokenImage($event)" />
+              }
+              <span class="map-card__icon" aria-hidden="true">{{ chapter.icon }}</span>
+            </span>
+
+            <span class="map-card__text">
+              <strong>{{ uiText.text(chapter.title) }}</strong>
+              <small>{{ uiText.text(chapter.subtitle) }}</small>
+            </span>
+
+            <mat-icon class="map-card__state">{{
+              chapter.locked ? 'lock' : 'chevron_right'
+            }}</mat-icon>
+          </button>
+        </li>
+      }
+    </ol>
+  }
+</main>
