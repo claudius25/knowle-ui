@@ -1,11 +1,11 @@
 <main class="game-page">
   <section class="activity-shell" aria-live="polite">
-    @if (game.status === 'loading') {
+    @if (chapter.status === 'loading') {
       <div class="status-panel">
         <span class="loader" aria-hidden="true"></span>
         <p>{{ text('loading') }}</p>
       </div>
-    } @else if (game.status === 'error') {
+    } @else if (chapter.status === 'error') {
       <div class="status-panel error-panel">
         <span class="status-icon" aria-hidden="true">!</span>
         <h1>{{ text('errorTitle') }}</h1>
@@ -39,9 +39,9 @@
 
   <app-test-progress-bar
     class="progress-bar-container"
-    [progress]="game.progress"
-    [health]="game.health"
-    [coins]="game.coins"
+    [progress]="chapter.progress"
+    [health]="chapter.health"
+    [coins]="chapter.coins"
     (close)="confirmExit()"
   ></app-test-progress-bar>
 
@@ -50,7 +50,7 @@
     [activity]="activity"
     [mode]="footerMode"
     [checkingText]="text('checking')"
-    [sessionComplete]="game.sessionComplete"
+    [sessionComplete]="chapter.sessionComplete"
     [chapterText]="text('chapterComplete')"
     [continueText]="text('continue')"
     [retryText]="text('retry')"
@@ -59,7 +59,7 @@
     [checkText]="text('check')"
     [characterPose]="characterPose"
     [characterSpeech]="characterSpeech"
-    (chapter)="continueGame()"
+    (chapterDone)="continueGame()"
     (continue)="continueGame()"
     (retry)="retry()"
     (check)="checkAnswer()"

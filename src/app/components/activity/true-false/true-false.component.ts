@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { TrueFalseActivityModel } from '../../../shared/models/activities';
-import { GameService } from '../../../shared/services/game.service';
+import { ChapterService } from '../../../shared/services/chapter.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { MultipleChoiceComponent } from '../multiple-choice/multiple-choice.component';
 
@@ -12,7 +12,7 @@ import { MultipleChoiceComponent } from '../multiple-choice/multiple-choice.comp
 })
 export class TrueFalseComponent implements OnChanges {
   private readonly uiText = inject(UiTextService);
-  protected readonly game = inject(GameService);
+  protected readonly chapter = inject(ChapterService);
 
   @Input({ required: true }) activity!: TrueFalseActivityModel;
 

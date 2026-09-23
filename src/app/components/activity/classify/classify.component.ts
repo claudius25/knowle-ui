@@ -13,7 +13,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { ClassifyItem } from '../../../shared/models/game.types';
 import { ClassifyActivityModel } from '../../../shared/models/activities';
-import { GameService } from '../../../shared/services/game.service';
+import { ChapterService } from '../../../shared/services/chapter.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
@@ -34,7 +34,7 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 })
 export class ClassifyComponent {
   protected readonly uiText = inject(UiTextService);
-  protected readonly game = inject(GameService);
+  protected readonly chapter = inject(ChapterService);
   private readonly audioPlayer = inject(AudioPlayerService);
 
   @Input({ required: true }) activity!: ClassifyActivityModel;

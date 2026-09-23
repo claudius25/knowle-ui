@@ -3,6 +3,19 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { Router } from '@angular/router';
 import { AdminComponent } from './admin.component';
 import { DbDatabase } from '../../shared/services/content-database.service';
+import { MapDefinition } from '../../shared/services/map.service';
+
+const MOCK_MAP: MapDefinition = {
+  version: 1,
+  chapters: [
+    {
+      id: 'geo_basics',
+      title: 'mapChapter1Title',
+      subtitle: 'mapChapter1Subtitle',
+      startActivityId: 'easy_geo_1',
+    },
+  ],
+};
 
 const MOCK_DB: DbDatabase = {
   version: 1,
@@ -70,6 +83,7 @@ describe('AdminComponent', () => {
     fixture.detectChanges();
 
     // Respond to initial load
+    httpMock.expectOne('/map.json').flush(MOCK_MAP);
     httpMock.expectOne('/db/easy/geography/db.json').flush(MOCK_DB);
     httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO);
     httpMock.expectOne('/db/easy/geography/i18n/en.json').flush(MOCK_EN);
@@ -81,18 +95,21 @@ describe('AdminComponent', () => {
 
   it('should create and load database and translations', () => {
     expect(component).toBeTruthy();
+    expect(component['mapChapters'].length).toBe(1);
     expect(component['db'].chapters.length).toBe(1);
     expect(component['translations'].ro['easy_geo_chapter_1_title']).toBe('Descoperim Pământul');
     expect(component['translations'].en['easy_geo_chapter_1_title']).toBe('Discovering Earth');
   });
 
-  it('should add and remove chapters', () => {
-    expect(component['db'].chapters.length).toBe(1);
+  it('should add and remove chapters through the map', () => {
+    expect(component['mapChapters'].length).toBe(1);
     component['addChapter']();
+    expect(component['mapChapters'].length).toBe(2);
     expect(component['db'].chapters.length).toBe(2);
 
     spyOn(window, 'confirm').and.returnValue(true);
     component['removeChapter'](1);
+    expect(component['mapChapters'].length).toBe(1);
     expect(component['db'].chapters.length).toBe(1);
   });
 

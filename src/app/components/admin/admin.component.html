@@ -70,10 +70,18 @@
         📥 en.json
       </button>
       <button
+        class="btn btn--download"
+        type="button"
+        (click)="downloadMapJson()"
+        title="Descarcă map.json"
+      >
+        📥 map.json
+      </button>
+      <button
         class="btn btn--accent"
         type="button"
         (click)="downloadAllFiles()"
-        title="Descarcă toate cele 3 fișiere"
+        title="Descarcă toate fișierele"
       >
         📦 Descarcă Toate
       </button>
@@ -104,7 +112,7 @@
       [class.active]="activeTab === 'editor'"
       (click)="activeTab = 'editor'"
     >
-      📚 Capitole & Activități ({{ db.chapters.length }} capitole)
+      📚 Capitole & Activități ({{ mapChapters.length }} capitole)
     </button>
     <button
       class="tab-btn"
@@ -137,7 +145,7 @@
         </div>
 
         <ul class="chapter-list">
-          @for (ch of db.chapters; track ch.id; let i = $index) {
+          @for (entry of mapChapters; track entry.id; let i = $index) {
             <li class="chapter-list-entry">
               <div
                 class="chapter-item"
@@ -145,9 +153,11 @@
                 (click)="selectChapter(i)"
               >
                 <div class="chapter-item-info">
-                  <strong>{{ ch.id }}</strong>
-                  <span class="chapter-subtitle">{{ translations.ro[ch.title] || ch.title }}</span>
-                  <span class="activity-badge">{{ ch.activities.length }} activități</span>
+                  <strong>{{ entry.id }}</strong>
+                  <span class="chapter-subtitle">{{ uiText.text(entry.title) }}</span>
+                  <span class="activity-badge"
+                    >{{ chapterOf(entry).activities.length }} activități</span
+                  >
                 </div>
                 <button
                   class="icon-btn icon-btn--danger"
@@ -162,7 +172,7 @@
               <!-- Activities nested under the currently selected chapter -->
               @if (selectedChapterIndex === i) {
                 <ul class="activity-sublist">
-                  @for (act of ch.activities; track act.id; let actIdx = $index) {
+                  @for (act of chapterOf(entry).activities; track act.id; let actIdx = $index) {
                     <li
                       class="activity-sub-item"
                       [class.active]="selectedActivityIndex === actIdx"
@@ -178,7 +188,7 @@
                         <button
                           class="icon-btn icon-btn--danger icon-btn--tiny"
                           type="button"
-                          (click)="removeActivity(ch, actIdx)"
+                          (click)="removeActivity(chapterOf(entry), actIdx)"
                           title="Șterge activitatea"
                         >
                           🗑️
@@ -197,56 +207,73 @@
 
       <!-- Main Editor Content -->
       <section class="chapter-details">
-        @if (db.chapters[selectedChapterIndex]; as currentChapter) {
-          @if (selectedActivityIndex === -1) {
-            <!-- Chapter Metadata Card -->
-            <div class="card chapter-meta-card">
-              <div class="card-header">
-                <h3>Setări Capitol: {{ currentChapter.id }}</h3>
-              </div>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>ID Capitol:</label>
-                  <input type="text" [(ngModel)]="currentChapter.id" />
+        @if (currentMapChapter; as mapChapter) {
+          @if (currentChapter; as currentChapter) {
+            @if (selectedActivityIndex === -1) {
+              <!-- Chapter Metadata Card (stored in map.json) -->
+              <div class="card chapter-meta-card">
+                <div class="card-header">
+                  <h3>Setări Capitol: {{ mapChapter.id }}</h3>
                 </div>
-
-                <div class="form-group">
-                  <label>Titlu (Cheie i18n):</label>
-                  <div class="i18n-input-row">
-                    <input type="text" [(ngModel)]="currentChapter.title" />
-                    <button
-                      class="btn btn--i18n"
-                      type="button"
-                      (click)="openTranslationModal(currentChapter.title, 'Titlu Capitol')"
-                    >
-                      🌐 Traduceri
-                    </button>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>ID Capitol:</label>
+                    <input
+                      type="text"
+                      [ngModel]="mapChapter.id"
+                      (ngModelChange)="renameChapter(mapChapter, $event)"
+                    />
                   </div>
-                  <small class="preview-text"
-                    >RO: "{{ translations.ro[currentChapter.title] || '-' }}"</small
-                  >
-                </div>
 
-                <div class="form-group full-width">
-                  <label>Descriere (Cheie i18n):</label>
-                  <div class="i18n-input-row">
-                    <input type="text" [(ngModel)]="currentChapter.description" />
-                    <button
-                      class="btn btn--i18n"
-                      type="button"
-                      (click)="
-                        openTranslationModal(currentChapter.description, 'Descriere Capitol')
-                      "
+                  <div class="form-group">
+                    <label>Prima activitate (ID):</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="mapChapter.startActivityId"
+                      placeholder="ex: easy_geo_1"
+                    />
+                    <small class="preview-text"
+                      >Fără acest ID capitolul rămâne blocat pe hartă.</small
                     >
-                      🌐 Traduceri
-                    </button>
                   </div>
-                  <small class="preview-text"
-                    >RO: "{{ translations.ro[currentChapter.description] || '-' }}"</small
-                  >
+
+                  <div class="form-group">
+                    <label>Titlu (Cheie i18n globală):</label>
+                    <input type="text" [(ngModel)]="mapChapter.title" />
+                    <small class="preview-text">RO: "{{ uiText.text(mapChapter.title) }}"</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Subtitlu (Cheie i18n globală):</label>
+                    <input type="text" [(ngModel)]="mapChapter.subtitle" />
+                    <small class="preview-text">RO: "{{ uiText.text(mapChapter.subtitle) }}"</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Imagine (cale sub assets/):</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="mapChapter.image"
+                      placeholder="assets/map/01_sistemul_solar.png"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Iconiță (emoji de rezervă):</label>
+                    <input type="text" [(ngModel)]="mapChapter.icon" placeholder="📘" />
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label class="checkbox-label">
+                      <input type="checkbox" [(ngModel)]="mapChapter.locked" />
+                      Capitol blocat manual
+                    </label>
+                    <small class="preview-text"
+                      >Textele capitolelor se editează în public/i18n/ro.json și en.json.</small
+                    >
+                  </div>
                 </div>
               </div>
-            </div>
 
             <!-- Activities Section -->
             <div class="activities-header">
@@ -733,6 +760,7 @@
               </div>
             }
           </div>
+          }
         } @else {
           <div class="empty-state">
             <p>Niciun capitol selectat. Apasă pe "+ Capitol" pentru a începe.</p>

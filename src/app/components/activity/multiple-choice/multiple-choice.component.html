@@ -42,10 +42,14 @@
     </h3>
     <button class="settings-btn" matButton [matMenuTriggerFor]="menu">⋮</button>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item [disabled]="!activity.canUseFiftyFifty" (click)="game.useFiftyFifty()">
+      <button
+        mat-menu-item
+        [disabled]="!activity.canUseFiftyFifty"
+        (click)="chapter.useFiftyFifty()"
+      >
         {{ uiText.text('fifty') }}
       </button>
-      <button mat-menu-item [disabled]="!activity.canUseHint" (click)="game.showHint()">
+      <button mat-menu-item [disabled]="!activity.canUseHint" (click)="chapter.showHint()">
         {{ uiText.text('hint') }}
       </button>
     </mat-menu>

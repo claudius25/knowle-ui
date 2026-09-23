@@ -15,6 +15,8 @@ import {
   DbPair,
 } from '../../shared/services/content-database.service';
 import { ActivityType, Difficulty } from '../../shared/models/game.types';
+import { MapChapterEntry, MapDefinition } from '../../shared/services/map.service';
+import { UiTextService } from '../../shared/services/ui-text.service';
 
 interface ActiveTranslationModal {
   key: string;
@@ -33,10 +35,14 @@ interface ActiveTranslationModal {
 export class AdminComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  protected readonly uiText = inject(UiTextService);
 
   // Selector state
   protected difficulty: Difficulty = 'EASY';
   protected domain = 'geography';
+
+  // Chapters come from the shared map, activities from the domain database
+  protected chapterMap: MapDefinition = { version: 1, chapters: [] };
 
   // Loaded database & translation dictionaries
   protected db: DbDatabase = {
@@ -88,7 +94,48 @@ export class AdminComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadChapterMap();
     this.loadCurrentDatabase();
+  }
+
+  private loadChapterMap(): void {
+    this.http.get<MapDefinition>('/map.json').subscribe({
+      next: (definition) => {
+        this.chapterMap = definition;
+      },
+      error: () => {
+        this.chapterMap = { version: 1, chapters: [] };
+      },
+    });
+  }
+
+  /** Chapters declared in map.json, the single source of truth for the chapter list. */
+  protected get mapChapters(): MapChapterEntry[] {
+    return this.chapterMap.chapters;
+  }
+
+  protected get currentMapChapter(): MapChapterEntry | null {
+    return this.chapterMap.chapters[this.selectedChapterIndex] ?? null;
+  }
+
+  /** Activities of a map chapter, created in the domain database on first use. */
+  protected chapterOf(entry: MapChapterEntry): DbChapter {
+    let chapter = this.db.chapters.find((c) => c.id === entry.id);
+    if (!chapter) {
+      chapter = {
+        id: entry.id,
+        title: entry.title,
+        description: entry.subtitle,
+        activities: [],
+      };
+      this.db.chapters.push(chapter);
+    }
+    return chapter;
+  }
+
+  protected get currentChapter(): DbChapter | null {
+    const entry = this.currentMapChapter;
+    return entry ? this.chapterOf(entry) : null;
   }
 
   protected loadCurrentDatabase(): void {
@@ -154,37 +201,49 @@ export class AdminComponent implements OnInit {
     this.translations.en[`${diff}_${dom}_chapter_1_desc`] = 'Description of the new chapter.';
   }
 
-  // --- Chapter Operations ---
+  // --- Chapter Operations (map.json is the source of truth) ---
   protected addChapter(): void {
-    const diff = this.difficulty.toLowerCase();
     const dom = this.domain.toLowerCase();
-    const chapterNum = this.db.chapters.length + 1;
+    const chapterNum = this.chapterMap.chapters.length + 1;
     const chapterId = `${dom}_chapter_${chapterNum}`;
-    const titleKey = `${diff}_${dom}_chapter_${chapterNum}_title`;
-    const descKey = `${diff}_${dom}_chapter_${chapterNum}_desc`;
 
-    const newChapter: DbChapter = {
+    const entry: MapChapterEntry = {
       id: chapterId,
-      title: titleKey,
-      description: descKey,
-      activities: [],
+      title: `mapChapter${chapterNum}Title`,
+      subtitle: `mapChapter${chapterNum}Subtitle`,
+      icon: '📘',
     };
 
-    this.db.chapters.push(newChapter);
-    this.selectedChapterIndex = this.db.chapters.length - 1;
-
-    this.translations.ro[titleKey] = `Capitolul ${chapterNum}`;
-    this.translations.ro[descKey] = `Descrierea capitolului ${chapterNum}.`;
-    this.translations.en[titleKey] = `Chapter ${chapterNum}`;
-    this.translations.en[descKey] = `Description for chapter ${chapterNum}.`;
+    this.chapterMap.chapters.push(entry);
+    this.chapterOf(entry);
+    this.selectedChapterIndex = this.chapterMap.chapters.length - 1;
+    this.selectedActivityIndex = -1;
   }
 
   protected removeChapter(index: number): void {
-    if (confirm(`Ești sigur că vrei să ștergi capitolul "${this.db.chapters[index].id}"?`)) {
-      this.db.chapters.splice(index, 1);
-      if (this.selectedChapterIndex >= this.db.chapters.length) {
-        this.selectedChapterIndex = Math.max(0, this.db.chapters.length - 1);
-      }
+    const entry = this.chapterMap.chapters[index];
+    if (!entry || !confirm(`Ești sigur că vrei să ștergi capitolul "${entry.id}"?`)) {
+      return;
+    }
+
+    this.chapterMap.chapters.splice(index, 1);
+    const dbIndex = this.db.chapters.findIndex((c) => c.id === entry.id);
+    if (dbIndex !== -1) {
+      this.db.chapters.splice(dbIndex, 1);
+    }
+
+    if (this.selectedChapterIndex >= this.chapterMap.chapters.length) {
+      this.selectedChapterIndex = Math.max(0, this.chapterMap.chapters.length - 1);
+    }
+    this.selectedActivityIndex = -1;
+  }
+
+  /** Keeps the domain chapter aligned when its map entry is renamed. */
+  protected renameChapter(entry: MapChapterEntry, newId: string): void {
+    const chapter = this.db.chapters.find((c) => c.id === entry.id);
+    entry.id = newId;
+    if (chapter) {
+      chapter.id = newId;
     }
   }
 
@@ -753,10 +812,16 @@ export class AdminComponent implements OnInit {
     this.triggerDownload(jsonStr, 'en.json', 'application/json');
   }
 
+  protected downloadMapJson(): void {
+    const jsonStr = JSON.stringify(this.chapterMap, null, 2);
+    this.triggerDownload(jsonStr, 'map.json', 'application/json');
+  }
+
   protected downloadAllFiles(): void {
     this.downloadDbJson();
     setTimeout(() => this.downloadRoJson(), 200);
     setTimeout(() => this.downloadEnJson(), 400);
+    setTimeout(() => this.downloadMapJson(), 600);
   }
 
   // --- Copy directly to the local gnosy-ui files via gnosy-deepl's /writeassets ---
@@ -774,6 +839,7 @@ export class AdminComponent implements OnInit {
       db: this.db,
       en: this.translations.en,
       ro: this.translations.ro,
+      map: this.chapterMap,
     };
 
     this.http

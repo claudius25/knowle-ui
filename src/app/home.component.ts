@@ -51,7 +51,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   protected hasSavedGame = false;
 
   ngOnInit(): void {
-    this.hasSavedGame = this.game.hasSavedSession;
+    this.hasSavedGame = this.game.hasSavedChapter;
   }
 
   protected text(key: Parameters<UiTextService['text']>[0]): string {
@@ -86,9 +86,11 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   protected startGame(): void {
-    if (this.selectedLanguage) {
-      this.router.navigate(['/game']);
+    if (!this.selectedLanguage) {
+      return;
     }
+
+    this.router.navigate([this.hasSavedGame ? '/game' : '/map']);
   }
 
   protected goToIntro(): void {

@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
-import { MapChapter, MapService } from '../../shared/services/map.service';
+import { MapChapter } from '../../shared/services/map.service';
 import { GameService } from '../../shared/services/game.service';
 import { UiTextService } from '../../shared/services/ui-text.service';
 
@@ -14,16 +14,15 @@ import { UiTextService } from '../../shared/services/ui-text.service';
   styleUrl: './map.component.css',
 })
 export class MapComponent implements OnInit {
-  private readonly mapService = inject(MapService);
   private readonly router = inject(Router);
   protected readonly game = inject(GameService);
   protected readonly uiText = inject(UiTextService);
 
-  protected chapters: MapChapter[] = [];
+  protected chapters: readonly MapChapter[] = [];
   protected loading = true;
 
   ngOnInit(): void {
-    this.mapService.loadChapters().subscribe({
+    this.game.loadChapters().subscribe({
       next: (chapters) => {
         this.chapters = chapters;
         this.loading = false;
@@ -35,11 +34,11 @@ export class MapComponent implements OnInit {
   }
 
   protected openChapter(chapter: MapChapter): void {
-    if (chapter.locked || !chapter.startActivityId) {
+    if (chapter.locked) {
       return;
     }
 
-    this.router.navigate(['/game', chapter.startActivityId]);
+    this.router.navigate(['/game'], { queryParams: { chapter: chapter.id } });
   }
 
   protected goBack(): void {

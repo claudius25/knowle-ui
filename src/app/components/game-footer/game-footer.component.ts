@@ -5,7 +5,7 @@ import { TortiComponent } from '../../characters/torti/torti.component';
 import { TortiPose } from '../../characters/torti/torti.types';
 import { ChapterButtonComponent } from '../ui/chapter-button/chapter-button.component';
 import { ActivityModel } from '../../shared/models/activities';
-import { GameService } from '../../shared/services/game.service';
+import { ChapterService } from '../../shared/services/chapter.service';
 
 @Component({
   selector: 'app-game-footer',
@@ -35,11 +35,11 @@ export class GameFooterComponent {
   @Input() characterPose: TortiPose = 'idle';
   @Input() characterSpeech = '';
 
-  protected readonly game = inject(GameService);
+  protected readonly chapter = inject(ChapterService);
   private _bottomSheet: MatBottomSheet = inject(MatBottomSheet);
 
   @Output() continue = new EventEmitter<void>();
   @Output() retry = new EventEmitter<void>();
-  @Output() chapter = new EventEmitter<void>();
+  @Output() chapterDone = new EventEmitter<void>();
   @Output() check = new EventEmitter<void>();
 }

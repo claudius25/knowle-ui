@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
-import { GameService } from './game.service';
+import { ChapterService } from './chapter.service';
 import { ContentDatabaseService, DbDatabase } from './content-database.service';
 import { Activity, AnswerResponse } from '../models/game.types';
 import { MultipleChoiceActivityModel } from '../models/activities';
@@ -50,8 +50,8 @@ function mockActivity(activityId: string): Activity {
   };
 }
 
-describe('GameService', () => {
-  let service: GameService;
+describe('ChapterService', () => {
+  let service: ChapterService;
   let contentDbSpy: jasmine.SpyObj<ContentDatabaseService>;
 
   beforeEach(() => {
@@ -66,13 +66,13 @@ describe('GameService', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        GameService,
+        ChapterService,
         { provide: ContentDatabaseService, useValue: spy },
         { provide: MatDialog, useValue: jasmine.createSpyObj('MatDialog', ['open']) },
       ],
     });
 
-    service = TestBed.inject(GameService);
+    service = TestBed.inject(ChapterService);
     contentDbSpy = TestBed.inject(ContentDatabaseService) as jasmine.SpyObj<ContentDatabaseService>;
   });
 
@@ -86,7 +86,7 @@ describe('GameService', () => {
       expect(model.activityId).toBe('easy_geo_1');
       expect(service.status).toBe('playing');
       expect(service.coins).toBe(0);
-      expect(service.health).toBe(GameService.MAX_HEALTH);
+      expect(service.health).toBe(ChapterService.MAX_HEALTH);
       done();
     });
   });
@@ -100,9 +100,9 @@ describe('GameService', () => {
 
       service.submitAnswer().subscribe((correct) => {
         expect(correct).toBeTrue();
-        expect(service.coins).toBe(GameService.COINS_PER_CORRECT_ANSWER);
-        expect(service.health).toBe(GameService.MAX_HEALTH);
-        expect(model.coinsDelta).toBe(GameService.COINS_PER_CORRECT_ANSWER);
+        expect(service.coins).toBe(ChapterService.COINS_PER_CORRECT_ANSWER);
+        expect(service.health).toBe(ChapterService.MAX_HEALTH);
+        expect(model.coinsDelta).toBe(ChapterService.COINS_PER_CORRECT_ANSWER);
         done();
       });
     });
@@ -116,8 +116,8 @@ describe('GameService', () => {
       (model as MultipleChoiceActivityModel).selectLabel('Marte');
 
       service.submitAnswer().subscribe(() => {
-        expect(service.health).toBe(GameService.MAX_HEALTH - GameService.HEALTH_LOSS_PER_MISTAKE);
-        expect(model.healthLost).toBe(GameService.HEALTH_LOSS_PER_MISTAKE);
+        expect(service.health).toBe(ChapterService.MAX_HEALTH - ChapterService.HEALTH_LOSS_PER_MISTAKE);
+        expect(model.healthLost).toBe(ChapterService.HEALTH_LOSS_PER_MISTAKE);
         done();
       });
     });
@@ -133,7 +133,7 @@ describe('GameService', () => {
         const coinsBefore = service.coins;
         service.retry();
 
-        expect(service.coins).toBe(coinsBefore - GameService.COINS_LOST_PER_RETRY);
+        expect(service.coins).toBe(coinsBefore - ChapterService.COINS_LOST_PER_RETRY);
         expect(model.retryCount).toBe(1);
         expect(model.selectedAnswer).toBeNull();
         expect(service.status).toBe('playing');
@@ -152,7 +152,7 @@ describe('GameService', () => {
       expect(choice.fiftyFiftyUsed).toBeTrue();
       expect(choice.eliminatedLabels.size).toBe(2);
       expect(choice.eliminatedLabels.has('Pământ')).toBeFalse();
-      expect(service.coins).toBe(-GameService.COINS_LOST_PER_FIFTY_FIFTY);
+      expect(service.coins).toBe(-ChapterService.COINS_LOST_PER_FIFTY_FIFTY);
       done();
     });
   });
@@ -169,7 +169,7 @@ describe('GameService', () => {
           expect(service.outcomes[0]).toEqual({
             activityId: 'easy_geo_1',
             correct: true,
-            coinsDelta: GameService.COINS_PER_CORRECT_ANSWER,
+            coinsDelta: ChapterService.COINS_PER_CORRECT_ANSWER,
             healthLost: 0,
           });
           expect(next?.activityId).toBe('easy_geo_2');

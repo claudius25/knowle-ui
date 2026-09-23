@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { PuzzleActivityModel } from '../../../shared/models/activities';
-import { GameService } from '../../../shared/services/game.service';
+import { ChapterService } from '../../../shared/services/chapter.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
@@ -26,7 +26,7 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 })
 export class PuzzleComponent implements OnChanges {
   protected readonly uiText = inject(UiTextService);
-  protected readonly game = inject(GameService);
+  protected readonly chapter = inject(ChapterService);
   private readonly audioPlayer = inject(AudioPlayerService);
 
   protected readonly gridSize = 3;

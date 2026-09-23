@@ -1,154 +1,115 @@
 import { Injectable, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Observable, map, of, switchMap, tap, throwError } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { Difficulty } from '../models/game.types';
-import {
-  ActivityModel,
-  ActivityProgress,
-  ChoiceActivityModel,
-  createActivityModel,
-} from '../models/activities';
-import { ContentDatabaseService } from './content-database.service';
-import { HintDialogComponent } from '../components/hint-dialog/hint-dialog.component';
+import { ActivityModel } from '../models/activities';
+import { ChapterService } from './chapter.service';
+import { MapChapter, MapService } from './map.service';
 
-export type GameStatus = 'idle' | 'loading' | 'playing' | 'checking' | 'answered' | 'error';
-
-export interface GameSessionOptions {
-  difficulty?: Difficulty;
-  domain?: string;
-  /** Serves the activities in random order instead of the chapter order. */
-  random?: boolean;
-  /** Number of activities to play in this session. */
-  activityCount?: number;
-  /** 1-based index or activity id to start the ordered session from. */
-  startFrom?: string | number;
-}
-
-export interface ActivityOutcome {
-  activityId: string;
-  correct: boolean;
-  coinsDelta: number;
-  healthLost: number;
-}
-
-/** Everything needed to pick an interrupted session back up after a reload. */
-interface GameSnapshot {
-  version: 1;
-  difficulty: Difficulty;
-  domain: string;
-  random: boolean;
-  activityCount: number;
-  /** Ids still waiting after the current one. */
-  queue: string[];
-  currentActivityId: string | null;
-  currentProgress: ActivityProgress | null;
+/** Per-chapter result kept across the whole game. */
+export interface ChapterProgress {
+  chapterId: string;
+  completed: boolean;
   coins: number;
   health: number;
-  completedActivities: number;
-  outcomes: ActivityOutcome[];
 }
 
 /**
- * Game engine: owns the session, builds and serves the activity models,
- * verifies the answers and keeps the coin/health ledger.
+ * Owns the game across all chapters: reads the chapter list from map.json,
+ * tracks which ones are unlocked or finished and hands one over to the
+ * ChapterService to be played.
  */
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  private readonly contentDb = inject(ContentDatabaseService);
-  private readonly dialog = inject(MatDialog);
+  private readonly mapService = inject(MapService);
+  private readonly chapterService = inject(ChapterService);
 
-  static readonly ACTIVITIES_PER_SESSION = 10;
-  static readonly MAX_HEALTH = 100;
-  static readonly COINS_PER_CORRECT_ANSWER = 10;
-  static readonly COINS_LOST_PER_RETRY = 5;
-  static readonly COINS_LOST_PER_HINT = 5;
-  static readonly COINS_LOST_PER_FIFTY_FIFTY = 5;
-  static readonly HEALTH_LOSS_PER_MISTAKE = 20;
-  private static readonly STORAGE_KEY = 'knowle-game-session';
+  private static readonly STORAGE_KEY = 'knowle-game-progress';
 
-  private difficulty: Difficulty = 'EASY';
-  private domain = 'geography';
-  private randomMode = false;
-  private activityCount = GameService.ACTIVITIES_PER_SESSION;
-  /** Ids still to be served, in the order they will be played. */
-  private queue: string[] = [];
+  private _chapters: MapChapter[] = [];
+  private progress = new Map<string, ChapterProgress>();
 
-  private _status: GameStatus = 'idle';
-  private _activity: ActivityModel | null = null;
-  private _coins = 0;
-  private _health = GameService.MAX_HEALTH;
-  private _completedActivities = 0;
-  private readonly _outcomes: ActivityOutcome[] = [];
-
-  get status(): GameStatus {
-    return this._status;
+  constructor() {
+    this.progress = this.readProgress();
   }
 
-  get activity(): ActivityModel | null {
-    return this._activity;
+  /** Chapters declared in map.json, in their authored order. */
+  get chapters(): readonly MapChapter[] {
+    return this._chapters;
   }
 
-  get coins(): number {
-    return this._coins;
+  /** Chapter currently being played, if any. */
+  get currentChapter(): MapChapter | null {
+    const id = this.chapterService.currentChapterId;
+    return this._chapters.find((chapter) => chapter.id === id) ?? null;
   }
 
-  get health(): number {
-    return this._health;
+  get totalCoins(): number {
+    return [...this.progress.values()].reduce((sum, entry) => sum + entry.coins, 0);
   }
 
-  get completedActivities(): number {
-    return this._completedActivities;
+  get completedChapterCount(): number {
+    return [...this.progress.values()].filter((entry) => entry.completed).length;
   }
 
-  /** Coin/health ledger of every activity already completed in this session. */
-  get outcomes(): readonly ActivityOutcome[] {
-    return this._outcomes;
+  /** True when an interrupted chapter run can be picked back up. */
+  get hasSavedChapter(): boolean {
+    return this.chapterService.hasSavedSession;
   }
 
-  get isRandomMode(): boolean {
-    return this.randomMode;
+  loadChapters(): Observable<readonly MapChapter[]> {
+    return this.mapService.loadChapters().pipe(
+      map((chapters) => this.withUnlocking(chapters)),
+      tap((chapters) => (this._chapters = chapters)),
+    );
   }
 
-  get progress(): number {
-    return (this._completedActivities / this.activityCount) * 100;
+  isCompleted(chapterId: string): boolean {
+    return this.progress.get(chapterId)?.completed ?? false;
   }
 
-  get sessionComplete(): boolean {
-    return this._completedActivities >= this.activityCount || this.queue.length === 0;
+  getProgress(chapterId: string): ChapterProgress | null {
+    return this.progress.get(chapterId) ?? null;
   }
 
-  get isOutOfHealth(): boolean {
-    return this._health <= 0;
+  /** Starts a run of the given chapter, or resumes the stored one when it matches. */
+  startChapter(
+    chapterId: string,
+    options: { difficulty?: Difficulty; domain?: string; random?: boolean } = {},
+  ): Observable<ActivityModel> {
+    return this.chapterService.startSession({
+      chapterId,
+      difficulty: options.difficulty,
+      domain: options.domain,
+      random: options.random,
+    });
   }
 
-  /** True when an unfinished session is stored and can be resumed. */
-  get hasSavedSession(): boolean {
-    return this.readSnapshot() !== null;
+  resumeChapter(): Observable<ActivityModel> {
+    return this.chapterService.resumeSession();
   }
 
-  /** Restores the stored session and re-serves the activity it was interrupted on. */
-  resumeSession(): Observable<ActivityModel> {
-    const snapshot = this.readSnapshot();
-    if (!snapshot?.currentActivityId) {
-      return throwError(() => new Error('No session to resume'));
+  /** Records the outcome of the chapter that just ended and unlocks the next one. */
+  completeCurrentChapter(): void {
+    const chapterId = this.chapterService.currentChapterId;
+    if (!chapterId) {
+      return;
     }
 
-    this.difficulty = snapshot.difficulty;
-    this.domain = snapshot.domain;
-    this.randomMode = snapshot.random;
-    this.activityCount = snapshot.activityCount;
-    this.queue = [...snapshot.queue];
-    this._coins = snapshot.coins;
-    this._health = snapshot.health;
-    this._completedActivities = snapshot.completedActivities;
-    this._outcomes.length = 0;
-    this._outcomes.push(...snapshot.outcomes);
+    this.progress.set(chapterId, {
+      chapterId,
+      completed: true,
+      coins: this.chapterService.coins,
+      health: this.chapterService.health,
+    });
 
-    return this.serve(snapshot.currentActivityId, snapshot.currentProgress);
+    this.writeProgress();
+    this._chapters = this.withUnlocking(this._chapters);
   }
 
-  /** Drops the stored session so the next start begins from scratch. */
-  clearSession(): void {
+  resetProgress(): void {
+    this.progress.clear();
+    this.chapterService.clearSession();
+    this._chapters = this.withUnlocking(this._chapters);
     try {
       localStorage.removeItem(GameService.STORAGE_KEY);
     } catch {
@@ -156,282 +117,34 @@ export class GameService {
     }
   }
 
-  /** Builds the activity queue and serves the first activity. */
-  startSession(options: GameSessionOptions = {}): Observable<ActivityModel> {
-    this.difficulty = options.difficulty ?? 'EASY';
-    this.domain = options.domain ?? 'geography';
-    this.randomMode = options.random ?? false;
-    this.activityCount = options.activityCount ?? GameService.ACTIVITIES_PER_SESSION;
-
-    this._status = 'loading';
-    this._activity = null;
-    this._coins = 0;
-    this._health = GameService.MAX_HEALTH;
-    this._completedActivities = 0;
-    this._outcomes.length = 0;
-    this.queue = [];
-    this.clearSession();
-
-    return this.contentDb.loadDatabase(this.difficulty, this.domain).pipe(
-      switchMap((db) => {
-        const ids = db.chapters.flatMap((chapter) => chapter.activities).map((act) => act.id);
-        if (ids.length === 0) {
-          this._status = 'error';
-          return throwError(() => new Error('No activities available'));
-        }
-
-        this.queue = this.randomMode
-          ? shuffle(ids)
-          : ids.slice(startIndexOf(ids, options.startFrom));
-        return this.serveNext();
-      }),
-    );
-  }
-
-  /** Counts the current activity as done and serves the following one. */
-  advance(): Observable<ActivityModel | null> {
-    if (this._activity) {
-      this._outcomes.push({
-        activityId: this._activity.activityId,
-        correct: this._activity.isCorrect,
-        coinsDelta: this._activity.coinsDelta,
-        healthLost: this._activity.healthLost,
-      });
-      this._completedActivities += 1;
-    }
-
-    if (this.sessionComplete) {
-      this._activity = null;
-      this._status = 'idle';
-      this.clearSession();
-      return of(null);
-    }
-
-    return this.serveNext();
-  }
-
-  /** Verifies the answer staged on the current activity and applies its coin/health cost. */
-  submitAnswer(): Observable<boolean> {
-    const activity = this._activity;
-    if (!activity || this._status !== 'playing') {
-      return of(false);
-    }
-
-    const answer = activity.prepareSubmission();
-    if (answer === null) {
-      return of(false);
-    }
-
-    this._status = 'checking';
-    return this.contentDb.submitAnswer(activity.activityId, answer, this.difficulty).pipe(
-      map((response) => response.correct),
-      tap({
-        next: (correct) => {
-          activity.markAnswered(correct);
-          this._status = 'answered';
-
-          if (correct) {
-            this.addCoins(activity, GameService.COINS_PER_CORRECT_ANSWER);
-            return;
-          }
-
-          if (activity.isPractical) {
-            this.loseHealth(activity, GameService.HEALTH_LOSS_PER_MISTAKE);
-            return;
-          }
-
-          this.persist();
-        },
-        error: () => {
-          activity.submitting = false;
-          this._status = 'error';
-        },
-      }),
-    );
-  }
-
-  /** Lets the player attempt the current activity again, for a coin fee. */
-  retry(): void {
-    const activity = this._activity;
-    if (!activity?.isAnswered || activity.isCorrect) {
-      return;
-    }
-
-    this.addCoins(activity, -GameService.COINS_LOST_PER_RETRY);
-    activity.retry();
-    this._status = 'playing';
-  }
-
-  /** Reveals the hint of the current activity in a dialog, for a coin fee. */
-  showHint(): void {
-    const activity = this._activity;
-    if (!activity?.canUseHint) {
-      return;
-    }
-
-    const hint = activity.useHint();
-    if (!hint) {
-      return;
-    }
-
-    this.addCoins(activity, -GameService.COINS_LOST_PER_HINT);
-    this.dialog.open(HintDialogComponent, {
-      data: { hint },
-      panelClass: 'hint-dialog-panel',
-      autoFocus: false,
-      maxWidth: '90vw',
-      width: '420px',
+  /** A chapter opens once it has content and the previous one has been completed. */
+  private withUnlocking(chapters: readonly MapChapter[]): MapChapter[] {
+    let unlocked = true;
+    return chapters.map((chapter) => {
+      const locked = chapter.locked || !unlocked;
+      unlocked = this.isCompleted(chapter.id);
+      return { ...chapter, locked };
     });
   }
 
-  /** Removes half of the wrong options of the current activity, for a coin fee. */
-  useFiftyFifty(): void {
-    const activity = this._activity;
-    if (!(activity instanceof ChoiceActivityModel) || !activity.canUseFiftyFifty) {
-      return;
-    }
-
-    this.contentDb
-      .getWrongOptionLabels(activity.activityId, this.difficulty, this.domain)
-      .subscribe((wrongLabels) => {
-        const toRemove = shuffle(wrongLabels).slice(
-          0,
-          Math.max(1, Math.floor(activity.optionLabels.length / 2)),
-        );
-        if (toRemove.length === 0) {
-          return;
-        }
-
-        activity.useFiftyFifty(toRemove);
-        this.addCoins(activity, -GameService.COINS_LOST_PER_FIFTY_FIFTY);
-      });
-  }
-
-  private serveNext(): Observable<ActivityModel> {
-    const activityId = this.queue.shift();
-    if (!activityId) {
-      this._status = 'error';
-      return throwError(() => new Error('No activity left to serve'));
-    }
-
-    return this.serve(activityId, null);
-  }
-
-  private serve(activityId: string, progress: ActivityProgress | null): Observable<ActivityModel> {
-    this._status = 'loading';
-    this._activity = null;
-
-    return this.contentDb.getActivity(activityId, this.difficulty, this.domain).pipe(
-      map((activity) => createActivityModel(activity)),
-      tap({
-        next: (model) => {
-          if (progress) {
-            model.restore(progress);
-          }
-          this._activity = model;
-          this._status = 'playing';
-          this.persist();
-        },
-        error: () => {
-          this._status = 'error';
-          // The stored session points at content we can no longer load.
-          this.clearSession();
-        },
-      }),
-    );
-  }
-
-  private addCoins(activity: ActivityModel, amount: number): void {
-    activity.coinsDelta += amount;
-    this._coins += amount;
-    this.persist();
-  }
-
-  private loseHealth(activity: ActivityModel, amount: number): void {
-    const applied = Math.min(amount, this._health);
-    activity.healthLost += applied;
-    this._health -= applied;
-    this.persist();
-  }
-
-  private persist(): void {
-    if (!this._activity) {
-      return;
-    }
-
-    const snapshot: GameSnapshot = {
-      version: 1,
-      difficulty: this.difficulty,
-      domain: this.domain,
-      random: this.randomMode,
-      activityCount: this.activityCount,
-      queue: [...this.queue],
-      currentActivityId: this._activity.activityId,
-      currentProgress: this._activity.toProgress(),
-      coins: this._coins,
-      health: this._health,
-      completedActivities: this._completedActivities,
-      outcomes: [...this._outcomes],
-    };
-
+  private readProgress(): Map<string, ChapterProgress> {
     try {
-      localStorage.setItem(GameService.STORAGE_KEY, JSON.stringify(snapshot));
+      const raw = localStorage.getItem(GameService.STORAGE_KEY);
+      if (!raw) {
+        return new Map();
+      }
+      const entries = JSON.parse(raw) as ChapterProgress[];
+      return new Map(entries.map((entry) => [entry.chapterId, entry]));
     } catch {
-      // localStorage unavailable (e.g. private mode) - the session just won't survive a reload.
+      return new Map();
     }
   }
 
-  private readSnapshot(): GameSnapshot | null {
-    let raw: string | null = null;
+  private writeProgress(): void {
     try {
-      raw = localStorage.getItem(GameService.STORAGE_KEY);
+      localStorage.setItem(GameService.STORAGE_KEY, JSON.stringify([...this.progress.values()]));
     } catch {
-      return null;
-    }
-
-    if (!raw) {
-      return null;
-    }
-
-    try {
-      const snapshot = JSON.parse(raw) as GameSnapshot;
-      return snapshot.version === 1 && snapshot.currentActivityId ? snapshot : null;
-    } catch {
-      this.clearSession();
-      return null;
+      // localStorage unavailable (e.g. private mode) - progress just won't persist.
     }
   }
-}
-
-/** Returns a copy in random order. */
-function shuffle<T>(items: readonly T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
-/** Resolves a 1-based index or an activity id into a position in the ordered list. */
-function startIndexOf(ids: readonly string[], startFrom?: string | number): number {
-  if (startFrom === undefined) {
-    return 0;
-  }
-
-  if (typeof startFrom === 'number') {
-    return clamp(startFrom - 1, ids.length);
-  }
-
-  const parsed = parseInt(startFrom.trim(), 10);
-  if (!isNaN(parsed)) {
-    return clamp(parsed - 1, ids.length);
-  }
-
-  const found = ids.indexOf(startFrom.trim());
-  return found === -1 ? 0 : found;
-}
-
-function clamp(index: number, length: number): number {
-  return Math.max(0, Math.min(index, Math.max(0, length - 1)));
 }

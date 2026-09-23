@@ -7,6 +7,7 @@ import { OrderingComponent } from '../activity/ordering/ordering.component';
 import { MultipleChoiceComponent } from '../activity/multiple-choice/multiple-choice.component';
 import { TrueFalseComponent } from '../activity/true-false/true-false.component';
 import { PuzzleComponent } from '../activity/puzzle/puzzle.component';
+import { ChapterService } from '../../shared/services/chapter.service';
 import { GameService } from '../../shared/services/game.service';
 import { GameFooterComponent } from '../game-footer/game-footer.component';
 import { UiTextService } from '../../shared/services/ui-text.service';
@@ -46,7 +47,8 @@ import { GButtonComponent } from '../../shared/components/g-button/g-button.comp
   styleUrl: './game.component.css',
 })
 export class GameComponent implements OnInit, OnDestroy {
-  protected readonly game = inject(GameService);
+  protected readonly chapter = inject(ChapterService);
+  private readonly game = inject(GameService);
   protected readonly uiText = inject(UiTextService);
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly router = inject(Router);
@@ -57,7 +59,7 @@ export class GameComponent implements OnInit, OnDestroy {
   protected showExitConfirm = false;
 
   protected get activity() {
-    return this.game.activity;
+    return this.chapter.activity;
   }
 
   protected get characterPose(): TortiPose {
@@ -109,7 +111,7 @@ export class GameComponent implements OnInit, OnDestroy {
     | 'classify'
     | 'matching'
     | 'ordering' {
-    if (this.game.status === 'checking') {
+    if (this.chapter.status === 'checking') {
       return 'checking';
     }
     if (this.activity?.answerState === 'correct') {
@@ -131,9 +133,9 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   protected checkAnswer(): void {
-    this.game.submitAnswer().subscribe({
+    this.chapter.submitAnswer().subscribe({
       next: (correct) => {
-        if (this.game.status !== 'answered') {
+        if (this.chapter.status !== 'answered') {
           return;
         }
         this.reactToAnswer(correct);
@@ -145,7 +147,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   protected get isCheckDisabled(): boolean {
-    return this.game.status === 'checking' || !this.activity?.isReadyToSubmit;
+    return this.chapter.status === 'checking' || !this.activity?.isReadyToSubmit;
   }
 
   ngOnDestroy(): void {
@@ -156,13 +158,14 @@ export class GameComponent implements OnInit, OnDestroy {
     this.audioPlayer.stop();
     this.characterSpeech = '';
 
-    this.game.advance().subscribe({
+    this.chapter.advance().subscribe({
       next: (activity) => {
         if (!activity) {
+          this.game.completeCurrentChapter();
           this.router.navigate(['/chapter-done'], {
             state: {
-              coins: this.game.coins,
-              health: this.game.health,
+              coins: this.chapter.coins,
+              health: this.chapter.health,
             },
           });
         }
@@ -176,7 +179,7 @@ export class GameComponent implements OnInit, OnDestroy {
   protected retry(): void {
     this.audioPlayer.stop();
     this.characterSpeech = '';
-    this.game.retry();
+    this.chapter.retry();
   }
 
   protected reload(): void {
@@ -202,18 +205,17 @@ export class GameComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.characterSpeech = '';
 
-    const activityParam = this.route.snapshot.paramMap.get('activityIndex');
+    const chapterId = this.route.snapshot.queryParamMap.get('chapter');
     const random = this.route.snapshot.queryParamMap.get('mode') === 'random';
 
-    // An explicit starting point always begins a fresh session.
+    // Picking a chapter explicitly always begins a fresh run.
     const session =
-      !activityParam && this.game.hasSavedSession
-        ? this.game.resumeSession()
-        : this.game.startSession({
+      !chapterId && this.game.hasSavedChapter
+        ? this.game.resumeChapter()
+        : this.game.startChapter(chapterId ?? '', {
             difficulty: 'EASY',
             domain: 'geography',
             random,
-            startFrom: activityParam ?? undefined,
           });
 
     session.subscribe({

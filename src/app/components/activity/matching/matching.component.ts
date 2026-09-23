@@ -17,7 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatchAttempt, MatchingActivityModel } from '../../../shared/models/activities';
-import { GameService } from '../../../shared/services/game.service';
+import { ChapterService } from '../../../shared/services/chapter.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
@@ -30,7 +30,7 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 })
 export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
   protected readonly uiText = inject(UiTextService);
-  protected readonly game = inject(GameService);
+  protected readonly chapter = inject(ChapterService);
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 

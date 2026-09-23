@@ -9,8 +9,8 @@
       [showMuteButton]="false"
       [showCoinButton]="true"
       [showHealthDisplay]="true"
-      [health]="game.health"
-      [coins]="game.coins"
+      [health]="chapter.health"
+      [coins]="chapter.coins"
     />
   </div>
 
@@ -43,7 +43,7 @@
       }
       @case ('correct') {
         @if (sessionComplete) {
-          <app-chapter-button (chapter)="chapter.emit()">{{ chapterText }}</app-chapter-button>
+          <app-chapter-button (chapter)="chapterDone.emit()">{{ chapterText }}</app-chapter-button>
         } @else {
           <g-button
             class="check-button"

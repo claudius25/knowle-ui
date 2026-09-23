@@ -14,7 +14,7 @@
       <p>{{ uiText.text('mapSubtitle') }}</p>
     </div>
 
-    <app-coin-display class="map-coins" [amount]="game.coins"></app-coin-display>
+    <app-coin-display class="map-coins" [amount]="game.totalCoins"></app-coin-display>
   </header>
 
   @if (loading) {
