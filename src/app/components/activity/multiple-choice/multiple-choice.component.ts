@@ -15,6 +15,8 @@ import {
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 import { MultipleChoiceActivityData } from '../../../shared/models/game.types';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
@@ -23,7 +25,7 @@ import { ImageUtils } from '../../../shared/utils/image-utils';
 @Component({
   selector: 'app-multiple-choice',
   standalone: true,
-  imports: [AsyncPipe, MatIconModule],
+  imports: [AsyncPipe, MatIconModule, MatMenuModule, MatButtonModule],
   templateUrl: './multiple-choice.component.html',
   styleUrl: './multiple-choice.component.css',
 })
@@ -221,5 +223,9 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     const host = this.elementRef.nativeElement as HTMLElement;
     const gamePage = host.closest('.game-page');
     return gamePage?.querySelector('app-game-footer .game-footer') as HTMLElement | null;
+  }
+
+  openMenu() {
+    console.log('Icon clicked');
   }
 }

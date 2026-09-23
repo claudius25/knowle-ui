@@ -254,3 +254,13 @@ mat-icon {
 .mat-focus-indicator[aria-checked='true'] .mat-button-toggle-label-content {
   color: darkslategrey;
 }
+
+.settings-btn {
+  color: white !important;
+  margin-left: auto;
+  align-self: end;
+  font-size: 20px !important;
+  min-width: unset;
+  padding: 0 !important ;
+  min-width: unset !important;
+}

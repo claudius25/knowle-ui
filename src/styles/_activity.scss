@@ -83,19 +83,19 @@
 }
 
 .speak-btn {
-  align-self: end;
+  align-self: start;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 30px;
+  // width: 40px;
+  // height: 30px;
   color: #ffffff;
   background: none;
   border: 0;
   cursor: pointer;
   transition: all 0.16s ease;
-  padding: 0;
+  padding-right: 5px;
 }
 
 // .speak-btn:hover {

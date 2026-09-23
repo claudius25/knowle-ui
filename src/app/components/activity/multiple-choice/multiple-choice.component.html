@@ -36,17 +36,15 @@
     </div>
   }
   <div class="question-row">
-    <h2 #questionTitle>{{ data.question }}</h2>
-    <button
-      class="speak-btn"
-      type="button"
-      [class.speaking]="isSpeaking$ | async"
-      (click)="speak()"
-      [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
-      title="Ascultă descrierea și întrebarea"
-    >
-      <mat-icon>record_voice_over</mat-icon>
-    </button>
+    <h3 [style.margin]="0">
+      <span class="speak-btn" [class.speaking]="isSpeaking$ | async" (click)="speak()">📣</span>
+      {{ data.question }}
+    </h3>
+    <button class="settings-btn" matButton [matMenuTriggerFor]="menu">⋮</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>{{ uiText.text('fifty') }}</button>
+      <button mat-menu-item>{{ uiText.text('hint') }}</button>
+    </mat-menu>
   </div>
 </div>
 
