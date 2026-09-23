@@ -2,11 +2,9 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
-  Output,
   SimpleChanges,
   ViewChild,
   ViewChildren,
@@ -17,7 +15,8 @@ import { AsyncPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import { MultipleChoiceActivityData } from '../../../shared/models/game.types';
+import { ChoiceActivityModel } from '../../../shared/models/activities';
+import { GameService } from '../../../shared/services/game.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 import { ImageUtils } from '../../../shared/utils/image-utils';
@@ -36,18 +35,14 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   private activityImageWrappers!: QueryList<ElementRef<HTMLElement>>;
 
   protected readonly uiText = inject(UiTextService);
+  protected readonly game = inject(GameService);
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   private resizeObserver?: ResizeObserver;
   private fitTimer?: number;
 
-  @Input({ required: true }) data!: MultipleChoiceActivityData;
-  @Input() disabled = false;
-  @Input() selectedAnswer: string | null = null;
-  /** Result of the checked answer, used to color the selected option. */
-  @Input() answerState: 'correct' | 'incorrect' | null = null;
-  @Output() answerSelected = new EventEmitter<string>();
+  @Input({ required: true }) activity!: ChoiceActivityModel;
 
   protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
   protected hasLightImage = false;
@@ -74,7 +69,7 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] && !changes['data'].firstChange) {
+    if (changes['activity'] && !changes['activity'].firstChange) {
       this.hasLightImage = false;
       this.imageBackgroundColor = null;
       this.scheduleQuestionFit();
@@ -87,10 +82,8 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     window.clearTimeout(this.fitTimer);
   }
 
-  protected select(answer: string): void {
-    if (!this.disabled) {
-      this.answerSelected.emit(answer);
-    }
+  protected select(option: string): void {
+    this.activity.selectLabel(option);
   }
 
   protected handleImageLoad(event: Event): void {
@@ -115,11 +108,11 @@ export class MultipleChoiceComponent implements AfterViewInit, OnChanges, OnDest
     }
 
     const keys: string[] = [];
-    if (this.data.descriptionKey) {
-      keys.push(this.data.descriptionKey);
+    if (this.activity.data.descriptionKey) {
+      keys.push(this.activity.data.descriptionKey);
     }
-    if (this.data.questionKey) {
-      keys.push(this.data.questionKey);
+    if (this.activity.data.questionKey) {
+      keys.push(this.activity.data.questionKey);
     }
 
     if (keys.length > 0) {

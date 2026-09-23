@@ -1,14 +1,14 @@
 <div class="question-block">
-  @if (data.title) {
-    <h3 class="activity-title">{{ data.title }}</h3>
+  @if (activity.data.title) {
+    <h3 class="activity-title">{{ activity.data.title }}</h3>
   }
-  @if (data.description) {
+  @if (activity.data.description) {
     <div class="question-description-row">
-      <p class="question-description">{{ data.description }}</p>
+      <p class="question-description">{{ activity.data.description }}</p>
     </div>
   }
   <div class="question-row">
-    <h2>{{ data.question }}</h2>
+    <h2>{{ activity.data.question }}</h2>
     <button
       class="speak-btn"
       type="button"
@@ -26,27 +26,33 @@
   <div
     class="classify-pool"
     cdkDropList
-    [cdkDropListData]="pool"
-    [cdkDropListDisabled]="disabled"
+    [cdkDropListData]="activity.pool"
+    [cdkDropListDisabled]="activity.isLocked"
     (cdkDropListDropped)="drop($event)"
   >
-    @for (item of pool; track item.id) {
-      <div class="classify-chip" cdkDrag [cdkDragDisabled]="disabled">{{ item.label }}</div>
+    @for (item of activity.pool; track item.id) {
+      <div class="classify-chip" cdkDrag [cdkDragDisabled]="activity.isLocked">
+        {{ item.label }}
+      </div>
     }
   </div>
 
   <div class="classify-categories">
-    @for (category of data.categories; track category.id) {
+    @for (category of activity.data.categories; track category.id) {
       <div class="classify-category">
         <div
           class="classify-category-list"
           cdkDropList
-          [cdkDropListData]="categoryItems[category.id]"
-          [cdkDropListDisabled]="disabled"
+          [cdkDropListData]="activity.categoryItems[category.id]"
+          [cdkDropListDisabled]="activity.isLocked"
           (cdkDropListDropped)="drop($event)"
         >
-          @for (item of categoryItems[category.id]; track item.id) {
-            <div class="classify-chip classify-chip--placed" cdkDrag [cdkDragDisabled]="disabled">
+          @for (item of activity.categoryItems[category.id]; track item.id) {
+            <div
+              class="classify-chip classify-chip--placed"
+              cdkDrag
+              [cdkDragDisabled]="activity.isLocked"
+            >
               {{ item.label }}
             </div>
           }

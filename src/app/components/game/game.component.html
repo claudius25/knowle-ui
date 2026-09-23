@@ -1,11 +1,11 @@
 <main class="game-page">
   <section class="activity-shell" aria-live="polite">
-    @if (state === 'loading') {
+    @if (game.status === 'loading') {
       <div class="status-panel">
         <span class="loader" aria-hidden="true"></span>
         <p>{{ text('loading') }}</p>
       </div>
-    } @else if (state === 'error') {
+    } @else if (game.status === 'error') {
       <div class="status-panel error-panel">
         <span class="status-icon" aria-hidden="true">!</span>
         <h1>{{ text('errorTitle') }}</h1>
@@ -15,47 +15,18 @@
         </button>
       </div>
     } @else if (activity) {
-      @if (multipleChoiceData; as data) {
-        <app-multiple-choice
-          [data]="data"
-          [disabled]="state === 'answering' || state === 'correct'"
-          [selectedAnswer]="selectedMultipleChoiceAnswer"
-          [answerState]="answerState"
-          (answerSelected)="selectAnswer($event)"
-        />
-      } @else if (trueFalseData; as data) {
-        <app-true-false
-          [data]="data"
-          [disabled]="state === 'answering' || state === 'correct'"
-          [selectedAnswer]="selectedTrueFalseAnswer"
-          [answerState]="answerState"
-          (answerSelected)="selectAnswer($event)"
-        />
-      } @else if (classifyData; as data) {
-        <app-classify
-          [data]="data"
-          [disabled]="state === 'answering' || state === 'correct'"
-          (answerSubmitted)="submitClassifyAnswer($event)"
-        />
-      } @else if (matchingData; as data) {
-        <app-matching
-          [data]="data"
-          [disabled]="state === 'answering' || state === 'correct'"
-          (answerSubmitted)="submitMatchingAnswer($event)"
-        />
-      } @else if (orderingData; as data) {
-        <app-ordering
-          [data]="data"
-          [disabled]="state === 'answering' || state === 'correct'"
-          (answerSubmitted)="submitOrderingAnswer($event)"
-        />
-      } @else if (puzzleData; as data) {
-        <app-puzzle
-          [data]="data"
-          [disabled]="state === 'answering' || state === 'correct'"
-          [selectedAnswer]="selectedMultipleChoiceAnswer"
-          (answerSelected)="selectAnswer($event)"
-        />
+      @if (multipleChoice; as model) {
+        <app-multiple-choice [activity]="model" />
+      } @else if (trueFalse; as model) {
+        <app-true-false [activity]="model" />
+      } @else if (classify; as model) {
+        <app-classify [activity]="model" />
+      } @else if (matching; as model) {
+        <app-matching [activity]="model" (completed)="checkAnswer()" />
+      } @else if (ordering; as model) {
+        <app-ordering [activity]="model" />
+      } @else if (puzzle; as model) {
+        <app-puzzle [activity]="model" />
       } @else {
         <div class="status-panel">
           <span class="status-icon" aria-hidden="true">i</span>
@@ -68,9 +39,9 @@
 
   <app-test-progress-bar
     class="progress-bar-container"
-    [progress]="progress"
-    [health]="health"
-    [coins]="coins"
+    [progress]="game.progress"
+    [health]="game.health"
+    [coins]="game.coins"
     (close)="confirmExit()"
   ></app-test-progress-bar>
 
@@ -79,30 +50,23 @@
     [activity]="activity"
     [mode]="footerMode"
     [checkingText]="text('checking')"
-    [sessionComplete]="sessionComplete"
+    [sessionComplete]="game.sessionComplete"
     [chapterText]="text('chapterComplete')"
     [continueText]="text('continue')"
     [retryText]="text('retry')"
-    [classifyComplete]="classifyComplete"
+    [classifyComplete]="!!activity?.isReadyToSubmit"
     [disabled]="isCheckDisabled"
     [checkText]="text('check')"
     [characterPose]="characterPose"
     [characterSpeech]="characterSpeech"
-    [health]="health"
-    [hasHint]="!!hintText"
+    [health]="game.health"
+    [coins]="game.coins"
     (chapter)="continueGame()"
     (continue)="continueGame()"
     (retry)="retry()"
-    (hint)="openHint()"
-    (check)="
-      classifyData
-        ? checkClassifyAnswer()
-        : matchingData
-          ? checkMatchingAnswer()
-          : orderingData
-            ? checkOrderingAnswer()
-            : checkSelectedAnswer()
-    "
+    (hint)="game.showHint()"
+    (fifty)="game.useFiftyFifty()"
+    (check)="checkAnswer()"
   />
 
   @if (showExitConfirm) {

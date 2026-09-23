@@ -8,6 +8,12 @@
   opacity: 1;
 }
 
+.answer-card.answer--eliminated:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+  text-decoration: line-through;
+}
+
 .question-description--on-light {
   color: #000000;
 }

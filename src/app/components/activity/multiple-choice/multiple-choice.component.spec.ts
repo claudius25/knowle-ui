@@ -1,8 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MultipleChoiceComponent } from './multiple-choice.component';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 import { MultipleChoiceActivityData } from '../../../shared/models/game.types';
+import { MultipleChoiceActivityModel } from '../../../shared/models/activities';
 
 const MOCK_DATA: MultipleChoiceActivityData = {
   question: 'Pe ce planetă trăim noi?',
@@ -12,10 +15,21 @@ const MOCK_DATA: MultipleChoiceActivityData = {
   options: ['Marte', 'Pământ', 'Jupiter'],
 };
 
+function createModel(): MultipleChoiceActivityModel {
+  return new MultipleChoiceActivityModel({
+    activityId: 'easy_geo_1',
+    title: 'Planete',
+    type: 'MULTIPLE_CHOICE',
+    difficulty: 'EASY',
+    data: MOCK_DATA,
+  });
+}
+
 describe('MultipleChoiceComponent', () => {
   let component: MultipleChoiceComponent;
   let fixture: ComponentFixture<MultipleChoiceComponent>;
   let audioPlayerSpy: jasmine.SpyObj<AudioPlayerService>;
+  let model: MultipleChoiceActivityModel;
 
   beforeEach(async () => {
     audioPlayerSpy = jasmine.createSpyObj('AudioPlayerService', ['playKeys', 'stop'], {
@@ -25,13 +39,18 @@ describe('MultipleChoiceComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [MultipleChoiceComponent],
-      providers: [UiTextService, { provide: AudioPlayerService, useValue: audioPlayerSpy }],
+      providers: [
+        UiTextService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AudioPlayerService, useValue: audioPlayerSpy },
+      ],
     }).compileComponents();
 
+    model = createModel();
     fixture = TestBed.createComponent(MultipleChoiceComponent);
     component = fixture.componentInstance;
-    component.data = MOCK_DATA;
-    fixture.componentRef.setInput('data', MOCK_DATA);
+    fixture.componentRef.setInput('activity', model);
     fixture.detectChanges();
   });
 
@@ -39,10 +58,29 @@ describe('MultipleChoiceComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should emit answerSelected on select()', () => {
-    spyOn(component.answerSelected, 'emit');
+  it('should stage the picked option on the model', () => {
     component['select']('Pământ');
-    expect(component.answerSelected.emit).toHaveBeenCalledWith('Pământ');
+    expect(model.selectedAnswer).toBe('Pământ');
+    expect(model.selectedLabel).toBe('Pământ');
+  });
+
+  it('should disable an option that was already submitted and rejected', () => {
+    component['select']('Marte');
+    model.markAnswered(false);
+    model.retry();
+
+    expect(model.isLabelDisabled('Marte')).toBeTrue();
+    expect(model.isLabelDisabled('Pământ')).toBeFalse();
+    expect(model.retryCount).toBe(1);
+  });
+
+  it('should remove the options eliminated by fifty-fifty', () => {
+    model.useFiftyFifty(['Marte', 'Jupiter']);
+
+    expect(model.fiftyFiftyUsed).toBeTrue();
+    expect(model.canUseFiftyFifty).toBeFalse();
+    expect(model.isLabelDisabled('Marte')).toBeTrue();
+    expect(model.isLabelDisabled('Pământ')).toBeFalse();
   });
 
   it('should play description and question audio keys on speak()', () => {

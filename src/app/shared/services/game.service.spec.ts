@@ -1,8 +1,40 @@
 import { TestBed } from '@angular/core/testing';
-import { GameService } from './game.service';
-import { ContentDatabaseService } from './content-database.service';
+import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
-import { Activity, AnswerResponse, GameStartResponse } from '../models/game.types';
+import { GameService } from './game.service';
+import { ContentDatabaseService, DbDatabase } from './content-database.service';
+import { Activity, AnswerResponse } from '../models/game.types';
+import { MultipleChoiceActivityModel } from '../models/activities';
+
+const MOCK_DB: DbDatabase = {
+  version: 1,
+  chapters: [
+    {
+      id: 'geography_chapter_1',
+      title: 'chapter_title',
+      description: 'chapter_desc',
+      activities: [
+        { id: 'easy_geo_1', type: 'MULTIPLE_CHOICE', title: 't', description: 'd', question: 'q', answer: 'b' },
+        { id: 'easy_geo_2', type: 'MULTIPLE_CHOICE', title: 't', description: 'd', question: 'q', answer: 'a' },
+      ],
+    },
+  ],
+};
+
+function mockActivity(activityId: string): Activity {
+  return {
+    activityId,
+    title: 'Planeta noastră',
+    type: 'MULTIPLE_CHOICE',
+    difficulty: 'EASY',
+    isPractical: true,
+    data: {
+      question: 'Pe ce planetă trăim?',
+      options: ['Marte', 'Pământ', 'Jupiter', 'Venus'],
+      hint: 'Este numită și Planeta Albastră.',
+    },
+  };
+}
 
 describe('GameService', () => {
   let service: GameService;
@@ -10,13 +42,20 @@ describe('GameService', () => {
 
   beforeEach(() => {
     const spy = jasmine.createSpyObj('ContentDatabaseService', [
-      'startGame',
+      'loadDatabase',
       'getActivity',
       'submitAnswer',
+      'getWrongOptionLabels',
     ]);
+    spy.loadDatabase.and.returnValue(of(MOCK_DB));
+    spy.getActivity.and.callFake((id: string) => of(mockActivity(id)));
 
     TestBed.configureTestingModule({
-      providers: [GameService, { provide: ContentDatabaseService, useValue: spy }],
+      providers: [
+        GameService,
+        { provide: ContentDatabaseService, useValue: spy },
+        { provide: MatDialog, useValue: jasmine.createSpyObj('MatDialog', ['open']) },
+      ],
     });
 
     service = TestBed.inject(GameService);
@@ -27,83 +66,102 @@ describe('GameService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should delegate startGame to ContentDatabaseService', (done) => {
-    const mockStart: GameStartResponse = {
-      activityId: 'easy_geo_1',
-      title: 'Planeta noastră',
-      type: 'MULTIPLE_CHOICE',
-      difficulty: 'EASY',
-    };
-
-    contentDbSpy.startGame.and.returnValue(of(mockStart));
-
-    service.startGame().subscribe((res) => {
-      expect(res).toEqual(mockStart);
-      expect(contentDbSpy.startGame).toHaveBeenCalledWith('EASY', 'geography', undefined);
+  it('should build an activity model for the first queued activity', (done) => {
+    service.startSession().subscribe((model) => {
+      expect(model).toBeInstanceOf(MultipleChoiceActivityModel);
+      expect(model.activityId).toBe('easy_geo_1');
+      expect(service.status).toBe('playing');
+      expect(service.coins).toBe(0);
+      expect(service.health).toBe(GameService.MAX_HEALTH);
       done();
     });
   });
 
-  it('should delegate startGame with startIndex to ContentDatabaseService', (done) => {
-    const mockStart: GameStartResponse = {
-      activityId: 'easy_geo_5',
-      title: 'Forme de relief',
-      type: 'CLASSIFY',
-      difficulty: 'EASY',
-    };
+  it('should award coins for a correct answer', (done) => {
+    const response: AnswerResponse = { correct: true, nextActivity: null };
+    contentDbSpy.submitAnswer.and.returnValue(of(response));
 
-    contentDbSpy.startGame.and.returnValue(of(mockStart));
+    service.startSession().subscribe((model) => {
+      (model as MultipleChoiceActivityModel).selectLabel('Pământ');
 
-    service.startGame('EASY', 'geography', 5).subscribe((res) => {
-      expect(res).toEqual(mockStart);
-      expect(contentDbSpy.startGame).toHaveBeenCalledWith('EASY', 'geography', 5);
+      service.submitAnswer().subscribe((correct) => {
+        expect(correct).toBeTrue();
+        expect(service.coins).toBe(GameService.COINS_PER_CORRECT_ANSWER);
+        expect(service.health).toBe(GameService.MAX_HEALTH);
+        expect(model.coinsDelta).toBe(GameService.COINS_PER_CORRECT_ANSWER);
+        done();
+      });
+    });
+  });
+
+  it('should take health for a wrong answer on a graded activity', (done) => {
+    const response: AnswerResponse = { correct: false, nextActivity: null };
+    contentDbSpy.submitAnswer.and.returnValue(of(response));
+
+    service.startSession().subscribe((model) => {
+      (model as MultipleChoiceActivityModel).selectLabel('Marte');
+
+      service.submitAnswer().subscribe(() => {
+        expect(service.health).toBe(GameService.MAX_HEALTH - GameService.HEALTH_LOSS_PER_MISTAKE);
+        expect(model.healthLost).toBe(GameService.HEALTH_LOSS_PER_MISTAKE);
+        done();
+      });
+    });
+  });
+
+  it('should charge coins for a retry and clear the staged answer', (done) => {
+    contentDbSpy.submitAnswer.and.returnValue(of({ correct: false, nextActivity: null }));
+
+    service.startSession().subscribe((model) => {
+      (model as MultipleChoiceActivityModel).selectLabel('Marte');
+
+      service.submitAnswer().subscribe(() => {
+        const coinsBefore = service.coins;
+        service.retry();
+
+        expect(service.coins).toBe(coinsBefore - GameService.COINS_LOST_PER_RETRY);
+        expect(model.retryCount).toBe(1);
+        expect(model.selectedAnswer).toBeNull();
+        expect(service.status).toBe('playing');
+        done();
+      });
+    });
+  });
+
+  it('should charge coins and remove wrong options on fifty-fifty', (done) => {
+    contentDbSpy.getWrongOptionLabels.and.returnValue(of(['Marte', 'Jupiter', 'Venus']));
+
+    service.startSession().subscribe((model) => {
+      const choice = model as MultipleChoiceActivityModel;
+      service.useFiftyFifty();
+
+      expect(choice.fiftyFiftyUsed).toBeTrue();
+      expect(choice.eliminatedLabels.size).toBe(2);
+      expect(choice.eliminatedLabels.has('Pământ')).toBeFalse();
+      expect(service.coins).toBe(-GameService.COINS_LOST_PER_FIFTY_FIFTY);
       done();
     });
   });
 
-  it('should delegate getActivity to ContentDatabaseService', (done) => {
-    const mockActivity: Activity = {
-      activityId: 'easy_geo_1',
-      title: 'Planeta noastră',
-      type: 'MULTIPLE_CHOICE',
-      difficulty: 'EASY',
-      data: {
-        question: 'Pe ce planetă trăim?',
-        options: ['Marte', 'Pământ'],
-      },
-    };
+  it('should record the outcome of each completed activity', (done) => {
+    contentDbSpy.submitAnswer.and.returnValue(of({ correct: true, nextActivity: null }));
 
-    contentDbSpy.getActivity.and.returnValue(of(mockActivity));
+    service.startSession().subscribe((model) => {
+      (model as MultipleChoiceActivityModel).selectLabel('Pământ');
 
-    service.getActivity('easy_geo_1').subscribe((res) => {
-      expect(res).toEqual(mockActivity);
-      expect(contentDbSpy.getActivity).toHaveBeenCalledWith('easy_geo_1', 'EASY', 'geography');
-      done();
-    });
-  });
-
-  it('should delegate submitAnswer to ContentDatabaseService', (done) => {
-    const mockResponse: AnswerResponse = {
-      correct: true,
-      nextActivity: {
-        activityId: 'easy_geo_2',
-        title: 'Apa pe Pământ',
-        type: 'TRUE_FALSE',
-        difficulty: 'EASY',
-      },
-    };
-
-    contentDbSpy.submitAnswer.and.returnValue(of(mockResponse));
-
-    service.submitAnswer('easy_geo_1', 'Pământ', 'EASY').subscribe((res) => {
-      expect(res).toEqual(mockResponse);
-      expect(contentDbSpy.submitAnswer).toHaveBeenCalledWith(
-        'easy_geo_1',
-        'Pământ',
-        'EASY',
-        'geography',
-      );
-      done();
+      service.submitAnswer().subscribe(() => {
+        service.advance().subscribe((next) => {
+          expect(service.outcomes.length).toBe(1);
+          expect(service.outcomes[0]).toEqual({
+            activityId: 'easy_geo_1',
+            correct: true,
+            coinsDelta: GameService.COINS_PER_CORRECT_ANSWER,
+            healthLost: 0,
+          });
+          expect(next?.activityId).toBe('easy_geo_2');
+          done();
+        });
+      });
     });
   });
 });

@@ -1,12 +1,12 @@
 <div class="question-block question-block--puzzle">
-  @if (data.title) {
-    <h3 class="activity-title">{{ data.title }}</h3>
+  @if (activity.data.title) {
+    <h3 class="activity-title">{{ activity.data.title }}</h3>
   }
 
   <div
     class="puzzle-board"
     cdkDropListGroup
-    [class.puzzle-board--solved]="isSolved"
+    [class.puzzle-board--solved]="activity.solved"
     [style.grid-template-columns]="'repeat(' + gridSize + ', 1fr)'"
     [style.aspect-ratio]="boardAspectRatio"
     [style.width]="boardWidth"
@@ -17,14 +17,14 @@
         class="puzzle-cell"
         cdkDropList
         [cdkDropListData]="position"
-        [cdkDropListDisabled]="disabled || isSolved"
+        [cdkDropListDisabled]="activity.isLocked || activity.solved"
         (cdkDropListDropped)="drop($event)"
       >
         <div
           class="puzzle-piece"
           cdkDrag
-          [cdkDragDisabled]="disabled || isSolved"
-          [style.background-image]="'url(' + data.image + ')'"
+          [cdkDragDisabled]="activity.isLocked || activity.solved"
+          [style.background-image]="'url(' + activity.data.image + ')'"
           [style.background-size]="gridSize * 100 + '% ' + gridSize * 100 + '%'"
           [style.background-position]="pieceBackgroundPosition(piece)"
         ></div>
@@ -32,9 +32,9 @@
     }
   </div>
 
-  @if (data.description) {
+  @if (activity.data.description) {
     <div class="question-description-row">
-      <p class="question-description">{{ data.description }}</p>
+      <p class="question-description">{{ activity.data.description }}</p>
       <button
         class="speak-btn"
         type="button"
@@ -49,23 +49,29 @@
   }
 </div>
 
-@if (isSolved) {
+@if (activity.solved) {
   <div class="puzzle-question">
     <div class="question-row">
-      <h2>{{ data.question }}</h2>
+      <h2>{{ activity.data.question }}</h2>
     </div>
 
     <div
       class="answers"
-      [class.answers--two-columns]="data.options.length % 2 === 0"
+      [class.answers--two-columns]="activity.optionLabels.length % 2 === 0"
       [attr.aria-label]="uiText.text('answers')"
     >
-      @for (option of data.options; track option) {
+      @for (option of activity.optionLabels; track option) {
         <button
           class="duo-button duo-button--neutral answer-card"
           type="button"
-          [class.selected]="selectedAnswer === option"
-          [disabled]="disabled"
+          [class.selected]="activity.selectedLabel === option && activity.answerState === null"
+          [class.answer--correct]="
+            activity.selectedLabel === option && activity.answerState === 'correct'
+          "
+          [class.answer--incorrect]="
+            activity.selectedLabel === option && activity.answerState === 'incorrect'
+          "
+          [disabled]="activity.isLabelDisabled(option)"
           (click)="select(option)"
         >
           <span>{{ option }}</span>

@@ -1,5 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { TestProgressBarComponent } from '../test-progress-bar/test-progress-bar.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClassifyComponent } from '../activity/classify/classify.component';
@@ -20,20 +19,14 @@ import {
   pickRandomLine,
 } from '../../characters/torti/torti-speech.constants';
 import {
-  Activity,
-  AnswerResponse,
-  ClassifyActivityData,
-  MatchingActivityData,
-  MultipleChoiceActivityData,
-  NextActivity,
-  OrderingActivityData,
-  PuzzleActivityData,
-  TrueFalseActivityData,
-} from '../../shared/models/game.types';
+  ClassifyActivityModel,
+  MatchingActivityModel,
+  MultipleChoiceActivityModel,
+  OrderingActivityModel,
+  PuzzleActivityModel,
+  TrueFalseActivityModel,
+} from '../../shared/models/activities';
 import { GButtonComponent } from '../../shared/components/g-button/g-button.component';
-import { HintDialogComponent } from '../../shared/components/hint-dialog/hint-dialog.component';
-
-type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'incorrect';
 
 @Component({
   selector: 'app-game',
@@ -53,46 +46,25 @@ type GameState = 'loading' | 'error' | 'playing' | 'answering' | 'correct' | 'in
   styleUrl: './game.component.css',
 })
 export class GameComponent implements OnInit, OnDestroy {
-  private readonly gameService = inject(GameService);
+  protected readonly game = inject(GameService);
   protected readonly uiText = inject(UiTextService);
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly dialog = inject(MatDialog);
 
-  @ViewChild(ClassifyComponent) private classifyComponent?: ClassifyComponent;
-  @ViewChild(MatchingComponent) private matchingComponent?: MatchingComponent;
-  @ViewChild(OrderingComponent) private orderingComponent?: OrderingComponent;
-
-  private static readonly ACTIVITIES_PER_SESSION = 10;
-  private static readonly COINS_PER_CORRECT_ANSWER = 10;
-  private static readonly COINS_LOST_PER_RETRY = 20;
-  private static readonly HEALTH_LOSS_PER_MISTAKE = 20;
-
-  protected state: GameState = 'loading';
-  protected activity: Activity | null = null;
-  protected selectedAnswer: unknown = null;
-  protected nextActivity: NextActivity | null = null;
   protected errorMessage = '';
-  protected completedActivities = 0;
-  protected coins = 0;
-  protected health = 100;
   protected characterSpeech = '';
   protected showExitConfirm = false;
 
-  protected get progress(): number {
-    return (this.completedActivities / GameComponent.ACTIVITIES_PER_SESSION) * 100;
-  }
-
-  protected get sessionComplete(): boolean {
-    return this.completedActivities >= GameComponent.ACTIVITIES_PER_SESSION;
+  protected get activity() {
+    return this.game.activity;
   }
 
   protected get characterPose(): TortiPose {
-    if (this.state === 'correct') {
+    if (this.activity?.answerState === 'correct') {
       return this.correctPose;
     }
-    if (this.state === 'incorrect') {
+    if (this.activity?.answerState === 'incorrect') {
       return 'sad';
     }
     return 'idle';
@@ -102,108 +74,31 @@ export class GameComponent implements OnInit, OnDestroy {
   private correctPose: TortiPose = 'happy';
 
   ngOnInit(): void {
-    this.loadInitialActivity();
+    this.startSession();
   }
 
-  protected selectAnswer(answer: unknown): void {
-    if (this.state !== 'playing' || !this.activity) {
-      return;
-    }
-
-    this.selectedAnswer = answer;
+  protected get multipleChoice(): MultipleChoiceActivityModel | null {
+    return this.activity instanceof MultipleChoiceActivityModel ? this.activity : null;
   }
 
-  protected checkSelectedAnswer(): void {
-    if (this.state !== 'playing' || !this.activity || this.selectedAnswer === null) {
-      return;
-    }
-
-    const answer = this.selectedAnswer;
-    this.state = 'answering';
-    this.gameService
-      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
-      .subscribe({
-        next: (response) => this.handleAnswer(response),
-        error: () => {
-          this.state = 'error';
-          this.errorMessage = this.text('activityError');
-        },
-      });
+  protected get trueFalse(): TrueFalseActivityModel | null {
+    return this.activity instanceof TrueFalseActivityModel ? this.activity : null;
   }
 
-  protected get multipleChoiceData(): MultipleChoiceActivityData | null {
-    return this.activity?.type === 'MULTIPLE_CHOICE' ? this.activity.data : null;
+  protected get classify(): ClassifyActivityModel | null {
+    return this.activity instanceof ClassifyActivityModel ? this.activity : null;
   }
 
-  protected get selectedMultipleChoiceAnswer(): string | null {
-    return typeof this.selectedAnswer === 'string' ? this.selectedAnswer : null;
+  protected get matching(): MatchingActivityModel | null {
+    return this.activity instanceof MatchingActivityModel ? this.activity : null;
   }
 
-  protected get answerState(): 'correct' | 'incorrect' | null {
-    return this.state === 'correct' || this.state === 'incorrect' ? this.state : null;
+  protected get ordering(): OrderingActivityModel | null {
+    return this.activity instanceof OrderingActivityModel ? this.activity : null;
   }
 
-  protected get trueFalseData(): TrueFalseActivityData | null {
-    return this.activity?.type === 'TRUE_FALSE' ? this.activity.data : null;
-  }
-
-  protected get selectedTrueFalseAnswer(): boolean | null {
-    return typeof this.selectedAnswer === 'boolean' ? this.selectedAnswer : null;
-  }
-
-  protected get classifyData(): ClassifyActivityData | null {
-    return this.activity?.type === 'CLASSIFY' ? this.activity.data : null;
-  }
-
-  protected get classifyComplete(): boolean {
-    return this.classifyComponent?.isComplete ?? false;
-  }
-
-  protected get matchingData(): MatchingActivityData | null {
-    return this.activity?.type === 'MATCHING' ? this.activity.data : null;
-  }
-
-  protected get matchingComplete(): boolean {
-    return this.matchingComponent?.isComplete ?? false;
-  }
-
-  protected get orderingData(): OrderingActivityData | null {
-    return this.activity?.type === 'ORDERING' ? this.activity.data : null;
-  }
-
-  protected get orderingComplete(): boolean {
-    return this.orderingComponent?.isComplete ?? false;
-  }
-
-  protected get puzzleData(): PuzzleActivityData | null {
-    return this.activity?.type === 'PUZZLE' ? this.activity.data : null;
-  }
-
-  protected get hintText(): string {
-    switch (this.activity?.type) {
-      case 'MULTIPLE_CHOICE':
-      case 'TRUE_FALSE':
-      case 'CLASSIFY':
-      case 'ORDERING':
-        return this.activity.data.hint ?? '';
-      default:
-        return '';
-    }
-  }
-
-  protected openHint(): void {
-    const hint = this.hintText;
-    if (!hint) {
-      return;
-    }
-
-    this.dialog.open(HintDialogComponent, {
-      data: { hint },
-      panelClass: 'hint-dialog-panel',
-      autoFocus: false,
-      maxWidth: '90vw',
-      width: '420px',
-    });
+  protected get puzzle(): PuzzleActivityModel | null {
+    return this.activity instanceof PuzzleActivityModel ? this.activity : null;
   }
 
   protected get footerMode():
@@ -214,107 +109,43 @@ export class GameComponent implements OnInit, OnDestroy {
     | 'classify'
     | 'matching'
     | 'ordering' {
-    if (this.state === 'answering') {
+    if (this.game.status === 'checking') {
       return 'checking';
     }
-    if (this.state === 'correct') {
+    if (this.activity?.answerState === 'correct') {
       return 'correct';
     }
-    if (this.state === 'incorrect') {
+    if (this.activity?.answerState === 'incorrect') {
       return 'incorrect';
     }
-    if (this.classifyData) {
-      return 'classify';
+    switch (this.activity?.type) {
+      case 'CLASSIFY':
+        return 'classify';
+      case 'MATCHING':
+        return 'matching';
+      case 'ORDERING':
+        return 'ordering';
+      default:
+        return 'waiting';
     }
-    if (this.matchingData) {
-      return 'matching';
-    }
-    if (this.orderingData) {
-      return 'ordering';
-    }
-    return 'waiting';
   }
 
-  protected checkClassifyAnswer(): void {
-    this.classifyComponent?.submit();
-  }
-
-  protected submitClassifyAnswer(answer: Record<string, string>): void {
-    if (this.state !== 'playing' || !this.activity) {
-      return;
-    }
-
-    this.selectedAnswer = answer;
-    this.state = 'answering';
-    this.gameService
-      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
-      .subscribe({
-        next: (response) => this.handleAnswer(response),
-        error: () => {
-          this.state = 'error';
-          this.errorMessage = this.text('activityError');
-        },
-      });
-  }
-
-  protected checkMatchingAnswer(): void {
-    this.matchingComponent?.submit();
-  }
-
-  protected submitMatchingAnswer(answer: Record<string, string>): void {
-    if (this.state !== 'playing' || !this.activity) {
-      return;
-    }
-
-    this.selectedAnswer = answer;
-    this.state = 'answering';
-    this.gameService
-      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
-      .subscribe({
-        next: (response) => this.handleAnswer(response),
-        error: () => {
-          this.state = 'error';
-          this.errorMessage = this.text('activityError');
-        },
-      });
-  }
-
-  protected checkOrderingAnswer(): void {
-    this.orderingComponent?.submit();
-  }
-
-  protected submitOrderingAnswer(answer: string[]): void {
-    if (this.state !== 'playing' || !this.activity) {
-      return;
-    }
-
-    this.selectedAnswer = answer;
-    this.state = 'answering';
-    this.gameService
-      .submitAnswer(this.activity.activityId, answer, this.activity.difficulty)
-      .subscribe({
-        next: (response) => this.handleAnswer(response),
-        error: () => {
-          this.state = 'error';
-          this.errorMessage = this.text('activityError');
-        },
-      });
+  protected checkAnswer(): void {
+    this.game.submitAnswer().subscribe({
+      next: (correct) => {
+        if (this.game.status !== 'answered') {
+          return;
+        }
+        this.reactToAnswer(correct);
+      },
+      error: () => {
+        this.errorMessage = this.text('activityError');
+      },
+    });
   }
 
   protected get isCheckDisabled(): boolean {
-    if (this.state === 'answering') {
-      return true;
-    }
-    if (this.classifyData) {
-      return !this.classifyComplete;
-    }
-    if (this.matchingData) {
-      return !this.matchingComplete;
-    }
-    if (this.orderingData) {
-      return !this.orderingComplete;
-    }
-    return this.selectedAnswer === null;
+    return this.game.status === 'checking' || !this.activity?.isReadyToSubmit;
   }
 
   ngOnDestroy(): void {
@@ -325,31 +156,31 @@ export class GameComponent implements OnInit, OnDestroy {
     this.audioPlayer.stop();
     this.characterSpeech = '';
 
-    this.completedActivities += 1;
-
-    if (this.sessionComplete || !this.nextActivity) {
-      this.router.navigate(['/chapter-done'], {
-        state: {
-          coins: this.coins,
-          health: this.health,
-        },
-      });
-      return;
-    }
-
-    this.loadActivity(this.nextActivity.activityId);
+    this.game.advance().subscribe({
+      next: (activity) => {
+        if (!activity) {
+          this.router.navigate(['/chapter-done'], {
+            state: {
+              coins: this.game.coins,
+              health: this.game.health,
+            },
+          });
+        }
+      },
+      error: () => {
+        this.errorMessage = this.text('activityError');
+      },
+    });
   }
 
   protected retry(): void {
     this.audioPlayer.stop();
-    this.coins = this.coins - GameComponent.COINS_LOST_PER_RETRY;
-    this.selectedAnswer = null;
     this.characterSpeech = '';
-    this.state = 'playing';
+    this.game.retry();
   }
 
   protected reload(): void {
-    this.loadInitialActivity();
+    this.startSession();
   }
 
   protected confirmExit(): void {
@@ -366,83 +197,43 @@ export class GameComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
-  private loadInitialActivity(): void {
+  private startSession(): void {
     this.audioPlayer.stop();
-    this.state = 'loading';
     this.errorMessage = '';
-    this.coins = 0;
-    this.health = 100;
     this.characterSpeech = '';
 
     const activityParam = this.route.snapshot.paramMap.get('activityIndex');
-    if (activityParam) {
-      const parsed = parseInt(activityParam, 10);
-      if (!isNaN(parsed) && parsed > 0) {
-        this.completedActivities = parsed - 1;
-      } else {
-        this.completedActivities = 0;
-      }
-    } else {
-      this.completedActivities = 0;
-    }
+    const random = this.route.snapshot.queryParamMap.get('mode') === 'random';
 
-    this.gameService.startGame('EASY', 'geography', activityParam ?? undefined).subscribe({
-      next: (start) => this.loadActivity(start.activityId),
-      error: () => {
-        this.state = 'error';
-        this.errorMessage = this.text('backendError');
-      },
-    });
-  }
-
-  private loadActivity(activityId: string, preserveState = false): void {
-    const previousState = this.state;
-    const previousAnswer = this.selectedAnswer;
-    const previousNextActivity = this.nextActivity;
-    this.state = 'loading';
-    this.activity = null;
-    this.selectedAnswer = preserveState ? previousAnswer : null;
-    this.nextActivity = preserveState ? previousNextActivity : null;
-    this.errorMessage = '';
-    if (!preserveState) {
-      this.characterSpeech = '';
-      this.audioPlayer.stop();
-    }
-    this.gameService.getActivity(activityId).subscribe({
-      next: (activity) => {
-        this.activity = activity;
-        this.state = preserveState ? previousState : 'playing';
-      },
-      error: () => {
-        this.state = 'error';
-        this.errorMessage = this.text('activityError');
-      },
-    });
+    this.game
+      .startSession({
+        difficulty: 'EASY',
+        domain: 'geography',
+        random,
+        startFrom: activityParam ?? undefined,
+      })
+      .subscribe({
+        error: () => {
+          this.errorMessage = this.text('backendError');
+        },
+      });
   }
 
   protected text(key: Parameters<UiTextService['text']>[0]): string {
     return this.uiText.text(key);
   }
 
-  private handleAnswer(response: AnswerResponse): void {
-    this.nextActivity = response.nextActivity;
-
-    if (response.correct) {
-      this.coins += GameComponent.COINS_PER_CORRECT_ANSWER;
+  private reactToAnswer(correct: boolean): void {
+    if (correct) {
       this.correctPose = TORTI_HAPPY_POSES[Math.floor(Math.random() * TORTI_HAPPY_POSES.length)];
       const speechKey = pickRandomLine(TORTI_HAPPY_LINES);
       this.characterSpeech = this.text(speechKey);
       void this.audioPlayer.playKey(speechKey, { global: true, characterSpeech: true });
-      this.state = 'correct';
       return;
     }
 
-    if (this.activity?.isPractical) {
-      this.health = Math.max(0, this.health - GameComponent.HEALTH_LOSS_PER_MISTAKE);
-    }
     const speechKey = pickRandomLine(TORTI_SAD_LINES);
     this.characterSpeech = this.text(speechKey);
     void this.audioPlayer.playKey(speechKey, { global: true, characterSpeech: true });
-    this.state = 'incorrect';
   }
 }

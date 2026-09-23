@@ -1,16 +1,16 @@
 <div class="question-block">
-  @if (data.title) {
+  @if (activity.data.title) {
     <h3
       class="activity-title"
       [class.activity-title--on-light]="hasLightImage"
       [style.background-color]="imageBackgroundColor"
     >
-      {{ data.title }}
+      {{ activity.data.title }}
     </h3>
   }
-  @if (data.pictures && data.pictures.length > 0) {
+  @if (activity.data.pictures && activity.data.pictures.length > 0) {
     <div class="activity-image-gallery" [style.background-color]="imageBackgroundColor">
-      @for (pic of data.pictures; track pic) {
+      @for (pic of activity.data.pictures; track pic) {
         <div #activityImageWrapper class="activity-image-wrapper">
           <img
             [src]="pic"
@@ -23,7 +23,7 @@
     </div>
   }
 
-  @if (data.description) {
+  @if (activity.data.description) {
     <div class="question-description-row">
       <p
         #questionDescription
@@ -31,36 +31,45 @@
         [class.question-description--on-light]="hasLightImage"
         [style.background-color]="imageBackgroundColor"
       >
-        {{ data.description }}
+        {{ activity.data.description }}
       </p>
     </div>
   }
   <div class="question-row">
     <h3 [style.margin]="0">
       <span class="speak-btn" [class.speaking]="isSpeaking$ | async" (click)="speak()">📣</span>
-      {{ data.question }}
+      {{ activity.data.question }}
     </h3>
     <button class="settings-btn" matButton [matMenuTriggerFor]="menu">⋮</button>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item>{{ uiText.text('fifty') }}</button>
-      <button mat-menu-item>{{ uiText.text('hint') }}</button>
+      <button mat-menu-item [disabled]="!activity.canUseFiftyFifty" (click)="game.useFiftyFifty()">
+        {{ uiText.text('fifty') }}
+      </button>
+      <button mat-menu-item [disabled]="!activity.canUseHint" (click)="game.showHint()">
+        {{ uiText.text('hint') }}
+      </button>
     </mat-menu>
   </div>
 </div>
 
 <div
   class="answers"
-  [class.answers--two-columns]="data.options.length === 4"
+  [class.answers--two-columns]="activity.optionLabels.length === 4"
   [attr.aria-label]="uiText.text('answers')"
 >
-  @for (option of data.options; track option) {
+  @for (option of activity.optionLabels; track option) {
     <button
       class="duo-button duo-button--neutral answer-card"
       type="button"
-      [class.selected]="selectedAnswer === option && answerState === null"
-      [class.answer--correct]="selectedAnswer === option && answerState === 'correct'"
-      [class.answer--incorrect]="selectedAnswer === option && answerState === 'incorrect'"
-      [disabled]="disabled"
+      [class.selected]="activity.selectedLabel === option && activity.answerState === null"
+      [class.answer--correct]="
+        activity.selectedLabel === option && activity.answerState === 'correct'
+      "
+      [class.answer--incorrect]="
+        activity.selectedLabel === option && activity.answerState === 'incorrect'
+      "
+      [class.answer--eliminated]="activity.eliminatedLabels.has(option)"
+      [disabled]="activity.isLabelDisabled(option)"
       (click)="select(option)"
     >
       <span>{{ option }}</span>

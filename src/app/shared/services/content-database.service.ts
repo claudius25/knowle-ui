@@ -46,7 +46,7 @@ export interface DbActivity {
   description: string;
   question: string;
   hint?: string;
-  /** Practice activity: a wrong answer does not cost health. */
+  /** Graded activity: a wrong answer costs health. */
   isPractical?: boolean;
   pictures?: string[];
   options?: DbOption[];
@@ -201,6 +201,33 @@ export class ContentDatabaseService {
         }
 
         return this.mapToClientActivity(act, dict, difficulty, domain);
+      }),
+    );
+  }
+
+  /**
+   * Returns the translated labels of the options that are not the expected answer.
+   * Used by the fifty-fifty help to know what it may remove.
+   */
+  getWrongOptionLabels(
+    activityId: string,
+    difficulty: Difficulty = 'EASY',
+    domain = 'geography',
+  ): Observable<string[]> {
+    return forkJoin({
+      db: this.loadDatabase(difficulty, domain),
+      dict: this.loadTranslations(difficulty, domain),
+    }).pipe(
+      map(({ db, dict }) => {
+        const act = db.chapters.flatMap((c) => c.activities).find((a) => a.id === activityId);
+        if (!act?.options) {
+          return [];
+        }
+
+        const expectedOptionId = String(act.answer);
+        return act.options
+          .filter((option) => option.id !== expectedOptionId)
+          .map((option) => dict[option.text] ?? option.text);
       }),
     );
   }

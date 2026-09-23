@@ -1,7 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatchingComponent } from './matching.component';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { MatchingActivityData } from '../../../shared/models/game.types';
+import { MatchingActivityModel } from '../../../shared/models/activities';
 
 const MOCK_DATA: MatchingActivityData = {
   question: 'Potrivește fiecare instrument cu descrierea sa:',
@@ -12,20 +15,31 @@ const MOCK_DATA: MatchingActivityData = {
   ],
 };
 
+function createModel(): MatchingActivityModel {
+  return new MatchingActivityModel({
+    activityId: 'easy_geo_6',
+    title: 'Instrumente',
+    type: 'MATCHING',
+    difficulty: 'EASY',
+    data: MOCK_DATA,
+  });
+}
+
 describe('MatchingComponent', () => {
   let component: MatchingComponent;
   let fixture: ComponentFixture<MatchingComponent>;
+  let model: MatchingActivityModel;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MatchingComponent],
-      providers: [UiTextService],
+      providers: [UiTextService, provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
+    model = createModel();
     fixture = TestBed.createComponent(MatchingComponent);
     component = fixture.componentInstance;
-    component.data = MOCK_DATA;
-    fixture.componentRef.setInput('data', MOCK_DATA);
+    fixture.componentRef.setInput('activity', model);
     fixture.detectChanges();
   });
 
@@ -34,40 +48,43 @@ describe('MatchingComponent', () => {
   });
 
   it('should initialize left and right items', () => {
-    expect(component['leftItems'].length).toBe(3);
-    expect(component['rightItems'].length).toBe(3);
-    expect(component.isComplete).toBeFalse();
+    expect(model.leftItems.length).toBe(3);
+    expect(model.rightItems.length).toBe(3);
+    expect(model.isComplete).toBeFalse();
   });
 
   it('should pair items when selecting matching left then right, and disable them', () => {
     component['selectLeft']('pair_1');
-    expect(component['selectedLeftId']).toBe('pair_1');
-    expect(component['isLeftSelected']('pair_1')).toBeTrue();
+    expect(model.selectedLeftId).toBe('pair_1');
 
     component['selectRight']('pair_1');
-    expect(component['selectedLeftId']).toBeNull();
-    expect(component['selectedRightId']).toBeNull();
-    expect(component['isMatched']('pair_1')).toBeTrue();
+    expect(model.selectedLeftId).toBeNull();
+    expect(model.selectedRightId).toBeNull();
+    expect(model.isMatched('pair_1')).toBeTrue();
   });
 
   it('should deselect both items when selecting mismatched pair', (done) => {
     component['selectLeft']('pair_1');
     component['selectRight']('pair_2');
 
-    expect(component['wrongPair']).toEqual({ leftId: 'pair_1', rightId: 'pair_2' });
-    expect(component['isMatched']('pair_1')).toBeFalse();
-    expect(component['isMatched']('pair_2')).toBeFalse();
+    expect(component['wrongPair']).toEqual({
+      leftId: 'pair_1',
+      rightId: 'pair_2',
+      matched: false,
+    });
+    expect(model.isMatched('pair_1')).toBeFalse();
+    expect(model.isMatched('pair_2')).toBeFalse();
 
     setTimeout(() => {
-      expect(component['selectedLeftId']).toBeNull();
-      expect(component['selectedRightId']).toBeNull();
+      expect(model.selectedLeftId).toBeNull();
+      expect(model.selectedRightId).toBeNull();
       expect(component['wrongPair']).toBeNull();
       done();
     }, 750);
   });
 
-  it('should complete when all pairs are matched and emit answerSubmitted', () => {
-    spyOn(component.answerSubmitted, 'emit');
+  it('should emit completed and build the answer once all pairs are matched', () => {
+    spyOn(component.completed, 'emit');
 
     component['selectLeft']('pair_1');
     component['selectRight']('pair_1');
@@ -78,8 +95,9 @@ describe('MatchingComponent', () => {
     component['selectLeft']('pair_3');
     component['selectRight']('pair_3');
 
-    expect(component.isComplete).toBeTrue();
-    expect(component.answerSubmitted.emit).toHaveBeenCalledWith({
+    expect(model.isComplete).toBeTrue();
+    expect(component.completed.emit).toHaveBeenCalled();
+    expect(model.prepareSubmission()).toEqual({
       pair_1: 'pair_1',
       pair_2: 'pair_2',
       pair_3: 'pair_3',

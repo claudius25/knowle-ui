@@ -1,15 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TortiComponent } from '../../characters/torti/torti.component';
-import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
-import { HealthDisplayComponent } from '../ui/health-display/health-display.component';
 import { UiTextService } from '../../shared/services/ui-text.service';
 import { LanguageService } from '../../shared/services/language.service';
 
 @Component({
   selector: 'app-chapter-done',
   standalone: true,
-  imports: [TortiComponent, CoinDisplayComponent, HealthDisplayComponent],
+  imports: [TortiComponent],
   templateUrl: './chapter-done.component.html',
   styleUrl: './chapter-done.component.css',
 })

@@ -1,14 +1,14 @@
 <div class="question-block">
-  @if (data.title) {
-    <h3 class="activity-title">{{ data.title }}</h3>
+  @if (activity.data.title) {
+    <h3 class="activity-title">{{ activity.data.title }}</h3>
   }
-  @if (data.description) {
+  @if (activity.data.description) {
     <div class="question-description-row">
-      <p class="question-description">{{ data.description }}</p>
+      <p class="question-description">{{ activity.data.description }}</p>
     </div>
   }
   <div class="question-row">
-    <h2>{{ data.question }}</h2>
+    <h2>{{ activity.data.question }}</h2>
     <button
       class="speak-btn"
       type="button"
@@ -25,18 +25,18 @@
 <div
   class="ordering-list"
   cdkDropList
-  [cdkDropListData]="items"
-  [cdkDropListDisabled]="disabled"
+  [cdkDropListData]="activity.items"
+  [cdkDropListDisabled]="activity.isLocked"
   (cdkDropListDropped)="drop($event)"
   [attr.aria-label]="uiText.text('ordering')"
 >
-  @for (item of items; track item.id; let i = $index) {
+  @for (item of activity.items; track item.id; let i = $index) {
     <div
       #orderingCard
       class="duo-button duo-button--neutral ordering-card"
-      [class.ordering-card-small]="items.length > 4"
+      [class.ordering-card-small]="activity.items.length > 4"
       cdkDrag
-      [cdkDragDisabled]="disabled"
+      [cdkDragDisabled]="activity.isLocked"
     >
       <!-- <span class="order-badge">{{ i + 1 }}</span> -->
       <span class="ordering-card__text">{{ item.text }}</span>

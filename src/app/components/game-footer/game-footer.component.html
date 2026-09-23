@@ -31,27 +31,6 @@
         >
         </g-button>
       }
-      @if (
-        activity?.type !== 'MATCHING' &&
-        activity?.type !== 'CLASSIFY' &&
-        activity?.type !== 'TRUE_FALSE' &&
-        activity?.type !== 'PUZZLE'
-      ) {
-        <g-button
-          labelKey="fifty"
-          colorsStyleClass="duo-button duo-button--grey duo-button--medium duo-button--smalltext"
-          (clicked)="fifty.emit()"
-        >
-        </g-button>
-      }
-      @if (hasHint) {
-        <g-button
-          labelKey="hint"
-          colorsStyleClass="duo-button duo-button--grey duo-button--medium duo-button--smalltext"
-          (clicked)="hintClicked()"
-        >
-        </g-button>
-      }
     </div>
 
     @switch (mode) {

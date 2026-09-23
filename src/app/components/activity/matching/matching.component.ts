@@ -14,15 +14,10 @@ import {
 } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { MatchingActivityData } from '../../../shared/models/game.types';
+import { MatchAttempt, MatchingActivityModel } from '../../../shared/models/activities';
+import { GameService } from '../../../shared/services/game.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
-
-interface MatchingColumnItem {
-  id: string;
-  text: string;
-  image?: string;
-}
 
 @Component({
   selector: 'app-matching',
@@ -33,6 +28,7 @@ interface MatchingColumnItem {
 })
 export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
   protected readonly uiText = inject(UiTextService);
+  protected readonly game = inject(GameService);
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 
@@ -41,17 +37,15 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   private static readonly CARD_HEIGHT_STEP = 4;
   private static readonly MAX_CARD_HEIGHT = 220;
+  private static readonly MISMATCH_FEEDBACK_MS = 700;
   private resizeObserver?: ResizeObserver;
   private growTimer?: number;
 
-  @Input({ required: true }) data!: MatchingActivityData;
-  @Input() disabled = false;
-  @Output() answerSubmitted = new EventEmitter<Record<string, string>>();
+  @Input({ required: true }) activity!: MatchingActivityModel;
+  /** Raised once every pair has been matched. */
+  @Output() completed = new EventEmitter<void>();
 
   protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
-
-  protected leftItems: MatchingColumnItem[] = [];
-  protected rightItems: MatchingColumnItem[] = [];
 
   protected speak(): void {
     if (this.audioPlayer.isPlaying) {
@@ -60,11 +54,11 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
 
     const keys: string[] = [];
-    if (this.data.descriptionKey) {
-      keys.push(this.data.descriptionKey);
+    if (this.activity.data.descriptionKey) {
+      keys.push(this.activity.data.descriptionKey);
     }
-    if (this.data.questionKey) {
-      keys.push(this.data.questionKey);
+    if (this.activity.data.questionKey) {
+      keys.push(this.activity.data.questionKey);
     }
 
     if (keys.length > 0) {
@@ -72,24 +66,14 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
   }
 
-  protected selectedLeftId: string | null = null;
-  protected selectedRightId: string | null = null;
-
-  /**
-   * Set of matched item IDs (since left and right have the same pair.id,
-   * a matched pair's id is stored here).
-   */
-  protected matchedPairIds = new Set<string>();
-
-  /**
-   * Temporary wrong pair indication for animation before deselection.
-   */
-  protected wrongPair: { leftId: string; rightId: string } | null = null;
+  /** Pair shown in the mismatch style until the feedback delay elapses. */
+  protected wrongPair: MatchAttempt | null = null;
   private mismatchTimeout: number | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] && this.data) {
-      this.resetState();
+    if (changes['activity'] && this.activity) {
+      this.clearMismatch();
+      this.resetCardHeights();
       this.scheduleGrow();
     }
   }
@@ -108,40 +92,15 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
     this.resizeObserver?.disconnect();
     window.removeEventListener('resize', this.scheduleGrow);
     window.clearTimeout(this.growTimer);
-    if (this.mismatchTimeout) {
-      clearTimeout(this.mismatchTimeout);
-    }
+    this.clearMismatch();
   }
 
-  private resetState(): void {
-    if (this.mismatchTimeout) {
+  private clearMismatch(): void {
+    if (this.mismatchTimeout !== null) {
       clearTimeout(this.mismatchTimeout);
       this.mismatchTimeout = null;
     }
-    this.matchedPairIds.clear();
-    this.selectedLeftId = null;
-    this.selectedRightId = null;
     this.wrongPair = null;
-
-    if (!this.data?.pairs) {
-      this.leftItems = [];
-      this.rightItems = [];
-      return;
-    }
-
-    this.leftItems = this.data.pairs.map((p) => ({
-      id: p.id,
-      text: p.left,
-      image: p.image,
-    }));
-
-    const rightList = this.data.pairs.map((p) => ({
-      id: p.id,
-      text: p.right,
-    }));
-
-    this.rightItems = this.shuffle(rightList);
-    this.resetCardHeights();
   }
 
   protected handleImageLoad(): void {
@@ -266,86 +225,38 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
     return gamePage?.querySelector('app-game-footer .game-footer') as HTMLElement | null;
   }
 
-  private shuffle(array: MatchingColumnItem[]): MatchingColumnItem[] {
-    const arr = [...array];
-    if (arr.length <= 1) return arr;
-
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-
-    // If accidentally in the exact same order and length > 1, rotate by 1
-    const allSame = arr.every((item, idx) => item.id === array[idx].id);
-    if (allSame && arr.length > 1) {
-      arr.push(arr.shift()!);
-    }
-
-    return arr;
-  }
-
   protected selectLeft(id: string): void {
-    if (this.disabled || this.matchedPairIds.has(id) || this.wrongPair) return;
-
-    if (this.selectedLeftId === id) {
-      this.selectedLeftId = null;
+    if (this.wrongPair) {
       return;
     }
-
-    this.selectedLeftId = id;
-
-    if (this.selectedRightId !== null) {
-      this.checkPair(this.selectedLeftId, this.selectedRightId);
-    }
+    this.handleAttempt(this.activity.selectLeft(id));
   }
 
   protected selectRight(id: string): void {
-    if (this.disabled || this.matchedPairIds.has(id) || this.wrongPair) return;
+    if (this.wrongPair) {
+      return;
+    }
+    this.handleAttempt(this.activity.selectRight(id));
+  }
 
-    if (this.selectedRightId === id) {
-      this.selectedRightId = null;
+  private handleAttempt(attempt: MatchAttempt | null): void {
+    if (!attempt) {
       return;
     }
 
-    this.selectedRightId = id;
-
-    if (this.selectedLeftId !== null) {
-      this.checkPair(this.selectedLeftId, this.selectedRightId);
-    }
-  }
-
-  private checkPair(leftId: string, rightId: string): void {
-    if (leftId === rightId) {
-      // Correct Match!
-      this.matchedPairIds.add(leftId);
-      this.selectedLeftId = null;
-      this.selectedRightId = null;
-
-      if (this.isComplete) {
-        this.submit();
+    if (attempt.matched) {
+      if (this.activity.isComplete) {
+        this.completed.emit();
       }
-    } else {
-      // Mismatch: show error style briefly, then deselect both so user can try again
-      this.wrongPair = { leftId, rightId };
-      this.mismatchTimeout = window.setTimeout(() => {
-        this.selectedLeftId = null;
-        this.selectedRightId = null;
-        this.wrongPair = null;
-        this.mismatchTimeout = null;
-      }, 700);
+      return;
     }
-  }
 
-  protected isMatched(id: string): boolean {
-    return this.matchedPairIds.has(id);
-  }
-
-  protected isLeftSelected(id: string): boolean {
-    return this.selectedLeftId === id;
-  }
-
-  protected isRightSelected(id: string): boolean {
-    return this.selectedRightId === id;
+    // Show the mismatch briefly, then deselect both so the player can try again.
+    this.wrongPair = attempt;
+    this.mismatchTimeout = window.setTimeout(() => {
+      this.activity.clearSelection();
+      this.clearMismatch();
+    }, MatchingComponent.MISMATCH_FEEDBACK_MS);
   }
 
   protected isLeftWrong(id: string): boolean {
@@ -354,24 +265,5 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   protected isRightWrong(id: string): boolean {
     return this.wrongPair?.rightId === id;
-  }
-
-  get isComplete(): boolean {
-    const totalPairs = this.data?.pairs?.length ?? 0;
-    return totalPairs > 0 && this.matchedPairIds.size === totalPairs;
-  }
-
-  submit(): void {
-    if (this.disabled || !this.isComplete) {
-      return;
-    }
-
-    // Build the matches record for verification: { [pairId]: pairId }
-    const result: Record<string, string> = {};
-    for (const id of this.matchedPairIds) {
-      result[id] = id;
-    }
-
-    this.answerSubmitted.emit(result);
   }
 }

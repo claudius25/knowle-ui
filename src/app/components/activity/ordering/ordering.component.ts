@@ -2,11 +2,9 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
-  Output,
   QueryList,
   SimpleChanges,
   ViewChildren,
@@ -15,7 +13,9 @@ import {
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
-import { OrderingActivityData, OrderingItem } from '../../../shared/models/game.types';
+import { OrderingItem } from '../../../shared/models/game.types';
+import { OrderingActivityModel } from '../../../shared/models/activities';
+import { GameService } from '../../../shared/services/game.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
@@ -28,6 +28,7 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 })
 export class OrderingComponent implements OnChanges, AfterViewInit, OnDestroy {
   protected readonly uiText = inject(UiTextService);
+  protected readonly game = inject(GameService);
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 
@@ -38,13 +39,9 @@ export class OrderingComponent implements OnChanges, AfterViewInit, OnDestroy {
   private resizeObserver?: ResizeObserver;
   private growTimer?: number;
 
-  @Input({ required: true }) data!: OrderingActivityData;
-  @Input() disabled = false;
-  @Output() answerSubmitted = new EventEmitter<string[]>();
+  @Input({ required: true }) activity!: OrderingActivityModel;
 
   protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
-
-  protected items: OrderingItem[] = [];
 
   protected speak(): void {
     if (this.audioPlayer.isPlaying) {
@@ -53,11 +50,11 @@ export class OrderingComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
 
     const keys: string[] = [];
-    if (this.data.descriptionKey) {
-      keys.push(this.data.descriptionKey);
+    if (this.activity.data.descriptionKey) {
+      keys.push(this.activity.data.descriptionKey);
     }
-    if (this.data.questionKey) {
-      keys.push(this.data.questionKey);
+    if (this.activity.data.questionKey) {
+      keys.push(this.activity.data.questionKey);
     }
 
     if (keys.length > 0) {
@@ -66,8 +63,8 @@ export class OrderingComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] && this.data) {
-      this.initItems();
+    if (changes['activity'] && this.activity) {
+      this.resetCardHeights();
       this.scheduleGrow();
     }
   }
@@ -86,17 +83,6 @@ export class OrderingComponent implements OnChanges, AfterViewInit, OnDestroy {
     this.resizeObserver?.disconnect();
     window.removeEventListener('resize', this.scheduleGrow);
     window.clearTimeout(this.growTimer);
-  }
-
-  private initItems(): void {
-    if (!this.data?.items) {
-      this.items = [];
-      return;
-    }
-
-    const rawList = [...this.data.items];
-    this.items = this.shuffle(rawList);
-    this.resetCardHeights();
   }
 
   private resetCardHeights(): void {
@@ -191,21 +177,8 @@ export class OrderingComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   protected drop(event: CdkDragDrop<OrderingItem[]>): void {
-    if (this.disabled) return;
+    if (this.activity.isLocked) return;
 
-    moveItemInArray(this.items, event.previousIndex, event.currentIndex);
-  }
-
-  get isComplete(): boolean {
-    return this.items.length > 0;
-  }
-
-  submit(): void {
-    if (this.disabled || !this.isComplete) {
-      return;
-    }
-
-    const currentOrderIds = this.items.map((item) => item.id);
-    this.answerSubmitted.emit(currentOrderIds);
+    moveItemInArray(this.activity.items, event.previousIndex, event.currentIndex);
   }
 }

@@ -1,16 +1,9 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  inject,
-} from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
-import { PuzzleActivityData } from '../../../shared/models/game.types';
+import { PuzzleActivityModel } from '../../../shared/models/activities';
+import { GameService } from '../../../shared/services/game.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 
@@ -23,29 +16,25 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 })
 export class PuzzleComponent implements OnChanges {
   protected readonly uiText = inject(UiTextService);
+  protected readonly game = inject(GameService);
   private readonly audioPlayer = inject(AudioPlayerService);
 
   protected readonly gridSize = 3;
   private static readonly MAX_BOARD_VH = 36;
 
-  @Input({ required: true }) data!: PuzzleActivityData;
-  @Input() disabled = false;
-  /** Option picked in the question that is unlocked after the puzzle is solved. */
-  @Input() selectedAnswer: string | null = null;
-  @Output() answerSelected = new EventEmitter<string>();
+  @Input({ required: true }) activity!: PuzzleActivityModel;
 
   protected readonly isSpeaking$ = this.audioPlayer.isPlaying$;
 
   /** `pieces[position]` holds the index of the piece currently shown at that position. */
   protected pieces: number[] = [];
-  protected isSolved = false;
   /** Keeps the board proportional to the image so the pieces are not distorted. */
   protected boardAspectRatio = '1';
   /** Width is capped so the board's derived height stays within the visible area. */
   protected boardWidth = PuzzleComponent.boardWidthFor(1);
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] && this.data) {
+    if (changes['activity'] && this.activity) {
       this.shufflePieces();
       this.measureImage();
     }
@@ -54,7 +43,7 @@ export class PuzzleComponent implements OnChanges {
   private measureImage(): void {
     this.boardAspectRatio = '1';
     this.boardWidth = PuzzleComponent.boardWidthFor(1);
-    if (!this.data.image) {
+    if (!this.activity.data.image) {
       return;
     }
 
@@ -69,7 +58,7 @@ export class PuzzleComponent implements OnChanges {
       },
       { once: true },
     );
-    probe.src = this.data.image;
+    probe.src = this.activity.data.image;
   }
 
   private static boardWidthFor(ratio: number): string {
@@ -84,28 +73,26 @@ export class PuzzleComponent implements OnChanges {
       this.pieces = this.shuffle([...ordered]);
     } while (this.isOrdered(this.pieces));
 
-    this.isSolved = false;
+    this.activity.solved = false;
   }
 
   protected drop(event: CdkDragDrop<number>): void {
     const from = event.previousContainer.data;
     const to = event.container.data;
 
-    if (this.disabled || from === to) {
+    if (this.activity.isLocked || this.activity.solved || from === to) {
       return;
     }
 
     [this.pieces[from], this.pieces[to]] = [this.pieces[to], this.pieces[from]];
 
     if (this.isOrdered(this.pieces)) {
-      this.isSolved = true;
+      this.activity.solved = true;
     }
   }
 
   protected select(option: string): void {
-    if (!this.disabled) {
-      this.answerSelected.emit(option);
-    }
+    this.activity.selectLabel(option);
   }
 
   protected pieceBackgroundPosition(piece: number): string {
@@ -122,11 +109,11 @@ export class PuzzleComponent implements OnChanges {
     }
 
     const keys: string[] = [];
-    if (this.data.descriptionKey) {
-      keys.push(this.data.descriptionKey);
+    if (this.activity.data.descriptionKey) {
+      keys.push(this.activity.data.descriptionKey);
     }
-    if (this.isSolved && this.data.questionKey) {
-      keys.push(this.data.questionKey);
+    if (this.activity.solved && this.activity.data.questionKey) {
+      keys.push(this.activity.data.questionKey);
     }
 
     if (keys.length > 0) {

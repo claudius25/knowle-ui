@@ -1,7 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { OrderingComponent } from './ordering.component';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { OrderingActivityData } from '../../../shared/models/game.types';
+import { OrderingActivityModel } from '../../../shared/models/activities';
 
 const MOCK_DATA: OrderingActivityData = {
   question: 'Ordonează formele de relief de la cea mai joasă la cea mai înaltă:',
@@ -12,20 +15,31 @@ const MOCK_DATA: OrderingActivityData = {
   ],
 };
 
+function createModel(): OrderingActivityModel {
+  return new OrderingActivityModel({
+    activityId: 'easy_geo_7',
+    title: 'Relief',
+    type: 'ORDERING',
+    difficulty: 'EASY',
+    data: MOCK_DATA,
+  });
+}
+
 describe('OrderingComponent', () => {
   let component: OrderingComponent;
   let fixture: ComponentFixture<OrderingComponent>;
+  let model: OrderingActivityModel;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [OrderingComponent],
-      providers: [UiTextService],
+      providers: [UiTextService, provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
+    model = createModel();
     fixture = TestBed.createComponent(OrderingComponent);
     component = fixture.componentInstance;
-    component.data = MOCK_DATA;
-    fixture.componentRef.setInput('data', MOCK_DATA);
+    fixture.componentRef.setInput('activity', model);
     fixture.detectChanges();
   });
 
@@ -33,13 +47,13 @@ describe('OrderingComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with all items and report isComplete true', () => {
-    expect(component['items'].length).toBe(3);
-    expect(component.isComplete).toBeTrue();
+  it('should initialize with all items and be ready to submit', () => {
+    expect(model.items.length).toBe(3);
+    expect(model.isReadyToSubmit).toBeTrue();
   });
 
   it('should reorder items on drop event', () => {
-    const originalOrder = component['items'].map((i) => i.id);
+    const originalOrder = model.items.map((i) => i.id);
 
     // Simulate drop moving first item to second position
     const mockDropEvent = {
@@ -55,16 +69,12 @@ describe('OrderingComponent', () => {
     };
 
     component['drop'](mockDropEvent);
-    expect(component['items'][1].id).toBe(originalOrder[0]);
-    expect(component['items'][0].id).toBe(originalOrder[1]);
+    expect(model.items[1].id).toBe(originalOrder[0]);
+    expect(model.items[0].id).toBe(originalOrder[1]);
   });
 
-  it('should emit answerSubmitted on submit() with current order ids', () => {
-    spyOn(component.answerSubmitted, 'emit');
-
-    const expectedIds = component['items'].map((i) => i.id);
-    component.submit();
-
-    expect(component.answerSubmitted.emit).toHaveBeenCalledWith(expectedIds);
+  it('should build the answer from the current order', () => {
+    const expectedIds = model.items.map((i) => i.id);
+    expect(model.prepareSubmission()).toEqual(expectedIds);
   });
 });

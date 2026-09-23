@@ -1,8 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TrueFalseComponent } from './true-false.component';
 import { UiTextService } from '../../../shared/services/ui-text.service';
 import { AudioPlayerService } from '../../../shared/services/audio-player.service';
 import { TrueFalseActivityData } from '../../../shared/models/game.types';
+import { TrueFalseActivityModel } from '../../../shared/models/activities';
 
 const MOCK_DATA: TrueFalseActivityData = {
   question: 'România se află pe continentul Europa?',
@@ -12,10 +15,21 @@ const MOCK_DATA: TrueFalseActivityData = {
   options: [true, false],
 };
 
+function createModel(): TrueFalseActivityModel {
+  return new TrueFalseActivityModel({
+    activityId: 'easy_geo_4',
+    title: 'Continente',
+    type: 'TRUE_FALSE',
+    difficulty: 'EASY',
+    data: MOCK_DATA,
+  });
+}
+
 describe('TrueFalseComponent', () => {
   let component: TrueFalseComponent;
   let fixture: ComponentFixture<TrueFalseComponent>;
   let audioPlayerSpy: jasmine.SpyObj<AudioPlayerService>;
+  let model: TrueFalseActivityModel;
 
   beforeEach(async () => {
     audioPlayerSpy = jasmine.createSpyObj('AudioPlayerService', ['playKeys', 'stop'], {
@@ -25,13 +39,18 @@ describe('TrueFalseComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [TrueFalseComponent],
-      providers: [UiTextService, { provide: AudioPlayerService, useValue: audioPlayerSpy }],
+      providers: [
+        UiTextService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AudioPlayerService, useValue: audioPlayerSpy },
+      ],
     }).compileComponents();
 
+    model = createModel();
     fixture = TestBed.createComponent(TrueFalseComponent);
     component = fixture.componentInstance;
-    component.data = MOCK_DATA;
-    fixture.componentRef.setInput('data', MOCK_DATA);
+    fixture.componentRef.setInput('activity', model);
     fixture.detectChanges();
   });
 
@@ -41,32 +60,23 @@ describe('TrueFalseComponent', () => {
 
   it('should map the boolean options to the localized labels', () => {
     const uiText = TestBed.inject(UiTextService);
-    expect(component['choiceData'].options).toEqual([
-      uiText.text('trueLabel'),
-      uiText.text('falseLabel'),
-    ]);
+    expect(model.optionLabels).toEqual([uiText.text('trueLabel'), uiText.text('falseLabel')]);
   });
 
-  it('should emit answerSelected as a boolean', () => {
-    spyOn(component.answerSelected, 'emit');
-    const [trueLabel, falseLabel] = component['choiceData'].options;
+  it('should stage the picked label as a boolean', () => {
+    const [trueLabel, falseLabel] = model.optionLabels;
 
-    component['handleSelection'](trueLabel);
-    expect(component.answerSelected.emit).toHaveBeenCalledWith(true);
+    model.selectLabel(trueLabel);
+    expect(model.selectedAnswer).toBeTrue();
+    expect(model.selectedLabel).toBe(trueLabel);
 
-    component['handleSelection'](falseLabel);
-    expect(component.answerSelected.emit).toHaveBeenCalledWith(false);
+    model.selectLabel(falseLabel);
+    expect(model.selectedAnswer).toBeFalse();
+    expect(model.selectedLabel).toBe(falseLabel);
   });
 
-  it('should map the selected boolean back to the matching option', () => {
-    const [trueLabel, falseLabel] = component['choiceData'].options;
-
-    expect(component['selectedOption']).toBeNull();
-
-    component.selectedAnswer = true;
-    expect(component['selectedOption']).toBe(trueLabel);
-
-    component.selectedAnswer = false;
-    expect(component['selectedOption']).toBe(falseLabel);
+  it('should not offer fifty-fifty', () => {
+    expect(model.supportsFiftyFifty).toBeFalse();
+    expect(model.canUseFiftyFifty).toBeFalse();
   });
 });

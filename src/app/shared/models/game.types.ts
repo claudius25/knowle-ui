@@ -18,30 +18,29 @@ export interface GameStartResponse {
   difficulty: Difficulty;
 }
 
-export interface MultipleChoiceActivityData {
+/** Fields every activity renders, regardless of its type. */
+export interface ActivityPresentationData {
   question: string;
   title?: string;
   description?: string;
-  options: string[];
   pictures?: string[];
-  hint?: string;
   titleKey?: string;
   descriptionKey?: string;
   questionKey?: string;
+}
+
+/** Activity types that can offer the player a hint. */
+export interface HintableActivityData extends ActivityPresentationData {
+  hint?: string;
   hintKey?: string;
 }
 
-export interface TrueFalseActivityData {
-  question: string;
-  title?: string;
-  description?: string;
+export interface MultipleChoiceActivityData extends HintableActivityData {
+  options: string[];
+}
+
+export interface TrueFalseActivityData extends HintableActivityData {
   options: [boolean, boolean];
-  pictures?: string[];
-  hint?: string;
-  titleKey?: string;
-  descriptionKey?: string;
-  questionKey?: string;
-  hintKey?: string;
 }
 
 export interface ClassifyItem {
@@ -54,17 +53,9 @@ export interface ClassifyCategory {
   label: string;
 }
 
-export interface ClassifyActivityData {
-  question: string;
-  title?: string;
-  description?: string;
+export interface ClassifyActivityData extends HintableActivityData {
   items: ClassifyItem[];
   categories: ClassifyCategory[];
-  hint?: string;
-  titleKey?: string;
-  descriptionKey?: string;
-  questionKey?: string;
-  hintKey?: string;
 }
 
 export interface MatchingPair {
@@ -74,14 +65,8 @@ export interface MatchingPair {
   image?: string;
 }
 
-export interface MatchingActivityData {
-  question: string;
-  title?: string;
-  description?: string;
+export interface MatchingActivityData extends ActivityPresentationData {
   pairs: MatchingPair[];
-  titleKey?: string;
-  descriptionKey?: string;
-  questionKey?: string;
 }
 
 export interface OrderingItem {
@@ -89,29 +74,16 @@ export interface OrderingItem {
   text: string;
 }
 
-export interface OrderingActivityData {
-  question: string;
-  title?: string;
-  description?: string;
+export interface OrderingActivityData extends HintableActivityData {
   items: OrderingItem[];
-  hint?: string;
-  titleKey?: string;
-  descriptionKey?: string;
-  questionKey?: string;
-  hintKey?: string;
 }
 
-export interface PuzzleActivityData {
+export interface PuzzleActivityData extends ActivityPresentationData {
   /** Image to be split into pieces and reassembled by the player. */
   image: string;
   /** Question unlocked once the puzzle is solved. */
   question: string;
   options: string[];
-  title?: string;
-  description?: string;
-  titleKey?: string;
-  descriptionKey?: string;
-  questionKey?: string;
 }
 
 export type ActivityData =
@@ -126,7 +98,7 @@ interface ActivityBase {
   activityId: string;
   title: string;
   difficulty: Difficulty;
-  /** Practice activity: a wrong answer does not cost health. */
+  /** Graded activity: a wrong answer costs health. */
   isPractical?: boolean;
 }
 
