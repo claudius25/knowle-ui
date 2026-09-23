@@ -1,4 +1,12 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  ChangeDetectorRef,
+  inject,
+} from '@angular/core';
 
 const ANIMATION_DURATION_MS = 1000;
 
@@ -9,6 +17,7 @@ const ANIMATION_DURATION_MS = 1000;
   styleUrl: './coin-display.component.css',
 })
 export class CoinDisplayComponent implements OnChanges, OnDestroy {
+  cdr = inject(ChangeDetectorRef);
   @Input() amount = 0;
 
   displayedAmount = 0;
@@ -45,13 +54,13 @@ export class CoinDisplayComponent implements OnChanges, OnDestroy {
     const step = (now: number) => {
       const progress = Math.min((now - startTime) / ANIMATION_DURATION_MS, 1);
       this.displayedAmount = Math.round(from + (to - from) * progress);
-
       if (progress < 1) {
         this.animationFrameId = requestAnimationFrame(step);
       } else {
         this.displayedAmount = to;
         this.animationFrameId = null;
       }
+      this.cdr.markForCheck();
     };
 
     this.animationFrameId = requestAnimationFrame(step);

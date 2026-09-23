@@ -1,6 +1,8 @@
 import { Component, Input, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -18,7 +20,15 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 @Component({
   selector: 'app-classify',
   standalone: true,
-  imports: [AsyncPipe, CdkDropListGroup, CdkDropList, CdkDrag, MatIconModule],
+  imports: [
+    AsyncPipe,
+    CdkDropListGroup,
+    CdkDropList,
+    CdkDrag,
+    MatIconModule,
+    MatMenuModule,
+    MatButtonModule,
+  ],
   templateUrl: './classify.component.html',
   styleUrl: './classify.component.css',
 })
@@ -38,9 +48,9 @@ export class ClassifyComponent {
     }
 
     const keys: string[] = [];
-    if (this.activity.data.descriptionKey) {
-      keys.push(this.activity.data.descriptionKey);
-    }
+    // if (this.activity.data.descriptionKey) {
+    //   keys.push(this.activity.data.descriptionKey);
+    // }
     if (this.activity.data.questionKey) {
       keys.push(this.activity.data.questionKey);
     }

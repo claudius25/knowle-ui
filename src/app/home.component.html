@@ -42,7 +42,7 @@
           } @else { -->
       <g-button
         class="home-cta w-100"
-        labelKey="introStart"
+        [labelKey]="hasSavedGame ? 'continue' : 'introStart'"
         [colors]="['var(--home-button)', 'var(--home-button-depth)', 'var(--home-button)']"
         (clicked)="startGame()"
       ></g-button>

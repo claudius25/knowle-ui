@@ -13,6 +13,8 @@ import {
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 import { OrderingItem } from '../../../shared/models/game.types';
 import { OrderingActivityModel } from '../../../shared/models/activities';
 import { GameService } from '../../../shared/services/game.service';
@@ -22,7 +24,15 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 @Component({
   selector: 'app-ordering',
   standalone: true,
-  imports: [AsyncPipe, CommonModule, CdkDropList, CdkDrag, MatIconModule],
+  imports: [
+    AsyncPipe,
+    CommonModule,
+    CdkDropList,
+    CdkDrag,
+    MatIconModule,
+    MatMenuModule,
+    MatButtonModule,
+  ],
   templateUrl: './ordering.component.html',
   styleUrl: './ordering.component.css',
 })
@@ -50,9 +60,9 @@ export class OrderingComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
 
     const keys: string[] = [];
-    if (this.activity.data.descriptionKey) {
-      keys.push(this.activity.data.descriptionKey);
-    }
+    // if (this.activity.data.descriptionKey) {
+    //   keys.push(this.activity.data.descriptionKey);
+    // }
     if (this.activity.data.questionKey) {
       keys.push(this.activity.data.questionKey);
     }

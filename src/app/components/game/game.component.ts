@@ -205,18 +205,22 @@ export class GameComponent implements OnInit, OnDestroy {
     const activityParam = this.route.snapshot.paramMap.get('activityIndex');
     const random = this.route.snapshot.queryParamMap.get('mode') === 'random';
 
-    this.game
-      .startSession({
-        difficulty: 'EASY',
-        domain: 'geography',
-        random,
-        startFrom: activityParam ?? undefined,
-      })
-      .subscribe({
-        error: () => {
-          this.errorMessage = this.text('backendError');
-        },
-      });
+    // An explicit starting point always begins a fresh session.
+    const session =
+      !activityParam && this.game.hasSavedSession
+        ? this.game.resumeSession()
+        : this.game.startSession({
+            difficulty: 'EASY',
+            domain: 'geography',
+            random,
+            startFrom: activityParam ?? undefined,
+          });
+
+    session.subscribe({
+      error: () => {
+        this.errorMessage = this.text('backendError');
+      },
+    });
   }
 
   protected text(key: Parameters<UiTextService['text']>[0]): string {

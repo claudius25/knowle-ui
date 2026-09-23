@@ -20,6 +20,7 @@ import { Language, LanguageService } from './shared/services/language.service';
 import { IntroService } from './shared/services/intro.service';
 import { UiTextService } from './shared/services/ui-text.service';
 import { AudioPlayerService } from './shared/services/audio-player.service';
+import { GameService } from './shared/services/game.service';
 import { TORTI_HAPPY_LINES, pickRandomLine } from './characters/torti/torti-speech.constants';
 
 @Component({
@@ -36,6 +37,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   private readonly router = inject(Router);
   private readonly introService = inject(IntroService);
   private readonly audioPlayer = inject(AudioPlayerService);
+  private readonly game = inject(GameService);
   protected readonly uiText = inject(UiTextService);
   private resizeObserver?: ResizeObserver;
   private lastHeaderWidth = 0;
@@ -45,8 +47,12 @@ export class HomeComponent implements OnDestroy, OnInit {
   protected tortiSpeech = '';
   protected tortiShowBubble = false;
   protected showLanguageDialog = false;
+  /** An unfinished game is waiting: the player resumes it instead of starting a new one. */
+  protected hasSavedGame = false;
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.hasSavedGame = this.game.hasSavedSession;
+  }
 
   protected text(key: Parameters<UiTextService['text']>[0]): string {
     return this.uiText.text(key);
@@ -120,5 +126,6 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   clearLocalStorage() {
     localStorage.clear();
+    this.hasSavedGame = false;
   }
 }

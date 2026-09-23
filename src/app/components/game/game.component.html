@@ -59,13 +59,9 @@
     [checkText]="text('check')"
     [characterPose]="characterPose"
     [characterSpeech]="characterSpeech"
-    [health]="game.health"
-    [coins]="game.coins"
     (chapter)="continueGame()"
     (continue)="continueGame()"
     (retry)="retry()"
-    (hint)="game.showHint()"
-    (fifty)="game.useFiftyFifty()"
     (check)="checkAnswer()"
   />
 

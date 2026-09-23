@@ -2,6 +2,8 @@ import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/cor
 import { AsyncPipe } from '@angular/common';
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 import { PuzzleActivityModel } from '../../../shared/models/activities';
 import { GameService } from '../../../shared/services/game.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
@@ -10,7 +12,15 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 @Component({
   selector: 'app-puzzle',
   standalone: true,
-  imports: [AsyncPipe, CdkDropListGroup, CdkDropList, CdkDrag, MatIconModule],
+  imports: [
+    AsyncPipe,
+    CdkDropListGroup,
+    CdkDropList,
+    CdkDrag,
+    MatIconModule,
+    MatMenuModule,
+    MatButtonModule,
+  ],
   templateUrl: './puzzle.component.html',
   styleUrl: './puzzle.component.css',
 })

@@ -14,6 +14,8 @@ import {
 } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 import { MatchAttempt, MatchingActivityModel } from '../../../shared/models/activities';
 import { GameService } from '../../../shared/services/game.service';
 import { UiTextService } from '../../../shared/services/ui-text.service';
@@ -22,7 +24,7 @@ import { AudioPlayerService } from '../../../shared/services/audio-player.servic
 @Component({
   selector: 'app-matching',
   standalone: true,
-  imports: [AsyncPipe, CommonModule, MatIconModule],
+  imports: [AsyncPipe, CommonModule, MatIconModule, MatMenuModule, MatButtonModule],
   templateUrl: './matching.component.html',
   styleUrl: './matching.component.css',
 })
@@ -54,9 +56,9 @@ export class MatchingComponent implements OnChanges, AfterViewInit, OnDestroy {
     }
 
     const keys: string[] = [];
-    if (this.activity.data.descriptionKey) {
-      keys.push(this.activity.data.descriptionKey);
-    }
+    // if (this.activity.data.descriptionKey) {
+    //   keys.push(this.activity.data.descriptionKey);
+    // }
     if (this.activity.data.questionKey) {
       keys.push(this.activity.data.questionKey);
     }

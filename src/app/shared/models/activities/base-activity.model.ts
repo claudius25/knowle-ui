@@ -8,6 +8,16 @@ import {
 
 export type AnswerState = 'correct' | 'incorrect' | null;
 
+/** Serializable part of an attempt, so an interrupted session can be resumed. */
+export interface ActivityProgress {
+  hintUsed: boolean;
+  fiftyFiftyUsed: boolean;
+  retryCount: number;
+  coinsDelta: number;
+  healthLost: number;
+  eliminatedLabels?: string[];
+}
+
 /**
  * Runtime state of a single activity: what the player picked, which helps were
  * spent and how the attempt was judged. Components bind to the instance and
@@ -139,6 +149,24 @@ export abstract class BaseActivityModel<TAnswer = unknown> {
     return this.rejectedAnswers.some((rejected) => this.isSameAnswer(rejected, answer));
   }
 
+  toProgress(): ActivityProgress {
+    return {
+      hintUsed: this.hintUsed,
+      fiftyFiftyUsed: this.fiftyFiftyUsed,
+      retryCount: this.retryCount,
+      coinsDelta: this.coinsDelta,
+      healthLost: this.healthLost,
+    };
+  }
+
+  restore(progress: ActivityProgress): void {
+    this.hintUsed = progress.hintUsed;
+    this.fiftyFiftyUsed = progress.fiftyFiftyUsed;
+    this.retryCount = progress.retryCount;
+    this.coinsDelta = progress.coinsDelta;
+    this.healthLost = progress.healthLost;
+  }
+
   protected buildAnswer(): TAnswer | null {
     return this.selectedAnswer;
   }
@@ -191,6 +219,17 @@ export abstract class ChoiceActivityModel<TAnswer = unknown> extends BaseActivit
     const selected = this.selectedLabel;
     if (selected !== null && this.eliminatedLabels.has(selected)) {
       this.selectedAnswer = null;
+    }
+  }
+
+  override toProgress(): ActivityProgress {
+    return { ...super.toProgress(), eliminatedLabels: [...this.eliminatedLabels] };
+  }
+
+  override restore(progress: ActivityProgress): void {
+    super.restore(progress);
+    for (const label of progress.eliminatedLabels ?? []) {
+      this.eliminatedLabels.add(label);
     }
   }
 

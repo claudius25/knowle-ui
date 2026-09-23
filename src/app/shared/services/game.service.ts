@@ -2,7 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, map, of, switchMap, tap, throwError } from 'rxjs';
 import { Difficulty } from '../models/game.types';
-import { ActivityModel, ChoiceActivityModel, createActivityModel } from '../models/activities';
+import {
+  ActivityModel,
+  ActivityProgress,
+  ChoiceActivityModel,
+  createActivityModel,
+} from '../models/activities';
 import { ContentDatabaseService } from './content-database.service';
 import { HintDialogComponent } from '../components/hint-dialog/hint-dialog.component';
 
@@ -26,6 +31,23 @@ export interface ActivityOutcome {
   healthLost: number;
 }
 
+/** Everything needed to pick an interrupted session back up after a reload. */
+interface GameSnapshot {
+  version: 1;
+  difficulty: Difficulty;
+  domain: string;
+  random: boolean;
+  activityCount: number;
+  /** Ids still waiting after the current one. */
+  queue: string[];
+  currentActivityId: string | null;
+  currentProgress: ActivityProgress | null;
+  coins: number;
+  health: number;
+  completedActivities: number;
+  outcomes: ActivityOutcome[];
+}
+
 /**
  * Game engine: owns the session, builds and serves the activity models,
  * verifies the answers and keeps the coin/health ledger.
@@ -38,10 +60,11 @@ export class GameService {
   static readonly ACTIVITIES_PER_SESSION = 10;
   static readonly MAX_HEALTH = 100;
   static readonly COINS_PER_CORRECT_ANSWER = 10;
-  static readonly COINS_LOST_PER_RETRY = 20;
+  static readonly COINS_LOST_PER_RETRY = 5;
   static readonly COINS_LOST_PER_HINT = 5;
-  static readonly COINS_LOST_PER_FIFTY_FIFTY = 10;
+  static readonly COINS_LOST_PER_FIFTY_FIFTY = 5;
   static readonly HEALTH_LOSS_PER_MISTAKE = 20;
+  private static readonly STORAGE_KEY = 'knowle-game-session';
 
   private difficulty: Difficulty = 'EASY';
   private domain = 'geography';
@@ -98,6 +121,41 @@ export class GameService {
     return this._health <= 0;
   }
 
+  /** True when an unfinished session is stored and can be resumed. */
+  get hasSavedSession(): boolean {
+    return this.readSnapshot() !== null;
+  }
+
+  /** Restores the stored session and re-serves the activity it was interrupted on. */
+  resumeSession(): Observable<ActivityModel> {
+    const snapshot = this.readSnapshot();
+    if (!snapshot?.currentActivityId) {
+      return throwError(() => new Error('No session to resume'));
+    }
+
+    this.difficulty = snapshot.difficulty;
+    this.domain = snapshot.domain;
+    this.randomMode = snapshot.random;
+    this.activityCount = snapshot.activityCount;
+    this.queue = [...snapshot.queue];
+    this._coins = snapshot.coins;
+    this._health = snapshot.health;
+    this._completedActivities = snapshot.completedActivities;
+    this._outcomes.length = 0;
+    this._outcomes.push(...snapshot.outcomes);
+
+    return this.serve(snapshot.currentActivityId, snapshot.currentProgress);
+  }
+
+  /** Drops the stored session so the next start begins from scratch. */
+  clearSession(): void {
+    try {
+      localStorage.removeItem(GameService.STORAGE_KEY);
+    } catch {
+      // localStorage unavailable (e.g. private mode) - nothing to clear.
+    }
+  }
+
   /** Builds the activity queue and serves the first activity. */
   startSession(options: GameSessionOptions = {}): Observable<ActivityModel> {
     this.difficulty = options.difficulty ?? 'EASY';
@@ -112,6 +170,7 @@ export class GameService {
     this._completedActivities = 0;
     this._outcomes.length = 0;
     this.queue = [];
+    this.clearSession();
 
     return this.contentDb.loadDatabase(this.difficulty, this.domain).pipe(
       switchMap((db) => {
@@ -144,6 +203,7 @@ export class GameService {
     if (this.sessionComplete) {
       this._activity = null;
       this._status = 'idle';
+      this.clearSession();
       return of(null);
     }
 
@@ -177,7 +237,10 @@ export class GameService {
 
           if (activity.isPractical) {
             this.loseHealth(activity, GameService.HEALTH_LOSS_PER_MISTAKE);
+            return;
           }
+
+          this.persist();
         },
         error: () => {
           activity.submitting = false;
@@ -251,6 +314,10 @@ export class GameService {
       return throwError(() => new Error('No activity left to serve'));
     }
 
+    return this.serve(activityId, null);
+  }
+
+  private serve(activityId: string, progress: ActivityProgress | null): Observable<ActivityModel> {
     this._status = 'loading';
     this._activity = null;
 
@@ -258,11 +325,17 @@ export class GameService {
       map((activity) => createActivityModel(activity)),
       tap({
         next: (model) => {
+          if (progress) {
+            model.restore(progress);
+          }
           this._activity = model;
           this._status = 'playing';
+          this.persist();
         },
         error: () => {
           this._status = 'error';
+          // The stored session points at content we can no longer load.
+          this.clearSession();
         },
       }),
     );
@@ -271,12 +344,62 @@ export class GameService {
   private addCoins(activity: ActivityModel, amount: number): void {
     activity.coinsDelta += amount;
     this._coins += amount;
+    this.persist();
   }
 
   private loseHealth(activity: ActivityModel, amount: number): void {
     const applied = Math.min(amount, this._health);
     activity.healthLost += applied;
     this._health -= applied;
+    this.persist();
+  }
+
+  private persist(): void {
+    if (!this._activity) {
+      return;
+    }
+
+    const snapshot: GameSnapshot = {
+      version: 1,
+      difficulty: this.difficulty,
+      domain: this.domain,
+      random: this.randomMode,
+      activityCount: this.activityCount,
+      queue: [...this.queue],
+      currentActivityId: this._activity.activityId,
+      currentProgress: this._activity.toProgress(),
+      coins: this._coins,
+      health: this._health,
+      completedActivities: this._completedActivities,
+      outcomes: [...this._outcomes],
+    };
+
+    try {
+      localStorage.setItem(GameService.STORAGE_KEY, JSON.stringify(snapshot));
+    } catch {
+      // localStorage unavailable (e.g. private mode) - the session just won't survive a reload.
+    }
+  }
+
+  private readSnapshot(): GameSnapshot | null {
+    let raw: string | null = null;
+    try {
+      raw = localStorage.getItem(GameService.STORAGE_KEY);
+    } catch {
+      return null;
+    }
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      const snapshot = JSON.parse(raw) as GameSnapshot;
+      return snapshot.version === 1 && snapshot.currentActivityId ? snapshot : null;
+    } catch {
+      this.clearSession();
+      return null;
+    }
   }
 }
 

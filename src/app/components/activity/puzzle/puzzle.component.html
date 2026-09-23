@@ -52,7 +52,16 @@
 @if (activity.solved) {
   <div class="puzzle-question">
     <div class="question-row">
-      <h2>{{ activity.data.question }}</h2>
+      <h3 [style.margin]="0">
+        <span class="speak-btn" [class.speaking]="isSpeaking$ | async" (click)="speak()">📣</span>
+        {{ activity.data.question }}
+      </h3>
+      <button class="settings-btn" matButton [matMenuTriggerFor]="menu">⋮</button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item [disabled]="!activity.canUseHint" (click)="game.showHint()">
+          {{ uiText.text('hint') }}
+        </button>
+      </mat-menu>
     </div>
 
     <div
