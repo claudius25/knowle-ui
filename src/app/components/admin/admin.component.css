@@ -689,7 +689,9 @@ textarea:focus {
   font-weight: 800;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 0.1s ease, filter 0.1s ease;
+  transition:
+    transform 0.1s ease,
+    filter 0.1s ease;
 }
 
 .btn:active {

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "chapter": {
+    "id": "geo_terra",
+    "title": "geo_terra_title",
+    "description": "geo_terra_desc",
+    "activities": [
+      {
+        "id": "easy_geography_13",
+        "type": "PUZZLE",
+        "title": "easy_geography_13_title",
+        "description": "easy_geography_13_desc",
+        "question": "easy_geography_13_question",
+        "isPractical": false,
+        "pictures": [
+          "pangeea.png"
+        ],
+        "options": [
+          {
+            "id": "a",
+            "text": "easy_geography_13_op_1"
+          },
+          {
+            "id": "b",
+            "text": "easy_geography_13_op_2"
+          },
+          {
+            "id": "c",
+            "text": "easy_geography_13_op_3"
+          }
+        ],
+        "answer": "b",
+        "reward": {
+          "coins": 15,
+          "energy": 0
+        }
+      }
+    ]
+  }
+}

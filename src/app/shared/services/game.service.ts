@@ -76,6 +76,7 @@ export class GameService {
     chapterId: string,
     options: { difficulty?: Difficulty; domain?: string; random?: boolean } = {},
   ): Observable<ActivityModel> {
+    console.log('Starting chapter with ID:', options);
     const start = (id: string) =>
       this.chapterService.startSession({
         chapterId: id,

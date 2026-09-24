@@ -21,7 +21,7 @@ export interface ChapterSessionOptions {
   domain?: string;
   /** Serves the activities in random order instead of the authored order. */
   random?: boolean;
-  /** Number of activities to play in this session. */
+  /** Caps how many activities are played; by default the whole chapter is played. */
   activityCount?: number;
   /** 1-based index or activity id to start the ordered session from. */
   startFrom?: string | number;
@@ -62,7 +62,6 @@ export class ChapterService {
   private readonly audioPlayer = inject(AudioPlayerService);
   private readonly dialog = inject(MatDialog);
 
-  static readonly ACTIVITIES_PER_SESSION = 10;
   static readonly MAX_HEALTH = 100;
   static readonly COINS_PER_CORRECT_ANSWER = 10;
   static readonly COINS_LOST_PER_RETRY = 5;
@@ -75,7 +74,8 @@ export class ChapterService {
   private difficulty: Difficulty = 'EASY';
   private domain = 'geography';
   private randomMode = false;
-  private activityCount = ChapterService.ACTIVITIES_PER_SESSION;
+  /** Activities this run is made of; set from the chapter's db.json once loaded. */
+  private activityCount = 0;
   /** Ids still to be served, in the order they will be played. */
   private queue: string[] = [];
 
@@ -126,7 +126,7 @@ export class ChapterService {
   }
 
   get progress(): number {
-    return (this._completedActivities / this.activityCount) * 100;
+    return this.activityCount === 0 ? 0 : (this._completedActivities / this.activityCount) * 100;
   }
 
   get sessionComplete(): boolean {
@@ -180,7 +180,7 @@ export class ChapterService {
     this.difficulty = options.difficulty ?? 'EASY';
     this.domain = options.domain ?? 'geography';
     this.randomMode = options.random ?? false;
-    this.activityCount = options.activityCount ?? ChapterService.ACTIVITIES_PER_SESSION;
+    this.activityCount = 0;
 
     this._status = 'loading';
     this._activity = null;
@@ -206,9 +206,11 @@ export class ChapterService {
           return throwError(() => new Error('No activities available'));
         }
 
-        this.queue = this.randomMode
+        const queue = this.randomMode
           ? shuffle(ids)
           : ids.slice(startIndexOf(ids, options.startFrom));
+        this.queue = options.activityCount ? queue.slice(0, options.activityCount) : queue;
+        this.activityCount = this.queue.length;
         return this.serveNext();
       }),
     );

@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "chapter": {
+    "id": "geo_plants",
+    "title": "geo_plants_title",
+    "description": "geo_plants_desc",
+    "activities": []
+  }
+}
