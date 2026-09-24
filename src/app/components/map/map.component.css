@@ -200,6 +200,40 @@
   color: #a7b0b3;
 }
 
+/* Completed chapter: green check badge and a muted, "stamped" card. */
+.map-node--done .map-node__badge {
+  background: #2f8a4b;
+}
+
+.map-node--done .map-card {
+  background: #eef8ee;
+}
+
+.map-node--done .map-card__state {
+  color: #2f8a4b;
+}
+
+.map-card__done {
+  color: #2f8a4b !important;
+  font-weight: 800;
+}
+
+/* The chapter to play next gets a ring so it stands out in the trail. */
+.map-node--next .map-card {
+  outline: 3px solid #2f8a4b;
+  outline-offset: 2px;
+}
+
+/* No content authored for this chapter yet. */
+.map-node--soon .map-node__badge {
+  background: #c9a227;
+}
+
+.map-card__soon {
+  color: #a8801a !important;
+  font-weight: 800;
+}
+
 .loader {
   width: 28px;
   height: 28px;

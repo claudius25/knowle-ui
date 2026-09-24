@@ -26,9 +26,9 @@ describe('ChapterDoneComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should navigate to home on goHome()', () => {
+  it('should navigate to the map on goHome()', () => {
     component['goHome']();
-    expect(router.navigate).toHaveBeenCalledWith(['/']);
+    expect(router.navigate).toHaveBeenCalledWith(['/map']);
   });
 
   it('should navigate to game on playAgain()', () => {

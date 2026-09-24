@@ -14,7 +14,8 @@
       "title": "mapChapter2Title",
       "subtitle": "mapChapter2Subtitle",
       "icon": "🌋",
-      "image": "assets/map/terra.png"
+      "image": "assets/map/terra.png",
+      "startActivityId": "easy_geography_13"
     },
     {
       "id": "geo_waters",

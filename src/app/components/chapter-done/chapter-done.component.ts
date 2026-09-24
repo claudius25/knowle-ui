@@ -28,7 +28,7 @@ export class ChapterDoneComponent {
   }
 
   protected goHome(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/map']);
   }
 
   protected playAgain(): void {

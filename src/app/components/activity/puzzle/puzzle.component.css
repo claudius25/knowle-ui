@@ -1,5 +1,10 @@
 .question-block--puzzle {
   padding: 10px;
+  background: white;
+  color: black !important;
+  .activity-title {
+    color: black !important;
+  }
 }
 .puzzle-board {
   display: grid;

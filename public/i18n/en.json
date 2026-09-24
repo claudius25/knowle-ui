@@ -87,6 +87,8 @@
   "mapTitle": "Chapters",
   "mapSubtitle": "Choose your next destination",
   "mapLocked": "Locked chapter",
+  "mapCompleted": "Completed",
+  "mapComingSoon": "Coming soon",
   "mapChapter1Title": "The solar system",
   "mapChapter1Subtitle": "Planets, stars and galaxies",
   "mapChapter2Title": "Planet Earth",

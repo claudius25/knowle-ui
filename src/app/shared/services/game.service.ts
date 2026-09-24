@@ -13,6 +13,14 @@ export interface ChapterProgress {
   health: number;
 }
 
+/** A map chapter enriched with the player's progress on it. */
+export interface GameChapter extends MapChapter {
+  completed: boolean;
+  coins: number;
+  /** No content authored yet, so it can never be opened - not a progression lock. */
+  comingSoon: boolean;
+}
+
 /**
  * Owns the game across all chapters: reads the chapter list from map.json,
  * tracks which ones are unlocked or finished and hands one over to the
@@ -25,7 +33,9 @@ export class GameService {
 
   private static readonly STORAGE_KEY = 'knowle-game-progress';
 
-  private _chapters: MapChapter[] = [];
+  /** Chapters exactly as authored in map.json; progress is never folded into these. */
+  private mapChapters: readonly MapChapter[] = [];
+  private _chapters: GameChapter[] = [];
   private progress = new Map<string, ChapterProgress>();
 
   constructor() {
@@ -33,12 +43,12 @@ export class GameService {
   }
 
   /** Chapters declared in map.json, in their authored order. */
-  get chapters(): readonly MapChapter[] {
+  get chapters(): readonly GameChapter[] {
     return this._chapters;
   }
 
   /** Chapter currently being played, if any. */
-  get currentChapter(): MapChapter | null {
+  get currentChapter(): GameChapter | null {
     const id = this.chapterService.currentChapterId;
     return this._chapters.find((chapter) => chapter.id === id) ?? null;
   }
@@ -56,10 +66,10 @@ export class GameService {
     return this.chapterService.hasSavedSession;
   }
 
-  loadChapters(): Observable<readonly MapChapter[]> {
+  loadChapters(): Observable<readonly GameChapter[]> {
     return this.mapService.loadChapters().pipe(
-      map((chapters) => this.withUnlocking(chapters)),
-      tap((chapters) => (this._chapters = chapters)),
+      tap((chapters) => (this.mapChapters = chapters)),
+      map(() => this.refreshChapters()),
     );
   }
 
@@ -76,7 +86,6 @@ export class GameService {
     chapterId: string,
     options: { difficulty?: Difficulty; domain?: string; random?: boolean } = {},
   ): Observable<ActivityModel> {
-    console.log('Starting chapter with ID:', options);
     const start = (id: string) =>
       this.chapterService.startSession({
         chapterId: id,
@@ -100,7 +109,7 @@ export class GameService {
     );
   }
 
-  private ensureChapters(): Observable<readonly MapChapter[]> {
+  private ensureChapters(): Observable<readonly GameChapter[]> {
     return this._chapters.length ? of(this._chapters) : this.loadChapters();
   }
 
@@ -123,13 +132,13 @@ export class GameService {
     });
 
     this.writeProgress();
-    this._chapters = this.withUnlocking(this._chapters);
+    this.refreshChapters();
   }
 
   resetProgress(): void {
     this.progress.clear();
     this.chapterService.clearSession();
-    this._chapters = this.withUnlocking(this._chapters);
+    this.refreshChapters();
     try {
       localStorage.removeItem(GameService.STORAGE_KEY);
     } catch {
@@ -137,14 +146,26 @@ export class GameService {
     }
   }
 
-  /** A chapter opens once it has content and the previous one has been completed. */
-  private withUnlocking(chapters: readonly MapChapter[]): MapChapter[] {
-    let unlocked = true;
-    return chapters.map((chapter) => {
-      const locked = chapter.locked || !unlocked;
-      unlocked = this.isCompleted(chapter.id);
-      return { ...chapter, locked };
+  /**
+   * Recomputes the played state from the authored map, so a chapter re-opens as
+   * soon as the one before it is completed.
+   */
+  private refreshChapters(): readonly GameChapter[] {
+    let previousCompleted = true;
+    this._chapters = this.mapChapters.map((chapter) => {
+      const completed = this.isCompleted(chapter.id);
+      const comingSoon = !chapter.startActivityId;
+      const entry: GameChapter = {
+        ...chapter,
+        locked: comingSoon || chapter.locked || !previousCompleted,
+        completed,
+        comingSoon,
+        coins: this.progress.get(chapter.id)?.coins ?? 0,
+      };
+      previousCompleted = completed;
+      return entry;
     });
+    return this._chapters;
   }
 
   private readProgress(): Map<string, ChapterProgress> {

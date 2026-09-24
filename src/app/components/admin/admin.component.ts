@@ -502,12 +502,32 @@ export class AdminComponent implements OnInit {
     }
 
     chapter.activities.push(newActivity);
+    this.syncStartActivity(chapter);
     this.selectedActivityIndex = chapter.activities.length - 1;
+  }
+
+  /**
+   * A chapter is only playable when its map entry points at an existing activity,
+   * so keep that pointer valid as activities come and go.
+   */
+  private syncStartActivity(chapter: DbChapter): void {
+    const entry = this.chapterMap.chapters.find((c) => c.id === chapter.id);
+    if (!entry) {
+      return;
+    }
+
+    const stillExists = chapter.activities.some((act) => act.id === entry.startActivityId);
+    if (stillExists) {
+      return;
+    }
+
+    entry.startActivityId = chapter.activities[0]?.id;
   }
 
   protected removeActivity(chapter: DbChapter, index: number): void {
     if (confirm(`Ești sigur că vrei să ștergi activitatea "${chapter.activities[index].id}"?`)) {
       chapter.activities.splice(index, 1);
+      this.syncStartActivity(chapter);
       if (this.selectedActivityIndex === index) {
         this.selectedActivityIndex = -1;
       } else if (this.selectedActivityIndex > index) {

@@ -2,8 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CoinDisplayComponent } from '../ui/coin-display/coin-display.component';
-import { MapChapter } from '../../shared/services/map.service';
-import { GameService } from '../../shared/services/game.service';
+import { GameChapter, GameService } from '../../shared/services/game.service';
 import { UiTextService } from '../../shared/services/ui-text.service';
 
 @Component({
@@ -18,7 +17,7 @@ export class MapComponent implements OnInit {
   protected readonly game = inject(GameService);
   protected readonly uiText = inject(UiTextService);
 
-  protected chapters: readonly MapChapter[] = [];
+  protected chapters: readonly GameChapter[] = [];
   protected loading = true;
 
   ngOnInit(): void {
@@ -33,7 +32,12 @@ export class MapComponent implements OnInit {
     });
   }
 
-  protected openChapter(chapter: MapChapter): void {
+  /** First chapter that is open but not finished yet - the one to play next. */
+  protected get nextChapterId(): string | null {
+    return this.chapters.find((chapter) => !chapter.locked && !chapter.completed)?.id ?? null;
+  }
+
+  protected openChapter(chapter: GameChapter): void {
     if (chapter.locked) {
       return;
     }
