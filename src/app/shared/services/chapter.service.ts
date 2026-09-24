@@ -8,14 +8,15 @@ import {
   ChoiceActivityModel,
   createActivityModel,
 } from '../models/activities';
-import { ContentDatabaseService } from './content-database.service';
+import { ContentDatabaseService, ContentScope } from './content-database.service';
+import { AudioPlayerService } from './audio-player.service';
 import { HintDialogComponent } from '../components/hint-dialog/hint-dialog.component';
 
 export type ChapterStatus = 'idle' | 'loading' | 'playing' | 'checking' | 'answered' | 'error';
 
 export interface ChapterSessionOptions {
-  /** Chapter to play; when omitted every activity of the domain is queued. */
-  chapterId?: string;
+  /** Chapter to play; its content lives in /db/{difficulty}/{domain}/{chapterId}/. */
+  chapterId: string;
   difficulty?: Difficulty;
   domain?: string;
   /** Serves the activities in random order instead of the authored order. */
@@ -36,7 +37,7 @@ export interface ActivityOutcome {
 /** Everything needed to pick an interrupted session back up after a reload. */
 interface ChapterSnapshot {
   version: 1;
-  chapterId: string | null;
+  chapterId: string;
   difficulty: Difficulty;
   domain: string;
   random: boolean;
@@ -58,6 +59,7 @@ interface ChapterSnapshot {
 @Injectable({ providedIn: 'root' })
 export class ChapterService {
   private readonly contentDb = inject(ContentDatabaseService);
+  private readonly audioPlayer = inject(AudioPlayerService);
   private readonly dialog = inject(MatDialog);
 
   static readonly ACTIVITIES_PER_SESSION = 10;
@@ -69,7 +71,7 @@ export class ChapterService {
   static readonly HEALTH_LOSS_PER_MISTAKE = 20;
   private static readonly STORAGE_KEY = 'knowle-chapter-session';
 
-  private chapterId: string | null = null;
+  private chapterId = '';
   private difficulty: Difficulty = 'EASY';
   private domain = 'geography';
   private randomMode = false;
@@ -90,7 +92,12 @@ export class ChapterService {
 
   /** Chapter currently being played. */
   get currentChapterId(): string | null {
-    return this.chapterId;
+    return this.chapterId || null;
+  }
+
+  /** Content folder the current session reads its activities, texts and media from. */
+  get scope(): ContentScope {
+    return { difficulty: this.difficulty, domain: this.domain, chapter: this.chapterId };
   }
 
   get activity(): ActivityModel | null {
@@ -153,6 +160,7 @@ export class ChapterService {
     this._completedActivities = snapshot.completedActivities;
     this._outcomes.length = 0;
     this._outcomes.push(...snapshot.outcomes);
+    this.audioPlayer.setContentScope(this.scope);
 
     return this.serve(snapshot.currentActivityId, snapshot.currentProgress);
   }
@@ -167,8 +175,8 @@ export class ChapterService {
   }
 
   /** Builds the activity queue and serves the first activity. */
-  startSession(options: ChapterSessionOptions = {}): Observable<ActivityModel> {
-    this.chapterId = options.chapterId ?? null;
+  startSession(options: ChapterSessionOptions): Observable<ActivityModel> {
+    this.chapterId = options.chapterId;
     this.difficulty = options.difficulty ?? 'EASY';
     this.domain = options.domain ?? 'geography';
     this.randomMode = options.random ?? false;
@@ -183,12 +191,16 @@ export class ChapterService {
     this.queue = [];
     this.clearSession();
 
-    return this.contentDb.loadDatabase(this.difficulty, this.domain).pipe(
+    if (!this.chapterId) {
+      this._status = 'error';
+      return throwError(() => new Error('No chapter to play'));
+    }
+
+    this.audioPlayer.setContentScope(this.scope);
+
+    return this.contentDb.loadChapter(this.scope).pipe(
       switchMap((db) => {
-        const chapters = this.chapterId
-          ? db.chapters.filter((chapter) => chapter.id === this.chapterId)
-          : db.chapters;
-        const ids = chapters.flatMap((chapter) => chapter.activities).map((act) => act.id);
+        const ids = db.chapter.activities.map((act) => act.id);
         if (ids.length === 0) {
           this._status = 'error';
           return throwError(() => new Error('No activities available'));
@@ -237,7 +249,7 @@ export class ChapterService {
     }
 
     this._status = 'checking';
-    return this.contentDb.submitAnswer(activity.activityId, answer, this.difficulty).pipe(
+    return this.contentDb.submitAnswer(activity.activityId, answer, this.scope).pipe(
       map((response) => response.correct),
       tap({
         next: (correct) => {
@@ -306,7 +318,7 @@ export class ChapterService {
     }
 
     this.contentDb
-      .getWrongOptionLabels(activity.activityId, this.difficulty, this.domain)
+      .getWrongOptionLabels(activity.activityId, this.scope)
       .subscribe((wrongLabels) => {
         const toRemove = shuffle(wrongLabels).slice(
           0,
@@ -335,7 +347,7 @@ export class ChapterService {
     this._status = 'loading';
     this._activity = null;
 
-    return this.contentDb.getActivity(activityId, this.difficulty, this.domain).pipe(
+    return this.contentDb.getActivity(activityId, this.scope).pipe(
       map((activity) => createActivityModel(activity)),
       tap({
         next: (model) => {

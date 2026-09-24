@@ -51,6 +51,12 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+.export-scope {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #9fd8c8;
+  opacity: 0.85;
+}
 .input-group {
   display: flex;
   align-items: center;

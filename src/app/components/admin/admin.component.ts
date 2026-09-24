@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
   DbActivity,
   DbCategory,
   DbChapter,
-  DbDatabase,
+  DbChapterFile,
   DbItem,
   DbOption,
   DbPair,
@@ -23,6 +24,13 @@ interface ActiveTranslationModal {
   ro: string;
   en: string;
   title?: string;
+}
+
+/** Everything stored under /db/{difficulty}/{domain}/{chapterId}/ for one chapter. */
+interface ChapterBundle {
+  chapter: DbChapter;
+  ro: Record<string, string>;
+  en: Record<string, string>;
 }
 
 @Component({
@@ -41,22 +49,11 @@ export class AdminComponent implements OnInit {
   protected difficulty: Difficulty = 'EASY';
   protected domain = 'geography';
 
-  // Chapters come from the shared map, activities from the domain database
+  // Chapters come from the shared map, their content from one folder per chapter
   protected chapterMap: MapDefinition = { version: 1, chapters: [] };
 
-  // Loaded database & translation dictionaries
-  protected db: DbDatabase = {
-    version: 1,
-    chapters: [],
-  };
-
-  protected translations: {
-    ro: Record<string, string>;
-    en: Record<string, string>;
-  } = {
-    ro: {},
-    en: {},
-  };
+  /** Loaded content, keyed by chapter id. */
+  private readonly bundles = new Map<string, ChapterBundle>();
 
   // UI state
   protected activeTab: 'editor' | 'translations' | 'raw' = 'editor';
@@ -94,19 +91,7 @@ export class AdminComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadChapterMap();
     this.loadCurrentDatabase();
-  }
-
-  private loadChapterMap(): void {
-    this.http.get<MapDefinition>('/map.json').subscribe({
-      next: (definition) => {
-        this.chapterMap = definition;
-      },
-      error: () => {
-        this.chapterMap = { version: 1, chapters: [] };
-      },
-    });
   }
 
   /** Chapters declared in map.json, the single source of truth for the chapter list. */
@@ -118,19 +103,36 @@ export class AdminComponent implements OnInit {
     return this.chapterMap.chapters[this.selectedChapterIndex] ?? null;
   }
 
-  /** Activities of a map chapter, created in the domain database on first use. */
-  protected chapterOf(entry: MapChapterEntry): DbChapter {
-    let chapter = this.db.chapters.find((c) => c.id === entry.id);
-    if (!chapter) {
-      chapter = {
-        id: entry.id,
-        title: entry.title,
-        description: entry.subtitle,
-        activities: [],
-      };
-      this.db.chapters.push(chapter);
+  /** Folder holding the content of a chapter, relative to the app root. */
+  protected chapterFolder(chapterId: string): string {
+    return `/db/${this.difficulty.toLowerCase()}/${this.domain.toLowerCase().trim()}/${chapterId}`;
+  }
+
+  /** Content of a map chapter, created empty on first use. */
+  private bundleOf(entry: MapChapterEntry): ChapterBundle {
+    let bundle = this.bundles.get(entry.id);
+    if (!bundle) {
+      bundle = this.emptyBundle(entry);
+      this.bundles.set(entry.id, bundle);
     }
-    return chapter;
+    return bundle;
+  }
+
+  private emptyBundle(entry: MapChapterEntry): ChapterBundle {
+    return {
+      chapter: {
+        id: entry.id,
+        title: `${entry.id}_title`,
+        description: `${entry.id}_desc`,
+        activities: [],
+      },
+      ro: {},
+      en: {},
+    };
+  }
+
+  protected chapterOf(entry: MapChapterEntry): DbChapter {
+    return this.bundleOf(entry).chapter;
   }
 
   protected get currentChapter(): DbChapter | null {
@@ -138,67 +140,79 @@ export class AdminComponent implements OnInit {
     return entry ? this.chapterOf(entry) : null;
   }
 
+  /** Dictionaries of the selected chapter; the editor always writes into these. */
+  protected get translations(): { ro: Record<string, string>; en: Record<string, string> } {
+    const entry = this.currentMapChapter;
+    return entry ? this.bundleOf(entry) : { ro: {}, en: {} };
+  }
+
+  /** Reloads map.json and the content folder of every chapter it declares. */
   protected loadCurrentDatabase(): void {
     const diff = this.difficulty.toLowerCase();
     const dom = this.domain.toLowerCase().trim();
     this.statusMessage = `Încărcare /db/${diff}/${dom}/...`;
     this.isError = false;
 
-    this.http.get<DbDatabase>(`/db/${diff}/${dom}/db.json`).subscribe({
-      next: (dbData) => {
-        this.db = dbData;
-        this.loadTranslations(diff, dom);
-      },
-      error: () => {
-        this.statusMessage = `Baza de date /db/${diff}/${dom}/db.json nu a fost găsită. S-a inițializat un model nou.`;
-        this.isError = false;
-        this.initEmptyDatabase();
-      },
+    this.http
+      .get<MapDefinition>('/map.json')
+      .pipe(catchError(() => of({ version: 1, chapters: [] } as MapDefinition)))
+      .subscribe((definition) => {
+        this.chapterMap = definition;
+        this.bundles.clear();
+        this.selectedChapterIndex = 0;
+        this.selectedActivityIndex = -1;
+        this.loadBundles(definition.chapters);
+      });
+  }
+
+  private loadBundles(entries: MapChapterEntry[]): void {
+    if (entries.length === 0) {
+      this.statusMessage = 'map.json nu conține niciun capitol.';
+      return;
+    }
+
+    forkJoin(entries.map((entry) => this.loadBundle(entry))).subscribe((results) => {
+      results.forEach(({ entry, bundle }) => this.bundles.set(entry.id, bundle));
+      const missing = results.filter((r) => !r.found).map((r) => r.entry.id);
+      this.statusMessage = missing.length
+        ? `Capitole încărcate. Fără db.json încă: ${missing.join(', ')}.`
+        : `Datele pentru ${this.difficulty}/${this.domain} au fost încărcate cu succes.`;
+      this.isError = false;
     });
   }
 
-  private loadTranslations(diff: string, dom: string): void {
-    this.http.get<Record<string, string>>(`/db/${diff}/${dom}/i18n/ro.json`).subscribe({
-      next: (roDict) => {
-        this.translations.ro = { ...roDict };
-      },
-      error: () => {
-        this.translations.ro = {};
-      },
-    });
+  private loadBundle(entry: MapChapterEntry) {
+    const folder = this.chapterFolder(entry.id);
+    const dict = (lang: 'ro' | 'en') =>
+      this.http
+        .get<Record<string, string>>(`${folder}/i18n/${lang}.json`)
+        .pipe(catchError(() => of({} as Record<string, string>)));
 
-    this.http.get<Record<string, string>>(`/db/${diff}/${dom}/i18n/en.json`).subscribe({
-      next: (enDict) => {
-        this.translations.en = { ...enDict };
-        this.statusMessage = `Datele pentru ${this.difficulty}/${this.domain} au fost încărcate cu succes.`;
-      },
-      error: () => {
-        this.translations.en = {};
-        this.statusMessage = `Datele pentru ${this.difficulty}/${this.domain} au fost încărcate (fără en.json).`;
-      },
-    });
+    return forkJoin({
+      file: this.http.get<DbChapterFile>(`${folder}/db.json`).pipe(catchError(() => of(null))),
+      ro: dict('ro'),
+      en: dict('en'),
+    }).pipe(
+      map(({ file, ro, en }) => ({
+        entry,
+        found: file !== null,
+        bundle: {
+          chapter: file?.chapter ?? this.emptyBundle(entry).chapter,
+          ro: { ...ro },
+          en: { ...en },
+        } satisfies ChapterBundle,
+      })),
+    );
   }
 
+  /** Empties the content of the selected chapter, keeping its map entry. */
   protected initEmptyDatabase(): void {
-    const diff = this.difficulty.toLowerCase();
-    const dom = this.domain.toLowerCase();
-
-    this.db = {
-      version: 1,
-      chapters: [
-        {
-          id: `${dom}_basics`,
-          title: `${diff}_${dom}_chapter_1_title`,
-          description: `${diff}_${dom}_chapter_1_desc`,
-          activities: [],
-        },
-      ],
-    };
-
-    this.translations.ro[`${diff}_${dom}_chapter_1_title`] = 'Capitol Nou';
-    this.translations.ro[`${diff}_${dom}_chapter_1_desc`] = 'Descrierea noului capitol.';
-    this.translations.en[`${diff}_${dom}_chapter_1_title`] = 'New Chapter';
-    this.translations.en[`${diff}_${dom}_chapter_1_desc`] = 'Description of the new chapter.';
+    const entry = this.currentMapChapter;
+    if (!entry) {
+      return;
+    }
+    this.bundles.set(entry.id, this.emptyBundle(entry));
+    this.selectedActivityIndex = -1;
   }
 
   // --- Chapter Operations (map.json is the source of truth) ---
@@ -215,7 +229,7 @@ export class AdminComponent implements OnInit {
     };
 
     this.chapterMap.chapters.push(entry);
-    this.chapterOf(entry);
+    this.bundles.set(entry.id, this.emptyBundle(entry));
     this.selectedChapterIndex = this.chapterMap.chapters.length - 1;
     this.selectedActivityIndex = -1;
   }
@@ -227,10 +241,7 @@ export class AdminComponent implements OnInit {
     }
 
     this.chapterMap.chapters.splice(index, 1);
-    const dbIndex = this.db.chapters.findIndex((c) => c.id === entry.id);
-    if (dbIndex !== -1) {
-      this.db.chapters.splice(dbIndex, 1);
-    }
+    this.bundles.delete(entry.id);
 
     if (this.selectedChapterIndex >= this.chapterMap.chapters.length) {
       this.selectedChapterIndex = Math.max(0, this.chapterMap.chapters.length - 1);
@@ -238,13 +249,13 @@ export class AdminComponent implements OnInit {
     this.selectedActivityIndex = -1;
   }
 
-  /** Keeps the domain chapter aligned when its map entry is renamed. */
+  /** Keeps the content folder key aligned when its map entry is renamed. */
   protected renameChapter(entry: MapChapterEntry, newId: string): void {
-    const chapter = this.db.chapters.find((c) => c.id === entry.id);
+    const bundle = this.bundleOf(entry);
+    this.bundles.delete(entry.id);
     entry.id = newId;
-    if (chapter) {
-      chapter.id = newId;
-    }
+    bundle.chapter.id = newId;
+    this.bundles.set(newId, bundle);
   }
 
   protected selectChapter(index: number): void {
@@ -261,7 +272,10 @@ export class AdminComponent implements OnInit {
   protected addActivity(chapter: DbChapter, type: ActivityType = 'MULTIPLE_CHOICE'): void {
     const diff = this.difficulty.toLowerCase();
     const dom = this.domain.toLowerCase();
-    const totalActivities = this.db.chapters.reduce((acc, c) => acc + c.activities.length, 0);
+    const totalActivities = [...this.bundles.values()].reduce(
+      (acc, b) => acc + b.chapter.activities.length,
+      0,
+    );
     const actNum = totalActivities + 1;
     const actId = `${diff}_${dom}_${actNum}`;
 
@@ -677,13 +691,14 @@ export class AdminComponent implements OnInit {
 
   protected getPuzzleImageUrl(activity: DbActivity): string {
     const picture = activity.pictures?.[0];
-    if (!picture) {
+    const chapterId = this.currentMapChapter?.id;
+    if (!picture || !chapterId) {
       return '';
     }
     if (picture.startsWith('/') || picture.startsWith('http')) {
       return picture;
     }
-    return `/db/${this.difficulty.toLowerCase()}/${this.domain.toLowerCase().trim()}/pics/${picture}`;
+    return `${this.chapterFolder(chapterId)}/pics/${picture}`;
   }
 
   // --- Translation Modal Popup ---
@@ -797,9 +812,18 @@ export class AdminComponent implements OnInit {
   }
 
   // --- Download Exports ---
+  /** File as it is stored in the chapter folder. */
+  protected currentChapterFile(): DbChapterFile | null {
+    const chapter = this.currentChapter;
+    return chapter ? { version: 1, chapter } : null;
+  }
+
   protected downloadDbJson(): void {
-    const jsonStr = JSON.stringify(this.db, null, 2);
-    this.triggerDownload(jsonStr, 'db.json', 'application/json');
+    const file = this.currentChapterFile();
+    if (!file) {
+      return;
+    }
+    this.triggerDownload(JSON.stringify(file, null, 2), 'db.json', 'application/json');
   }
 
   protected downloadRoJson(): void {
@@ -836,10 +860,17 @@ export class AdminComponent implements OnInit {
     const body = {
       difficulty: this.difficulty.toLowerCase(),
       domain: this.domain.toLowerCase(),
-      db: this.db,
-      en: this.translations.en,
-      ro: this.translations.ro,
       map: this.chapterMap,
+      // One folder per chapter: /db/{difficulty}/{domain}/{chapter}/
+      chapters: this.chapterMap.chapters.map((entry) => {
+        const bundle = this.bundleOf(entry);
+        return {
+          chapter: entry.id,
+          db: { version: 1, chapter: bundle.chapter } satisfies DbChapterFile,
+          ro: bundle.ro,
+          en: bundle.en,
+        };
+      }),
     };
 
     this.http

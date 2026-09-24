@@ -5,11 +5,20 @@ import { Language, LanguageService } from './language.service';
 export interface PlayAudioKeyOptions {
   difficulty?: string;
   domain?: string;
+  /** Chapter folder the audio belongs to; defaults to the scope of the running session. */
+  chapter?: string;
   lang?: Language;
   format?: 'webm' | 'mp3' | 'ogg' | 'wav';
   global?: boolean;
   /** Marks this playback as a character (e.g. Torti) spoken line, subject to `characterMuted`. */
   characterSpeech?: boolean;
+}
+
+/** Content folder the quiz audio is read from while a chapter is being played. */
+export interface AudioContentScope {
+  difficulty: string;
+  domain: string;
+  chapter: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +42,21 @@ export class AudioPlayerService implements OnDestroy {
   private currentAudio: HTMLAudioElement | null = null;
   private queue: string[] = [];
   private currentPlayPromise: Promise<void> | null = null;
+
+  /** Set by the ChapterService so activity components don't have to know where they live. */
+  private contentScope: AudioContentScope = {
+    difficulty: 'easy',
+    domain: 'geography',
+    chapter: '',
+  };
+
+  setContentScope(scope: AudioContentScope): void {
+    this.contentScope = {
+      difficulty: scope.difficulty.toLowerCase(),
+      domain: scope.domain.toLowerCase().trim(),
+      chapter: scope.chapter.trim(),
+    };
+  }
 
   get isPlaying(): boolean {
     return this.isPlayingSubject.value;
@@ -104,7 +128,7 @@ export class AudioPlayerService implements OnDestroy {
   /**
    * Resolves the URL for an audio file given a key, language, domain, and difficulty.
    * Defaults to .webm (Opus), supporting .mp3 or others via options.format.
-   * e.g. /db/easy/geography/audio/easy_geo_1_desc_ro.webm or /audio/happyLine1_ro.webm
+   * e.g. /db/easy/geography/geo_basics/audio/easy_geo_1_desc_ro.webm or /audio/happyLine1_ro.webm
    */
   getAudioUrl(key: string, options?: PlayAudioKeyOptions): string {
     const lang = options?.lang || this.languageService.getCurrentLanguage() || 'ro';
@@ -112,9 +136,10 @@ export class AudioPlayerService implements OnDestroy {
     if (options?.global) {
       return `/audio/${key}_${lang}.${ext}`;
     }
-    const diff = (options?.difficulty || 'easy').toLowerCase();
-    const dom = (options?.domain || 'geography').toLowerCase();
-    return `/db/${diff}/${dom}/audio/${key}_${lang}.${ext}`;
+    const diff = (options?.difficulty || this.contentScope.difficulty).toLowerCase();
+    const dom = (options?.domain || this.contentScope.domain).toLowerCase();
+    const chapter = options?.chapter || this.contentScope.chapter;
+    return `/db/${diff}/${dom}/${chapter}/audio/${key}_${lang}.${ext}`;
   }
 
   /**

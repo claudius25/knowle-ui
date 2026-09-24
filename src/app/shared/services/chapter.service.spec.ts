@@ -2,37 +2,37 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { ChapterService } from './chapter.service';
-import { ContentDatabaseService, DbDatabase } from './content-database.service';
+import { ContentDatabaseService, DbChapterFile } from './content-database.service';
 import { Activity, AnswerResponse } from '../models/game.types';
 import { MultipleChoiceActivityModel } from '../models/activities';
 
-const MOCK_DB: DbDatabase = {
+const CHAPTER_ID = 'geography_chapter_1';
+
+const MOCK_DB: DbChapterFile = {
   version: 1,
-  chapters: [
-    {
-      id: 'geography_chapter_1',
-      title: 'chapter_title',
-      description: 'chapter_desc',
-      activities: [
-        {
-          id: 'easy_geo_1',
-          type: 'MULTIPLE_CHOICE',
-          title: 't',
-          description: 'd',
-          question: 'q',
-          answer: 'b',
-        },
-        {
-          id: 'easy_geo_2',
-          type: 'MULTIPLE_CHOICE',
-          title: 't',
-          description: 'd',
-          question: 'q',
-          answer: 'a',
-        },
-      ],
-    },
-  ],
+  chapter: {
+    id: CHAPTER_ID,
+    title: 'chapter_title',
+    description: 'chapter_desc',
+    activities: [
+      {
+        id: 'easy_geo_1',
+        type: 'MULTIPLE_CHOICE',
+        title: 't',
+        description: 'd',
+        question: 'q',
+        answer: 'b',
+      },
+      {
+        id: 'easy_geo_2',
+        type: 'MULTIPLE_CHOICE',
+        title: 't',
+        description: 'd',
+        question: 'q',
+        answer: 'a',
+      },
+    ],
+  },
 };
 
 function mockActivity(activityId: string): Activity {
@@ -54,14 +54,16 @@ describe('ChapterService', () => {
   let service: ChapterService;
   let contentDbSpy: jasmine.SpyObj<ContentDatabaseService>;
 
+  const startSession = () => service.startSession({ chapterId: CHAPTER_ID });
+
   beforeEach(() => {
     const spy = jasmine.createSpyObj('ContentDatabaseService', [
-      'loadDatabase',
+      'loadChapter',
       'getActivity',
       'submitAnswer',
       'getWrongOptionLabels',
     ]);
-    spy.loadDatabase.and.returnValue(of(MOCK_DB));
+    spy.loadChapter.and.returnValue(of(MOCK_DB));
     spy.getActivity.and.callFake((id: string) => of(mockActivity(id)));
 
     TestBed.configureTestingModule({
@@ -81,7 +83,7 @@ describe('ChapterService', () => {
   });
 
   it('should build an activity model for the first queued activity', (done) => {
-    service.startSession().subscribe((model) => {
+    startSession().subscribe((model) => {
       expect(model).toBeInstanceOf(MultipleChoiceActivityModel);
       expect(model.activityId).toBe('easy_geo_1');
       expect(service.status).toBe('playing');
@@ -95,7 +97,7 @@ describe('ChapterService', () => {
     const response: AnswerResponse = { correct: true, nextActivity: null };
     contentDbSpy.submitAnswer.and.returnValue(of(response));
 
-    service.startSession().subscribe((model) => {
+    startSession().subscribe((model) => {
       (model as MultipleChoiceActivityModel).selectLabel('Pământ');
 
       service.submitAnswer().subscribe((correct) => {
@@ -112,11 +114,13 @@ describe('ChapterService', () => {
     const response: AnswerResponse = { correct: false, nextActivity: null };
     contentDbSpy.submitAnswer.and.returnValue(of(response));
 
-    service.startSession().subscribe((model) => {
+    startSession().subscribe((model) => {
       (model as MultipleChoiceActivityModel).selectLabel('Marte');
 
       service.submitAnswer().subscribe(() => {
-        expect(service.health).toBe(ChapterService.MAX_HEALTH - ChapterService.HEALTH_LOSS_PER_MISTAKE);
+        expect(service.health).toBe(
+          ChapterService.MAX_HEALTH - ChapterService.HEALTH_LOSS_PER_MISTAKE,
+        );
         expect(model.healthLost).toBe(ChapterService.HEALTH_LOSS_PER_MISTAKE);
         done();
       });
@@ -126,7 +130,7 @@ describe('ChapterService', () => {
   it('should charge coins for a retry and clear the staged answer', (done) => {
     contentDbSpy.submitAnswer.and.returnValue(of({ correct: false, nextActivity: null }));
 
-    service.startSession().subscribe((model) => {
+    startSession().subscribe((model) => {
       (model as MultipleChoiceActivityModel).selectLabel('Marte');
 
       service.submitAnswer().subscribe(() => {
@@ -145,7 +149,7 @@ describe('ChapterService', () => {
   it('should charge coins and remove wrong options on fifty-fifty', (done) => {
     contentDbSpy.getWrongOptionLabels.and.returnValue(of(['Marte', 'Jupiter', 'Venus']));
 
-    service.startSession().subscribe((model) => {
+    startSession().subscribe((model) => {
       const choice = model as MultipleChoiceActivityModel;
       service.useFiftyFifty();
 
@@ -160,7 +164,7 @@ describe('ChapterService', () => {
   it('should record the outcome of each completed activity', (done) => {
     contentDbSpy.submitAnswer.and.returnValue(of({ correct: true, nextActivity: null }));
 
-    service.startSession().subscribe((model) => {
+    startSession().subscribe((model) => {
       (model as MultipleChoiceActivityModel).selectLabel('Pământ');
 
       service.submitAnswer().subscribe(() => {

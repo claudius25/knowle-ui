@@ -10,11 +10,11 @@
       "startActivityId": "easy_geo_1"
     },
     {
-      "id": "geo_mountains",
+      "id": "geo_terra",
       "title": "mapChapter2Title",
       "subtitle": "mapChapter2Subtitle",
       "icon": "🌋",
-      "image": "assets/map/02_munti_si_vulcani.png"
+      "image": "assets/map/terra.png"
     },
     {
       "id": "geo_waters",

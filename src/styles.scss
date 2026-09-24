@@ -58,6 +58,74 @@ body {
   box-sizing: border-box;
 }
 
+/* ------------------------------------------------------------------
+   Mobile-only shell.
+   The app is designed for phones, so on anything wider than a phone we
+   render it inside a centered, phone-sized frame instead of stretching.
+   ------------------------------------------------------------------ */
+:root {
+  --app-frame-width: 430px;
+}
+
+@media (min-width: 431px) {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    background: #041f1a;
+    overflow: hidden;
+  }
+
+  app-root {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    width: var(--app-frame-width);
+    height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #f4f8f5;
+    box-shadow: 0 0 48px rgba(0, 0, 0, 0.45);
+    /* Makes app-root the containing block for descendants that use
+       `position: fixed`, so headers/footers/overlays stay in the frame. */
+    transform: translateZ(0);
+  }
+
+  /* Material/CDK overlays are attached to <body>, keep them in the frame too. */
+  .cdk-overlay-container {
+    left: 50%;
+    right: auto;
+    width: var(--app-frame-width);
+    transform: translateX(-50%);
+  }
+
+  /* The admin tool is desktop-oriented, it keeps the full viewport. */
+  body:has(app-admin) {
+    display: block;
+    overflow: auto;
+  }
+
+  body:has(app-admin) app-root {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    box-shadow: none;
+    transform: none;
+  }
+
+  body:has(app-admin) .cdk-overlay-container {
+    left: 0;
+    right: 0;
+    width: auto;
+    transform: none;
+  }
+}
+
 .curved-title {
   width: 100%;
   overflow: visible;

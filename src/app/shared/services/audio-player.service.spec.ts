@@ -23,17 +23,20 @@ describe('AudioPlayerService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should generate correct audio URL based on key, language, difficulty, and domain', () => {
+  it('should generate correct audio URL based on key, language, difficulty, and chapter', () => {
+    service.setContentScope({ difficulty: 'EASY', domain: 'geography', chapter: 'geo_basics' });
+
     const urlRo = service.getAudioUrl('easy_geo_1_desc');
-    expect(urlRo).toBe('/db/easy/geography/audio/easy_geo_1_desc_ro.webm');
+    expect(urlRo).toBe('/db/easy/geography/geo_basics/audio/easy_geo_1_desc_ro.webm');
 
     const urlEn = service.getAudioUrl('easy_geo_1_question', {
       difficulty: 'easy',
       domain: 'geography',
+      chapter: 'geo_terra',
       lang: 'en',
       format: 'mp3',
     });
-    expect(urlEn).toBe('/db/easy/geography/audio/easy_geo_1_question_en.mp3');
+    expect(urlEn).toBe('/db/easy/geography/geo_terra/audio/easy_geo_1_question_en.mp3');
 
     const globalUrl = service.getAudioUrl('happyLine1', { global: true });
     expect(globalUrl).toBe('/audio/happyLine1_ro.webm');

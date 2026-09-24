@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, map, of, switchMap, tap, throwError } from 'rxjs';
 import { Difficulty } from '../models/game.types';
 import { ActivityModel } from '../models/activities';
 import { ChapterService } from './chapter.service';
@@ -71,17 +71,36 @@ export class GameService {
     return this.progress.get(chapterId) ?? null;
   }
 
-  /** Starts a run of the given chapter, or resumes the stored one when it matches. */
+  /** Starts a run of the given chapter; without an id the first playable one is used. */
   startChapter(
     chapterId: string,
     options: { difficulty?: Difficulty; domain?: string; random?: boolean } = {},
   ): Observable<ActivityModel> {
-    return this.chapterService.startSession({
-      chapterId,
-      difficulty: options.difficulty,
-      domain: options.domain,
-      random: options.random,
-    });
+    const start = (id: string) =>
+      this.chapterService.startSession({
+        chapterId: id,
+        difficulty: options.difficulty,
+        domain: options.domain,
+        random: options.random,
+      });
+
+    if (chapterId) {
+      return start(chapterId);
+    }
+
+    return this.ensureChapters().pipe(
+      switchMap((chapters) => {
+        const fallback = chapters.find((chapter) => !chapter.locked && chapter.startActivityId);
+        if (!fallback) {
+          return throwError(() => new Error('No playable chapter available'));
+        }
+        return start(fallback.id);
+      }),
+    );
+  }
+
+  private ensureChapters(): Observable<readonly MapChapter[]> {
+    return this._chapters.length ? of(this._chapters) : this.loadChapters();
   }
 
   resumeChapter(): Observable<ActivityModel> {

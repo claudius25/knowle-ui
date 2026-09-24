@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { AdminComponent } from './admin.component';
-import { DbDatabase } from '../../shared/services/content-database.service';
+import { DbChapterFile } from '../../shared/services/content-database.service';
 import { MapDefinition } from '../../shared/services/map.service';
 
 const MOCK_MAP: MapDefinition = {
@@ -17,29 +17,27 @@ const MOCK_MAP: MapDefinition = {
   ],
 };
 
-const MOCK_DB: DbDatabase = {
+const MOCK_DB: DbChapterFile = {
   version: 1,
-  chapters: [
-    {
-      id: 'geo_basics',
-      title: 'easy_geo_chapter_1_title',
-      description: 'easy_geo_chapter_1_desc',
-      activities: [
-        {
-          id: 'easy_geo_1',
-          type: 'MULTIPLE_CHOICE',
-          title: 'easy_geo_1_title',
-          description: 'easy_geo_1_desc',
-          question: 'easy_geo_1_question',
-          options: [
-            { id: 'a', text: 'easy_geo_1_op_1' },
-            { id: 'b', text: 'easy_geo_1_op_2' },
-          ],
-          answer: 'b',
-        },
-      ],
-    },
-  ],
+  chapter: {
+    id: 'geo_basics',
+    title: 'easy_geo_chapter_1_title',
+    description: 'easy_geo_chapter_1_desc',
+    activities: [
+      {
+        id: 'easy_geo_1',
+        type: 'MULTIPLE_CHOICE',
+        title: 'easy_geo_1_title',
+        description: 'easy_geo_1_desc',
+        question: 'easy_geo_1_question',
+        options: [
+          { id: 'a', text: 'easy_geo_1_op_1' },
+          { id: 'b', text: 'easy_geo_1_op_2' },
+        ],
+        answer: 'b',
+      },
+    ],
+  },
 };
 
 const MOCK_RO = {
@@ -84,9 +82,9 @@ describe('AdminComponent', () => {
 
     // Respond to initial load
     httpMock.expectOne('/map.json').flush(MOCK_MAP);
-    httpMock.expectOne('/db/easy/geography/db.json').flush(MOCK_DB);
-    httpMock.expectOne('/db/easy/geography/i18n/ro.json').flush(MOCK_RO);
-    httpMock.expectOne('/db/easy/geography/i18n/en.json').flush(MOCK_EN);
+    httpMock.expectOne('/db/easy/geography/geo_basics/db.json').flush(MOCK_DB);
+    httpMock.expectOne('/db/easy/geography/geo_basics/i18n/ro.json').flush(MOCK_RO);
+    httpMock.expectOne('/db/easy/geography/geo_basics/i18n/en.json').flush(MOCK_EN);
   });
 
   afterEach(() => {
@@ -96,7 +94,7 @@ describe('AdminComponent', () => {
   it('should create and load database and translations', () => {
     expect(component).toBeTruthy();
     expect(component['mapChapters'].length).toBe(1);
-    expect(component['db'].chapters.length).toBe(1);
+    expect(component['currentChapter']?.activities.length).toBe(1);
     expect(component['translations'].ro['easy_geo_chapter_1_title']).toBe('Descoperim Pământul');
     expect(component['translations'].en['easy_geo_chapter_1_title']).toBe('Discovering Earth');
   });
@@ -105,16 +103,16 @@ describe('AdminComponent', () => {
     expect(component['mapChapters'].length).toBe(1);
     component['addChapter']();
     expect(component['mapChapters'].length).toBe(2);
-    expect(component['db'].chapters.length).toBe(2);
+    expect(component['currentChapter']?.activities.length).toBe(0);
 
     spyOn(window, 'confirm').and.returnValue(true);
     component['removeChapter'](1);
     expect(component['mapChapters'].length).toBe(1);
-    expect(component['db'].chapters.length).toBe(1);
+    expect(component['currentChapter']?.activities.length).toBe(1);
   });
 
   it('should add and remove activities', () => {
-    const chapter = component['db'].chapters[0];
+    const chapter = component['currentChapter']!;
     const initialCount = chapter.activities.length;
     component['addActivity'](chapter, 'TRUE_FALSE');
     expect(chapter.activities.length).toBe(initialCount + 1);

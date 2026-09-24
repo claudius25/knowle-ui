@@ -64,9 +64,25 @@ export interface DbChapter {
   activities: DbActivity[];
 }
 
-export interface DbDatabase {
+/** Content of a single chapter, as stored in /db/{difficulty}/{domain}/{chapter}/db.json. */
+export interface DbChapterFile {
   version: number;
-  chapters: DbChapter[];
+  chapter: DbChapter;
+}
+
+/** Identifies the content folder an activity belongs to. */
+export interface ContentScope {
+  difficulty: Difficulty;
+  domain: string;
+  chapter: string;
+}
+
+/** Root folder holding the db.json, i18n, pics and audio of one chapter. */
+export function contentFolder(scope: ContentScope): string {
+  const diff = scope.difficulty.toLowerCase();
+  const dom = scope.domain.toLowerCase().trim();
+  const chapter = scope.chapter.trim();
+  return `/db/${diff}/${dom}/${chapter}`;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -74,52 +90,45 @@ export class ContentDatabaseService {
   private readonly http = inject(HttpClient);
   private readonly languageService = inject(LanguageService);
 
-  private readonly dbCache = new Map<string, DbDatabase>();
+  private readonly dbCache = new Map<string, DbChapterFile>();
   private readonly translationsCache = new Map<string, Record<string, string>>();
 
   /**
-   * Loads the static database JSON for the given difficulty and domain.
+   * Loads the static database JSON of a single chapter.
    */
-  loadDatabase(difficulty = 'easy', domain = 'geography'): Observable<DbDatabase> {
-    const diff = difficulty.toLowerCase();
-    const dom = domain.toLowerCase();
-    const cacheKey = `${diff}_${dom}`;
+  loadChapter(scope: ContentScope): Observable<DbChapterFile> {
+    const folder = contentFolder(scope);
 
-    if (this.dbCache.has(cacheKey)) {
-      return of(this.dbCache.get(cacheKey)!);
+    if (this.dbCache.has(folder)) {
+      return of(this.dbCache.get(folder)!);
     }
 
-    const url = `/db/${diff}/${dom}/db.json`;
-    return this.http.get<DbDatabase>(url).pipe(
+    const url = `${folder}/db.json`;
+    return this.http.get<DbChapterFile>(url).pipe(
       map((db) => {
-        this.dbCache.set(cacheKey, db);
+        this.dbCache.set(folder, db);
         return db;
       }),
       catchError((err) => {
         console.error(`[ContentDb] Failed to load database from ${url}:`, err);
-        return throwError(() => new Error(`Failed to load content database for ${diff}/${dom}`));
+        return throwError(() => new Error(`Failed to load content database from ${folder}`));
       }),
     );
   }
 
   /**
-   * Loads domain-specific content translations for the given language.
+   * Loads the chapter-specific content translations for the given language.
    */
-  loadTranslations(
-    difficulty = 'easy',
-    domain = 'geography',
-    lang?: Language,
-  ): Observable<Record<string, string>> {
-    const diff = difficulty.toLowerCase();
-    const dom = domain.toLowerCase();
+  loadTranslations(scope: ContentScope, lang?: Language): Observable<Record<string, string>> {
+    const folder = contentFolder(scope);
     const currentLang = lang ?? this.languageService.getCurrentLanguage() ?? 'ro';
-    const cacheKey = `${diff}_${dom}_${currentLang}`;
+    const cacheKey = `${folder}_${currentLang}`;
 
     if (this.translationsCache.has(cacheKey)) {
       return of(this.translationsCache.get(cacheKey)!);
     }
 
-    const url = `/db/${diff}/${dom}/i18n/${currentLang}.json`;
+    const url = `${folder}/i18n/${currentLang}.json`;
     return this.http.get<Record<string, string>>(url).pipe(
       map((dict) => {
         this.translationsCache.set(cacheKey, dict);
@@ -135,17 +144,13 @@ export class ContentDatabaseService {
   /**
    * Starts a game session by returning the first or requested activity in the chapter.
    */
-  startGame(
-    difficulty: Difficulty = 'EASY',
-    domain = 'geography',
-    startIndexOrId?: number | string,
-  ): Observable<GameStartResponse> {
+  startGame(scope: ContentScope, startIndexOrId?: number | string): Observable<GameStartResponse> {
     return forkJoin({
-      db: this.loadDatabase(difficulty, domain),
-      dict: this.loadTranslations(difficulty, domain),
+      db: this.loadChapter(scope),
+      dict: this.loadTranslations(scope),
     }).pipe(
       map(({ db, dict }) => {
-        const chapter = db.chapters[0];
+        const chapter = db.chapter;
         if (!chapter || !chapter.activities || chapter.activities.length === 0) {
           throw new Error('No activities available in this chapter');
         }
@@ -174,7 +179,7 @@ export class ContentDatabaseService {
           activityId: target.id,
           title: dict[target.title] ?? target.title,
           type: target.type,
-          difficulty,
+          difficulty: scope.difficulty,
         };
       }),
     );
@@ -183,24 +188,19 @@ export class ContentDatabaseService {
   /**
    * Loads a specific activity and translates its user-facing properties into the current language.
    */
-  getActivity(
-    activityId: string,
-    difficulty: Difficulty = 'EASY',
-    domain = 'geography',
-  ): Observable<Activity> {
+  getActivity(activityId: string, scope: ContentScope): Observable<Activity> {
     return forkJoin({
-      db: this.loadDatabase(difficulty, domain),
-      dict: this.loadTranslations(difficulty, domain),
+      db: this.loadChapter(scope),
+      dict: this.loadTranslations(scope),
     }).pipe(
       map(({ db, dict }) => {
-        const allActivities = db.chapters.flatMap((c) => c.activities);
-        const act = allActivities.find((a) => a.id === activityId);
+        const act = db.chapter.activities.find((a) => a.id === activityId);
 
         if (!act) {
           throw new Error(`Activity ${activityId} not found`);
         }
 
-        return this.mapToClientActivity(act, dict, difficulty, domain);
+        return this.mapToClientActivity(act, dict, scope);
       }),
     );
   }
@@ -209,17 +209,13 @@ export class ContentDatabaseService {
    * Returns the translated labels of the options that are not the expected answer.
    * Used by the fifty-fifty help to know what it may remove.
    */
-  getWrongOptionLabels(
-    activityId: string,
-    difficulty: Difficulty = 'EASY',
-    domain = 'geography',
-  ): Observable<string[]> {
+  getWrongOptionLabels(activityId: string, scope: ContentScope): Observable<string[]> {
     return forkJoin({
-      db: this.loadDatabase(difficulty, domain),
-      dict: this.loadTranslations(difficulty, domain),
+      db: this.loadChapter(scope),
+      dict: this.loadTranslations(scope),
     }).pipe(
       map(({ db, dict }) => {
-        const act = db.chapters.flatMap((c) => c.activities).find((a) => a.id === activityId);
+        const act = db.chapter.activities.find((a) => a.id === activityId);
         if (!act?.options) {
           return [];
         }
@@ -238,41 +234,29 @@ export class ContentDatabaseService {
   submitAnswer(
     activityId: string,
     userAnswer: unknown,
-    difficulty: Difficulty = 'EASY',
-    domain = 'geography',
+    scope: ContentScope,
   ): Observable<AnswerResponse> {
     return forkJoin({
-      db: this.loadDatabase(difficulty, domain),
-      dict: this.loadTranslations(difficulty, domain),
+      db: this.loadChapter(scope),
+      dict: this.loadTranslations(scope),
     }).pipe(
       map(({ db, dict }) => {
-        // Find activity and chapter
-        let targetChapter: DbChapter | null = null;
-        let targetIndex = -1;
-        let act: DbActivity | null = null;
+        const activities = db.chapter.activities;
+        const targetIndex = activities.findIndex((a) => a.id === activityId);
+        const act = targetIndex === -1 ? null : activities[targetIndex];
 
-        for (const chapter of db.chapters) {
-          const idx = chapter.activities.findIndex((a) => a.id === activityId);
-          if (idx !== -1) {
-            targetChapter = chapter;
-            targetIndex = idx;
-            act = chapter.activities[idx];
-            break;
-          }
-        }
-
-        if (!act || !targetChapter) {
+        if (!act) {
           throw new Error(`Activity ${activityId} not found`);
         }
 
         const isCorrect = this.checkAnswer(act, userAnswer, dict);
-        const nextAct = targetChapter.activities[targetIndex + 1] ?? null;
+        const nextAct = activities[targetIndex + 1] ?? null;
         const nextActivity: NextActivity | null = nextAct
           ? {
               activityId: nextAct.id,
               title: dict[nextAct.title] ?? nextAct.title,
               type: nextAct.type,
-              difficulty,
+              difficulty: scope.difficulty,
             }
           : null;
 
@@ -406,20 +390,19 @@ export class ContentDatabaseService {
   private mapToClientActivity(
     act: DbActivity,
     dict: Record<string, string>,
-    difficulty: Difficulty,
-    domain = 'geography',
+    scope: ContentScope,
   ): Activity {
     const title = dict[act.title] ?? act.title;
     const description = dict[act.description] ?? act.description;
     const question = dict[act.question] ?? act.question;
     const hint = act.hint ? (dict[act.hint] ?? act.hint) : undefined;
     const isPractical = act.isPractical ?? false;
-    const diff = difficulty.toLowerCase();
-    const dom = domain.toLowerCase();
+    const difficulty = scope.difficulty;
+    const picsFolder = `${contentFolder(scope)}/pics`;
 
-    // Resolve picture paths: if relative filename given, map to /db/{difficulty}/{domain}/pics/{filename}
+    // Resolve picture paths: a bare filename lives in the chapter's own pics folder.
     const pictures = act.pictures?.map((pic) =>
-      pic.startsWith('/') || pic.startsWith('http') ? pic : `/db/${diff}/${dom}/pics/${pic}`,
+      pic.startsWith('/') || pic.startsWith('http') ? pic : `${picsFolder}/${pic}`,
     );
 
     switch (act.type) {
@@ -513,7 +496,7 @@ export class ContentDatabaseService {
               image: p.image
                 ? p.image.startsWith('/') || p.image.startsWith('http')
                   ? p.image
-                  : `/db/${diff}/${dom}/pics/${p.image}`
+                  : `${picsFolder}/${p.image}`
                 : undefined,
             })),
           },

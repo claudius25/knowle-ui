@@ -39,17 +39,22 @@
       </button>
 
       <button class="btn btn--secondary" type="button" (click)="initEmptyDatabase()">
-        ✨ Model Nou
+        ✨ Golește Capitolul
       </button>
     </div>
 
     <!-- Download Export Actions -->
     <div class="export-bar">
+      @if (currentMapChapter; as selected) {
+        <span class="export-scope" title="Folderul capitolului selectat">{{
+          chapterFolder(selected.id)
+        }}</span>
+      }
       <button
         class="btn btn--download"
         type="button"
         (click)="downloadDbJson()"
-        title="Descarcă db.json"
+        title="Descarcă db.json al capitolului selectat"
       >
         📥 db.json
       </button>
@@ -57,7 +62,7 @@
         class="btn btn--download"
         type="button"
         (click)="downloadRoJson()"
-        title="Descarcă ro.json"
+        title="Descarcă i18n/ro.json al capitolului selectat"
       >
         📥 ro.json
       </button>
@@ -65,7 +70,7 @@
         class="btn btn--download"
         type="button"
         (click)="downloadEnJson()"
-        title="Descarcă en.json"
+        title="Descarcă i18n/en.json al capitolului selectat"
       >
         📥 en.json
       </button>
@@ -90,7 +95,7 @@
         type="button"
         [disabled]="copyingAll"
         (click)="copyAllToServer()"
-        title="Trimite db.json, en.json și ro.json direct în gnosy-ui prin gnosy-deepl"
+        title="Trimite map.json și folderul fiecărui capitol direct în gnosy-ui prin gnosy-deepl"
       >
         {{ copyingAll ? '⏳ Se copiază...' : '🗂️ Copiază Toate' }}
       </button>
@@ -275,491 +280,492 @@
                 </div>
               </div>
 
-            <!-- Activities Section -->
-            <div class="activities-header">
-              <h3>Activități în acest capitol ({{ currentChapter.activities.length }})</h3>
-              <div class="add-activity-dropdown">
-                <button
-                  class="btn btn--primary"
-                  type="button"
-                  (click)="addActivity(currentChapter, 'MULTIPLE_CHOICE')"
-                >
-                  + Multiple Choice
-                </button>
-                <button
-                  class="btn btn--primary"
-                  type="button"
-                  (click)="addActivity(currentChapter, 'TRUE_FALSE')"
-                >
-                  + True/False
-                </button>
-                <button
-                  class="btn btn--primary"
-                  type="button"
-                  (click)="addActivity(currentChapter, 'CLASSIFY')"
-                >
-                  + Classify
-                </button>
-                <button
-                  class="btn btn--primary"
-                  type="button"
-                  (click)="addActivity(currentChapter, 'MATCHING')"
-                >
-                  + Matching
-                </button>
-                <button
-                  class="btn btn--primary"
-                  type="button"
-                  (click)="addActivity(currentChapter, 'ORDERING')"
-                >
-                  + Ordering
-                </button>
-                <button
-                  class="btn btn--primary"
-                  type="button"
-                  (click)="addActivity(currentChapter, 'PUZZLE')"
-                >
-                  + Puzzle
-                </button>
-              </div>
-            </div>
-          }
-
-          <!-- Selected Activity Detail -->
-          <div class="activities-list">
-            @if (currentChapter.activities[selectedActivityIndex]; as act) {
-              <div class="card activity-card">
-                <!-- Activity Header -->
-                <div class="activity-card-header">
-                  <div class="activity-title-row">
-                    <span class="activity-index">#{{ selectedActivityIndex + 1 }}</span>
-                    <input class="act-id-input" type="text" [(ngModel)]="act.id" />
-                    <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{
-                      act.type
-                    }}</span>
-                  </div>
+              <!-- Activities Section -->
+              <div class="activities-header">
+                <h3>Activități în acest capitol ({{ currentChapter.activities.length }})</h3>
+                <div class="add-activity-dropdown">
+                  <button
+                    class="btn btn--primary"
+                    type="button"
+                    (click)="addActivity(currentChapter, 'MULTIPLE_CHOICE')"
+                  >
+                    + Multiple Choice
+                  </button>
+                  <button
+                    class="btn btn--primary"
+                    type="button"
+                    (click)="addActivity(currentChapter, 'TRUE_FALSE')"
+                  >
+                    + True/False
+                  </button>
+                  <button
+                    class="btn btn--primary"
+                    type="button"
+                    (click)="addActivity(currentChapter, 'CLASSIFY')"
+                  >
+                    + Classify
+                  </button>
+                  <button
+                    class="btn btn--primary"
+                    type="button"
+                    (click)="addActivity(currentChapter, 'MATCHING')"
+                  >
+                    + Matching
+                  </button>
+                  <button
+                    class="btn btn--primary"
+                    type="button"
+                    (click)="addActivity(currentChapter, 'ORDERING')"
+                  >
+                    + Ordering
+                  </button>
+                  <button
+                    class="btn btn--primary"
+                    type="button"
+                    (click)="addActivity(currentChapter, 'PUZZLE')"
+                  >
+                    + Puzzle
+                  </button>
                 </div>
+              </div>
+            }
 
-                <!-- Basic Fields Grid -->
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Tip Activitate:</label>
-                    <select [ngModel]="act.type" (ngModelChange)="changeActivityType(act, $event)">
-                      @for (t of activityTypes; track t) {
-                        <option [value]="t">{{ t }}</option>
-                      }
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label>Titlu (afișat deasupra imaginii - Cheie i18n):</label>
-                    <div class="i18n-input-row">
-                      <input type="text" [(ngModel)]="act.title" />
-                      <button
-                        class="btn btn--i18n"
-                        type="button"
-                        (click)="openTranslationModal(act.title, 'Titlu Activitate: ' + act.id)"
-                      >
-                        🌐
-                      </button>
+            <!-- Selected Activity Detail -->
+            <div class="activities-list">
+              @if (currentChapter.activities[selectedActivityIndex]; as act) {
+                <div class="card activity-card">
+                  <!-- Activity Header -->
+                  <div class="activity-card-header">
+                    <div class="activity-title-row">
+                      <span class="activity-index">#{{ selectedActivityIndex + 1 }}</span>
+                      <input class="act-id-input" type="text" [(ngModel)]="act.id" />
+                      <span class="type-pill type-pill--{{ act.type.toLowerCase() }}">{{
+                        act.type
+                      }}</span>
                     </div>
-                    <small class="preview-text"
-                      >RO: "{{ translations.ro[act.title] || '-' }}"</small
-                    >
                   </div>
 
-                  <div class="form-group full-width">
-                    <label>Descriere Introductivă (Concept didactic - Cheie i18n):</label>
-                    <div class="i18n-input-row">
-                      <input type="text" [(ngModel)]="act.description" />
-                      <button
-                        class="btn btn--i18n"
-                        type="button"
-                        (click)="openTranslationModal(act.description, 'Descriere: ' + act.id)"
+                  <!-- Basic Fields Grid -->
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>Tip Activitate:</label>
+                      <select
+                        [ngModel]="act.type"
+                        (ngModelChange)="changeActivityType(act, $event)"
                       >
-                        🌐
-                      </button>
+                        @for (t of activityTypes; track t) {
+                          <option [value]="t">{{ t }}</option>
+                        }
+                      </select>
                     </div>
-                    <small class="preview-text"
-                      >RO: "{{ translations.ro[act.description] || '-' }}"</small
-                    >
-                  </div>
 
-                  <div class="form-group full-width">
-                    <label>Întrebare (Cheie i18n):</label>
-                    <div class="i18n-input-row">
-                      <input type="text" [(ngModel)]="act.question" />
-                      <button
-                        class="btn btn--i18n"
-                        type="button"
-                        (click)="openTranslationModal(act.question, 'Întrebare: ' + act.id)"
-                      >
-                        🌐
-                      </button>
-                    </div>
-                    <small class="preview-text"
-                      >RO: "{{ translations.ro[act.question] || '-' }}"</small
-                    >
-                  </div>
-
-                  @if (supportsHint(act.type)) {
-                    <div class="form-group full-width">
-                      <label>Indiciu (Hint - Cheie i18n):</label>
+                    <div class="form-group">
+                      <label>Titlu (afișat deasupra imaginii - Cheie i18n):</label>
                       <div class="i18n-input-row">
-                        <input type="text" [(ngModel)]="act.hint" placeholder="opțional" />
+                        <input type="text" [(ngModel)]="act.title" />
                         <button
                           class="btn btn--i18n"
                           type="button"
-                          (click)="openTranslationModal(act.hint || '', 'Indiciu: ' + act.id)"
+                          (click)="openTranslationModal(act.title, 'Titlu Activitate: ' + act.id)"
                         >
                           🌐
                         </button>
                       </div>
                       <small class="preview-text"
-                        >RO: "{{ translations.ro[act.hint || ''] || '-' }}"</small
+                        >RO: "{{ translations.ro[act.title] || '-' }}"</small
                       >
                     </div>
-                  }
 
-                  <div class="form-group full-width">
-                    <label class="checkbox-label">
-                      <input type="checkbox" [(ngModel)]="act.isPractical" />
-                      Activitate evaluată (răspunsul greșit scade din viață)
-                    </label>
-                    <small class="preview-text"
-                      >Debifat: un răspuns greșit nu scade din bara de viață.</small
-                    >
-                  </div>
-
-                  <div class="form-group full-width">
-                    <label
-                      >Imagini (Pictures - ex: eclipse.png, map.jpg separate prin virgulă):</label
-                    >
-                    <input
-                      type="text"
-                      [ngModel]="getPicturesString(act)"
-                      (ngModelChange)="updatePicturesFromString(act, $event)"
-                      placeholder="ex: eclipse.png, relief.jpg"
-                    />
-                    <small class="preview-text"
-                      >Imaginile se caută automat în /db/{{ difficulty.toLowerCase() }}/{{
-                        domain.toLowerCase()
-                      }}/pics/</small
-                    >
-                  </div>
-                </div>
-
-                <!-- TYPE SPECIFIC EDITORS -->
-                <div class="type-specific-section">
-                  <!-- MULTIPLE_CHOICE -->
-                  @if (act.type === 'MULTIPLE_CHOICE' || act.type === 'PUZZLE') {
-                    <div class="sub-section">
-                      <div class="sub-section-header">
-                        <h4>Variante de Răspuns (Options)</h4>
+                    <div class="form-group full-width">
+                      <label>Descriere Introductivă (Concept didactic - Cheie i18n):</label>
+                      <div class="i18n-input-row">
+                        <input type="text" [(ngModel)]="act.description" />
                         <button
-                          class="btn btn--small btn--primary"
+                          class="btn btn--i18n"
                           type="button"
-                          (click)="addOption(act)"
+                          (click)="openTranslationModal(act.description, 'Descriere: ' + act.id)"
                         >
-                          + Opțiune
+                          🌐
                         </button>
                       </div>
+                      <small class="preview-text"
+                        >RO: "{{ translations.ro[act.description] || '-' }}"</small
+                      >
+                    </div>
 
-                      <div class="options-list">
-                        @for (opt of act.options; track opt.id; let optIdx = $index) {
-                          <div class="option-row">
-                            <label class="radio-label">
-                              <input
-                                type="radio"
-                                [name]="'ans_' + act.id"
-                                [value]="opt.id"
-                                [(ngModel)]="act.answer"
-                              />
-                              <span class="opt-id-badge">{{ opt.id }}</span>
-                            </label>
-                            <input class="flex-grow" type="text" [(ngModel)]="opt.text" />
-                            <button
-                              class="btn btn--i18n"
-                              type="button"
-                              (click)="openTranslationModal(opt.text, 'Opțiunea ' + opt.id)"
-                            >
-                              🌐
-                            </button>
-                            <span class="preview-mini"
-                              >"{{ translations.ro[opt.text] || '-' }}"</span
-                            >
+                    <div class="form-group full-width">
+                      <label>Întrebare (Cheie i18n):</label>
+                      <div class="i18n-input-row">
+                        <input type="text" [(ngModel)]="act.question" />
+                        <button
+                          class="btn btn--i18n"
+                          type="button"
+                          (click)="openTranslationModal(act.question, 'Întrebare: ' + act.id)"
+                        >
+                          🌐
+                        </button>
+                      </div>
+                      <small class="preview-text"
+                        >RO: "{{ translations.ro[act.question] || '-' }}"</small
+                      >
+                    </div>
+
+                    @if (supportsHint(act.type)) {
+                      <div class="form-group full-width">
+                        <label>Indiciu (Hint - Cheie i18n):</label>
+                        <div class="i18n-input-row">
+                          <input type="text" [(ngModel)]="act.hint" placeholder="opțional" />
+                          <button
+                            class="btn btn--i18n"
+                            type="button"
+                            (click)="openTranslationModal(act.hint || '', 'Indiciu: ' + act.id)"
+                          >
+                            🌐
+                          </button>
+                        </div>
+                        <small class="preview-text"
+                          >RO: "{{ translations.ro[act.hint || ''] || '-' }}"</small
+                        >
+                      </div>
+                    }
+
+                    <div class="form-group full-width">
+                      <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="act.isPractical" />
+                        Activitate evaluată (răspunsul greșit scade din viață)
+                      </label>
+                      <small class="preview-text"
+                        >Debifat: un răspuns greșit nu scade din bara de viață.</small
+                      >
+                    </div>
+
+                    <div class="form-group full-width">
+                      <label
+                        >Imagini (Pictures - ex: eclipse.png, map.jpg separate prin virgulă):</label
+                      >
+                      <input
+                        type="text"
+                        [ngModel]="getPicturesString(act)"
+                        (ngModelChange)="updatePicturesFromString(act, $event)"
+                        placeholder="ex: eclipse.png, relief.jpg"
+                      />
+                      <small class="preview-text"
+                        >Imaginile se caută automat în {{ chapterFolder(mapChapter.id) }}/pics/</small
+                      >
+                    </div>
+                  </div>
+
+                  <!-- TYPE SPECIFIC EDITORS -->
+                  <div class="type-specific-section">
+                    <!-- MULTIPLE_CHOICE -->
+                    @if (act.type === 'MULTIPLE_CHOICE' || act.type === 'PUZZLE') {
+                      <div class="sub-section">
+                        <div class="sub-section-header">
+                          <h4>Variante de Răspuns (Options)</h4>
+                          <button
+                            class="btn btn--small btn--primary"
+                            type="button"
+                            (click)="addOption(act)"
+                          >
+                            + Opțiune
+                          </button>
+                        </div>
+
+                        <div class="options-list">
+                          @for (opt of act.options; track opt.id; let optIdx = $index) {
+                            <div class="option-row">
+                              <label class="radio-label">
+                                <input
+                                  type="radio"
+                                  [name]="'ans_' + act.id"
+                                  [value]="opt.id"
+                                  [(ngModel)]="act.answer"
+                                />
+                                <span class="opt-id-badge">{{ opt.id }}</span>
+                              </label>
+                              <input class="flex-grow" type="text" [(ngModel)]="opt.text" />
+                              <button
+                                class="btn btn--i18n"
+                                type="button"
+                                (click)="openTranslationModal(opt.text, 'Opțiunea ' + opt.id)"
+                              >
+                                🌐
+                              </button>
+                              <span class="preview-mini"
+                                >"{{ translations.ro[opt.text] || '-' }}"</span
+                              >
+                              <button
+                                class="icon-btn icon-btn--danger"
+                                type="button"
+                                (click)="removeOption(act, optIdx)"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          }
+                        </div>
+                        <small class="hint-label"
+                          >Selectează butonul radio din dreptul opțiunii corecte.</small
+                        >
+                      </div>
+                    }
+
+                    <!-- TRUE_FALSE -->
+                    @if (act.type === 'TRUE_FALSE') {
+                      <div class="sub-section">
+                        <h4>Răspuns Corect (True / False):</h4>
+                        <div class="tf-options">
+                          <label class="radio-label">
+                            <input
+                              type="radio"
+                              [name]="'tf_' + act.id"
+                              [value]="true"
+                              [(ngModel)]="act.answer"
+                            />
+                            <span>ADEVĂRAT (True)</span>
+                          </label>
+                          <label class="radio-label">
+                            <input
+                              type="radio"
+                              [name]="'tf_' + act.id"
+                              [value]="false"
+                              [(ngModel)]="act.answer"
+                            />
+                            <span>FALS (False)</span>
+                          </label>
+                        </div>
+                      </div>
+                    }
+
+                    <!-- CLASSIFY -->
+                    @if (act.type === 'CLASSIFY') {
+                      <div class="sub-section">
+                        <div class="classify-grid">
+                          <!-- Categories Column -->
+                          <div class="classify-col">
+                            <div class="sub-section-header">
+                              <h4>Categorii</h4>
+                              <button
+                                class="btn btn--small btn--primary"
+                                type="button"
+                                (click)="addCategory(act)"
+                              >
+                                + Categorie
+                              </button>
+                            </div>
+                            @for (cat of act.categories; track cat.id; let catIdx = $index) {
+                              <div class="option-row">
+                                <input
+                                  style="width: 80px"
+                                  type="text"
+                                  [(ngModel)]="cat.id"
+                                  placeholder="id"
+                                />
+                                <input class="flex-grow" type="text" [(ngModel)]="cat.label" />
+                                <button
+                                  class="btn btn--i18n"
+                                  type="button"
+                                  (click)="openTranslationModal(cat.label, 'Categorie: ' + cat.id)"
+                                >
+                                  🌐
+                                </button>
+                                <button
+                                  class="icon-btn icon-btn--danger"
+                                  type="button"
+                                  (click)="removeCategory(act, catIdx)"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            }
+                          </div>
+
+                          <!-- Items Column -->
+                          <div class="classify-col">
+                            <div class="sub-section-header">
+                              <h4>Elemente & Categorie Țintă (Answer)</h4>
+                              <button
+                                class="btn btn--small btn--primary"
+                                type="button"
+                                (click)="addClassifyItem(act)"
+                              >
+                                + Element
+                              </button>
+                            </div>
+                            @for (item of act.items; track item.id; let itemIdx = $index) {
+                              <div class="option-row">
+                                <input
+                                  style="width: 70px"
+                                  type="text"
+                                  [(ngModel)]="item.id"
+                                  placeholder="id"
+                                />
+                                <input class="flex-grow" type="text" [(ngModel)]="item.label" />
+                                <button
+                                  class="btn btn--i18n"
+                                  type="button"
+                                  (click)="
+                                    openTranslationModal(item.label || '', 'Element: ' + item.id)
+                                  "
+                                >
+                                  🌐
+                                </button>
+                                <select
+                                  [ngModel]="getClassifyAnswer(act, item.id)"
+                                  (ngModelChange)="updateClassifyAnswer(act, item.id, $event)"
+                                >
+                                  @for (cat of act.categories; track cat.id) {
+                                    <option [value]="cat.id">
+                                      {{ cat.id }} ({{ translations.ro[cat.label] || cat.label }})
+                                    </option>
+                                  }
+                                </select>
+                                <button
+                                  class="icon-btn icon-btn--danger"
+                                  type="button"
+                                  (click)="removeClassifyItem(act, itemIdx)"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+                    <!-- MATCHING -->
+                    @if (act.type === 'MATCHING') {
+                      <div class="sub-section">
+                        <div class="sub-section-header">
+                          <h4>Perechi de Potrivire (Pairs)</h4>
+                          <button
+                            class="btn btn--small btn--primary"
+                            type="button"
+                            (click)="addPair(act)"
+                          >
+                            + Pereche
+                          </button>
+                        </div>
+
+                        @for (pair of act.pairs; track pair.id; let pairIdx = $index) {
+                          <div class="pair-row">
+                            <span class="opt-id-badge">{{ pair.id }}</span>
+                            <div class="pair-inputs">
+                              <div class="i18n-input-row">
+                                <label>Stânga:</label>
+                                <input type="text" [(ngModel)]="pair.left" />
+                                <button
+                                  class="btn btn--i18n"
+                                  type="button"
+                                  (click)="openTranslationModal(pair.left, 'Stânga: ' + pair.id)"
+                                >
+                                  🌐
+                                </button>
+                              </div>
+                              <div class="i18n-input-row pair-image-input-row">
+                                <label>Imagine:</label>
+                                <input
+                                  type="text"
+                                  [(ngModel)]="pair.image"
+                                  placeholder="ex: compass.png"
+                                />
+                              </div>
+                              <div class="i18n-input-row">
+                                <label>Dreapta:</label>
+                                <input type="text" [(ngModel)]="pair.right" />
+                                <button
+                                  class="btn btn--i18n"
+                                  type="button"
+                                  (click)="openTranslationModal(pair.right, 'Dreapta: ' + pair.id)"
+                                >
+                                  🌐
+                                </button>
+                              </div>
+                            </div>
                             <button
                               class="icon-btn icon-btn--danger"
                               type="button"
-                              (click)="removeOption(act, optIdx)"
+                              (click)="removePair(act, pairIdx)"
                             >
                               🗑️
                             </button>
                           </div>
                         }
                       </div>
-                      <small class="hint-label"
-                        >Selectează butonul radio din dreptul opțiunii corecte.</small
-                      >
-                    </div>
-                  }
+                    }
 
-                  <!-- TRUE_FALSE -->
-                  @if (act.type === 'TRUE_FALSE') {
-                    <div class="sub-section">
-                      <h4>Răspuns Corect (True / False):</h4>
-                      <div class="tf-options">
-                        <label class="radio-label">
-                          <input
-                            type="radio"
-                            [name]="'tf_' + act.id"
-                            [value]="true"
-                            [(ngModel)]="act.answer"
-                          />
-                          <span>ADEVĂRAT (True)</span>
-                        </label>
-                        <label class="radio-label">
-                          <input
-                            type="radio"
-                            [name]="'tf_' + act.id"
-                            [value]="false"
-                            [(ngModel)]="act.answer"
-                          />
-                          <span>FALS (False)</span>
-                        </label>
-                      </div>
-                    </div>
-                  }
+                    <!-- ORDERING -->
+                    @if (act.type === 'ORDERING') {
+                      <div class="sub-section">
+                        <div class="sub-section-header">
+                          <h4>Elemente Ordonabile (În ordinea corectă de la 1 la N)</h4>
+                          <button
+                            class="btn btn--small btn--primary"
+                            type="button"
+                            (click)="addOrderingItem(act)"
+                          >
+                            + Element
+                          </button>
+                        </div>
 
-                  <!-- CLASSIFY -->
-                  @if (act.type === 'CLASSIFY') {
-                    <div class="sub-section">
-                      <div class="classify-grid">
-                        <!-- Categories Column -->
-                        <div class="classify-col">
-                          <div class="sub-section-header">
-                            <h4>Categorii</h4>
+                        @for (item of act.items; track item.id; let oIdx = $index) {
+                          <div class="option-row">
+                            <span class="opt-id-badge">#{{ oIdx + 1 }} ({{ item.id }})</span>
+                            <input class="flex-grow" type="text" [(ngModel)]="item.text" />
                             <button
-                              class="btn btn--small btn--primary"
+                              class="btn btn--i18n"
                               type="button"
-                              (click)="addCategory(act)"
+                              (click)="
+                                openTranslationModal(item.text || '', 'Element Ordine: ' + item.id)
+                              "
                             >
-                              + Categorie
+                              🌐
+                            </button>
+                            <span class="preview-mini"
+                              >"{{ translations.ro[item.text || ''] || '-' }}"</span
+                            >
+                            <button
+                              class="icon-btn icon-btn--danger"
+                              type="button"
+                              (click)="removeOrderingItem(act, oIdx)"
+                            >
+                              🗑️
                             </button>
                           </div>
-                          @for (cat of act.categories; track cat.id; let catIdx = $index) {
-                            <div class="option-row">
-                              <input
-                                style="width: 80px"
-                                type="text"
-                                [(ngModel)]="cat.id"
-                                placeholder="id"
-                              />
-                              <input class="flex-grow" type="text" [(ngModel)]="cat.label" />
-                              <button
-                                class="btn btn--i18n"
-                                type="button"
-                                (click)="openTranslationModal(cat.label, 'Categorie: ' + cat.id)"
-                              >
-                                🌐
-                              </button>
-                              <button
-                                class="icon-btn icon-btn--danger"
-                                type="button"
-                                (click)="removeCategory(act, catIdx)"
-                              >
-                                🗑️
-                              </button>
-                            </div>
-                          }
-                        </div>
+                        }
+                      </div>
+                    }
 
-                        <!-- Items Column -->
-                        <div class="classify-col">
-                          <div class="sub-section-header">
-                            <h4>Elemente & Categorie Țintă (Answer)</h4>
-                            <button
-                              class="btn btn--small btn--primary"
-                              type="button"
-                              (click)="addClassifyItem(act)"
-                            >
-                              + Element
-                            </button>
+                    <!-- PUZZLE -->
+                    @if (act.type === 'PUZZLE') {
+                      <div class="sub-section">
+                        <h4>Imagine Puzzle (3x3)</h4>
+                        <small class="hint-label">
+                          Se folosește prima imagine din câmpul "Imagini" de mai sus. Va fi tăiată
+                          în 9 piese amestecate, iar întrebarea cu variante de mai sus apare abia
+                          după ce puzzle-ul este reconstituit.
+                        </small>
+
+                        @if (getPuzzleImageUrl(act); as puzzleUrl) {
+                          <div class="puzzle-preview">
+                            <img [src]="puzzleUrl" alt="Previzualizare puzzle" />
                           </div>
-                          @for (item of act.items; track item.id; let itemIdx = $index) {
-                            <div class="option-row">
-                              <input
-                                style="width: 70px"
-                                type="text"
-                                [(ngModel)]="item.id"
-                                placeholder="id"
-                              />
-                              <input class="flex-grow" type="text" [(ngModel)]="item.label" />
-                              <button
-                                class="btn btn--i18n"
-                                type="button"
-                                (click)="
-                                  openTranslationModal(item.label || '', 'Element: ' + item.id)
-                                "
-                              >
-                                🌐
-                              </button>
-                              <select
-                                [ngModel]="getClassifyAnswer(act, item.id)"
-                                (ngModelChange)="updateClassifyAnswer(act, item.id, $event)"
-                              >
-                                @for (cat of act.categories; track cat.id) {
-                                  <option [value]="cat.id">
-                                    {{ cat.id }} ({{ translations.ro[cat.label] || cat.label }})
-                                  </option>
-                                }
-                              </select>
-                              <button
-                                class="icon-btn icon-btn--danger"
-                                type="button"
-                                (click)="removeClassifyItem(act, itemIdx)"
-                              >
-                                🗑️
-                              </button>
-                            </div>
-                          }
-                        </div>
+                        } @else {
+                          <p class="preview-text">
+                            Adaugă o imagine în câmpul "Imagini" pentru a vedea previzualizarea.
+                          </p>
+                        }
                       </div>
-                    </div>
-                  }
-
-                  <!-- MATCHING -->
-                  @if (act.type === 'MATCHING') {
-                    <div class="sub-section">
-                      <div class="sub-section-header">
-                        <h4>Perechi de Potrivire (Pairs)</h4>
-                        <button
-                          class="btn btn--small btn--primary"
-                          type="button"
-                          (click)="addPair(act)"
-                        >
-                          + Pereche
-                        </button>
-                      </div>
-
-                      @for (pair of act.pairs; track pair.id; let pairIdx = $index) {
-                        <div class="pair-row">
-                          <span class="opt-id-badge">{{ pair.id }}</span>
-                          <div class="pair-inputs">
-                            <div class="i18n-input-row">
-                              <label>Stânga:</label>
-                              <input type="text" [(ngModel)]="pair.left" />
-                              <button
-                                class="btn btn--i18n"
-                                type="button"
-                                (click)="openTranslationModal(pair.left, 'Stânga: ' + pair.id)"
-                              >
-                                🌐
-                              </button>
-                            </div>
-                            <div class="i18n-input-row pair-image-input-row">
-                              <label>Imagine:</label>
-                              <input
-                                type="text"
-                                [(ngModel)]="pair.image"
-                                placeholder="ex: compass.png"
-                              />
-                            </div>
-                            <div class="i18n-input-row">
-                              <label>Dreapta:</label>
-                              <input type="text" [(ngModel)]="pair.right" />
-                              <button
-                                class="btn btn--i18n"
-                                type="button"
-                                (click)="openTranslationModal(pair.right, 'Dreapta: ' + pair.id)"
-                              >
-                                🌐
-                              </button>
-                            </div>
-                          </div>
-                          <button
-                            class="icon-btn icon-btn--danger"
-                            type="button"
-                            (click)="removePair(act, pairIdx)"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      }
-                    </div>
-                  }
-
-                  <!-- ORDERING -->
-                  @if (act.type === 'ORDERING') {
-                    <div class="sub-section">
-                      <div class="sub-section-header">
-                        <h4>Elemente Ordonabile (În ordinea corectă de la 1 la N)</h4>
-                        <button
-                          class="btn btn--small btn--primary"
-                          type="button"
-                          (click)="addOrderingItem(act)"
-                        >
-                          + Element
-                        </button>
-                      </div>
-
-                      @for (item of act.items; track item.id; let oIdx = $index) {
-                        <div class="option-row">
-                          <span class="opt-id-badge">#{{ oIdx + 1 }} ({{ item.id }})</span>
-                          <input class="flex-grow" type="text" [(ngModel)]="item.text" />
-                          <button
-                            class="btn btn--i18n"
-                            type="button"
-                            (click)="
-                              openTranslationModal(item.text || '', 'Element Ordine: ' + item.id)
-                            "
-                          >
-                            🌐
-                          </button>
-                          <span class="preview-mini"
-                            >"{{ translations.ro[item.text || ''] || '-' }}"</span
-                          >
-                          <button
-                            class="icon-btn icon-btn--danger"
-                            type="button"
-                            (click)="removeOrderingItem(act, oIdx)"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      }
-                    </div>
-                  }
-
-                  <!-- PUZZLE -->
-                  @if (act.type === 'PUZZLE') {
-                    <div class="sub-section">
-                      <h4>Imagine Puzzle (3x3)</h4>
-                      <small class="hint-label">
-                        Se folosește prima imagine din câmpul "Imagini" de mai sus. Va fi tăiată în
-                        9 piese amestecate, iar întrebarea cu variante de mai sus apare abia după ce
-                        puzzle-ul este reconstituit.
-                      </small>
-
-                      @if (getPuzzleImageUrl(act); as puzzleUrl) {
-                        <div class="puzzle-preview">
-                          <img [src]="puzzleUrl" alt="Previzualizare puzzle" />
-                        </div>
-                      } @else {
-                        <p class="preview-text">
-                          Adaugă o imagine în câmpul "Imagini" pentru a vedea previzualizarea.
-                        </p>
-                      }
-                    </div>
-                  }
+                    }
+                  </div>
                 </div>
-              </div>
-            } @else {
-              <div class="empty-state">
-                <p>Selectează o activitate din lista din stânga sau adaugă una nouă mai sus.</p>
-              </div>
-            }
-          </div>
+              } @else {
+                <div class="empty-state">
+                  <p>Selectează o activitate din lista din stânga sau adaugă una nouă mai sus.</p>
+                </div>
+              }
+            </div>
           }
         } @else {
           <div class="empty-state">
@@ -849,7 +855,7 @@
     <section class="raw-preview-container">
       <div class="raw-column">
         <h3>db.json</h3>
-        <pre><code>{{ db | json }}</code></pre>
+        <pre><code>{{ currentChapterFile() | json }}</code></pre>
       </div>
       <div class="raw-column">
         <h3>i18n/ro.json</h3>
