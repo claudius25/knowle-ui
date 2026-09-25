@@ -66,6 +66,11 @@ export class GameService {
     return this.chapterService.hasSavedSession;
   }
 
+  /** Chapter the interrupted run belongs to, if any. */
+  get savedChapterId(): string | null {
+    return this.chapterService.savedChapterId;
+  }
+
   loadChapters(): Observable<readonly GameChapter[]> {
     return this.mapService.loadChapters().pipe(
       tap((chapters) => (this.mapChapters = chapters)),

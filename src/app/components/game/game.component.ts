@@ -208,15 +208,20 @@ export class GameComponent implements OnInit, OnDestroy {
     const chapterId = this.route.snapshot.queryParamMap.get('chapter');
     const random = this.route.snapshot.queryParamMap.get('mode') === 'random';
 
-    // Picking a chapter explicitly always begins a fresh run.
-    const session =
-      !chapterId && this.game.hasSavedChapter
-        ? this.game.resumeChapter()
-        : this.game.startChapter(chapterId ?? '', {
-            difficulty: 'EASY',
-            domain: 'geography',
-            random,
-          });
+    // Re-entering the chapter that was left unfinished picks it back up; a random
+    // run or any other chapter begins from scratch.
+    const canResume =
+      !random &&
+      this.game.hasSavedChapter &&
+      (!chapterId || chapterId === this.game.savedChapterId);
+
+    const session = canResume
+      ? this.game.resumeChapter()
+      : this.game.startChapter(chapterId ?? '', {
+          difficulty: 'EASY',
+          domain: 'geography',
+          random,
+        });
 
     session.subscribe({
       error: () => {

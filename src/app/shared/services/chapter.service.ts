@@ -142,6 +142,11 @@ export class ChapterService {
     return this.readSnapshot() !== null;
   }
 
+  /** Chapter the stored session belongs to, if any. */
+  get savedChapterId(): string | null {
+    return this.readSnapshot()?.chapterId ?? null;
+  }
+
   /** Restores the stored session and re-serves the activity it was interrupted on. */
   resumeSession(): Observable<ActivityModel> {
     const snapshot = this.readSnapshot();
