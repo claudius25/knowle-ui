@@ -207,11 +207,14 @@ export class GameComponent implements OnInit, OnDestroy {
 
     const chapterId = this.route.snapshot.queryParamMap.get('chapter');
     const random = this.route.snapshot.queryParamMap.get('mode') === 'random';
+    // Debug helper: ?activity=3 (1-based index) or ?activity=<activityId>.
+    const startFrom = this.route.snapshot.queryParamMap.get('activity') ?? undefined;
 
     // Re-entering the chapter that was left unfinished picks it back up; a random
-    // run or any other chapter begins from scratch.
+    // run, an explicit activity or any other chapter begins from scratch.
     const canResume =
       !random &&
+      !startFrom &&
       this.game.hasSavedChapter &&
       (!chapterId || chapterId === this.game.savedChapterId);
 
@@ -221,6 +224,7 @@ export class GameComponent implements OnInit, OnDestroy {
           difficulty: 'EASY',
           domain: 'geography',
           random,
+          startFrom,
         });
 
     session.subscribe({

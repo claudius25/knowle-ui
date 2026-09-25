@@ -89,7 +89,12 @@ export class GameService {
   /** Starts a run of the given chapter; without an id the first playable one is used. */
   startChapter(
     chapterId: string,
-    options: { difficulty?: Difficulty; domain?: string; random?: boolean } = {},
+    options: {
+      difficulty?: Difficulty;
+      domain?: string;
+      random?: boolean;
+      startFrom?: string | number;
+    } = {},
   ): Observable<ActivityModel> {
     const start = (id: string) =>
       this.chapterService.startSession({
@@ -97,6 +102,7 @@ export class GameService {
         difficulty: options.difficulty,
         domain: options.domain,
         random: options.random,
+        startFrom: options.startFrom,
       });
 
     if (chapterId) {

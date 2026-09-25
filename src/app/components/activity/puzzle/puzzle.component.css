@@ -13,6 +13,8 @@
   padding: 6px;
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.2);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .puzzle-board--solved {
@@ -59,8 +61,22 @@
   transition: transform 220ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.puzzle-question {
-  margin-top: 12px;
+.puzzle-question .answers {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+/* An odd number of options leaves the last one spanning both columns. */
+.puzzle-question .answers:not(.answers--two-columns) .answer-card:last-child {
+  grid-column: 1 / -1;
+}
+
+.puzzle-question .answer-card {
+  min-height: 52px;
+  gap: 8px;
+  padding: 10px 12px !important;
+  font-size: 0.9rem;
+  border-radius: 12px;
 }
 
 .puzzle-question h2 {

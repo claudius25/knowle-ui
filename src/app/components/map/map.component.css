@@ -167,6 +167,11 @@
   grid-area: 1 / 1;
 }
 
+.map-node--locked .map-card__art {
+  filter: grayscale(1);
+  opacity: 0.65;
+}
+
 .map-card__text {
   display: flex;
   flex: 1;

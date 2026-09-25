@@ -35,16 +35,6 @@
   @if (activity.data.description) {
     <div class="question-description-row">
       <p class="question-description">{{ activity.data.description }}</p>
-      <button
-        class="speak-btn"
-        type="button"
-        [class.speaking]="isSpeaking$ | async"
-        (click)="speak()"
-        [attr.aria-label]="uiText.text('audioListen', 'Ascultă')"
-        title="Ascultă descrierea"
-      >
-        <mat-icon>record_voice_over</mat-icon>
-      </button>
     </div>
   }
 </div>
